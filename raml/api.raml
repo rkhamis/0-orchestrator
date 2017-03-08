@@ -178,15 +178,31 @@ types:
             'CIDR':
               Assign static IP to the link
 
+  MountMapping:
+    properties:
+      source: string
+      destination: string
+
+  PortMapping:
+    properties:
+      source: integer
+      destination: integer
+
   CoreX:
     type: object
     properties:
       id:
         description: identifier
         type: string
+      hostname:
+        description: Hostname for the CoreX
+        type: string
+      root_url:
+        type: string
+        description: The root filesystem plist
       mounts:
         description: Mapping of mounts
-        type: object
+        type: MountMapping[]
       zerotier:
         description: Zerotier network id
         type: string
@@ -195,8 +211,9 @@ types:
         type: Bridge[]
         displayName: Bridge mapping
       ports:
-         type: object
-         displayName: Port mMapping
+         type: PortMapping[]
+         displayName: Port Mapping
+         description: Maps ports from container to host
 /core0:
   displayName: Nodes
   get:
