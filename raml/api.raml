@@ -23,9 +23,64 @@ types:
       flags: string[]
       mhz: number
 
-  Memory:
-    type: object
+  MemInfo:
     properties:
+      active: integer
+      available: integer
+      buffers: integer
+      cached: integer
+      free: integer
+      inactive: integer
+      total: integer
+      used: integer
+      usedPercent: number
+      wired: integer
+
+  OSInfo:
+    properties:
+      bootTime: integer
+      hostname: string
+      os: string
+      platform: string
+      platformFamily: string
+      platformVersion: string
+      procs: integer
+      uptime: integer
+      virtualizationRole: string
+      virtualizationSystem: string
+
+  Nic:
+    properties:
+      addrs: string[]
+      flags: string[]
+      hardwareaddr: string
+      mtu: integer
+      name: string
+
+  Disk:
+    properties:
+      device: string
+      fstype: string
+      mountpoint: string
+      opts: string
+
+  ProcessCommand:
+    properties:
+      arguments: string[]
+      name: string
+      command: string
+      id: string
+      queue: string
+      tags: string
+
+  Process:
+    properties:
+      cmd: ProcessCommand
+      cpu: number
+      debug: string
+      rss: number
+      swap: number
+      vms: number
 
   KVMCPU:
     type: object
@@ -233,3 +288,19 @@ types:
             body:
               application/json:
                 type: OSInfo
+
+  /process:
+     get:
+       displayName: Get Processes
+       description: Get processes
+       responses:
+         200:
+           body:
+             application/json:
+               type: Process[]
+    /{id}:
+      delete:
+        displayName: Kill Process
+        description: Kill Process
+        response:
+           204:
