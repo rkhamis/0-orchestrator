@@ -2,3 +2,175 @@
 title: G8OS Stateless GRID API
 version: v0.1.0
 mediaType:  application/json
+
+
+types:
+  Node:
+    properties:
+      id: string
+      hostname: string
+
+
+  CPU:
+    properties:
+      cacheSize: integer
+      coreId: integer
+      cores: integer
+      cpu: integer
+      family: string
+      flags: string[]
+      mhz: number
+
+  Memory:
+    properties:
+
+  Domain:
+    properties:
+      id: string
+      xml: string
+
+  Bridge:
+     properties:
+       name:
+         displayName: Name
+         description: Name of the bridge
+       config:
+         displayName: Bridge config
+         description: |
+            '' or 'none':
+              no IP is gonna be set on the link
+            'dhcp':
+              Run `udhcpc` on the container link, of course this will
+              only work if the `bridge` is created with `dnsmasq` networking
+            'CIDR':
+              Assign static IP to the link
+
+  CoreX:
+    properties:
+      id:
+        description: identifier
+        type: string
+      mounts:
+        description: Mapping of mounts
+        type: object
+      zerotier:
+        description: Zerotier network id
+        type: string
+        required: false
+      bridges:
+        type: Bridge[]
+        displayName: Bridge mapping
+      ports:
+         type: object
+         displayName: Port mMapping
+/core0:
+  displayName: Nodes
+  get:
+    displayName: List Nodes
+    description: List Nodes
+    responses:
+      200:
+        body:
+          application/json:
+            type: Node[]
+  /domain:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: Node[]
+        description: TODO
+    post:
+      body:
+        application/json:
+          type: Domain
+      responses:
+        200:
+          body:
+            application/json:
+              type: Domain
+        description: TODO
+    /{id}:
+      delete:
+        displayName: Delete Domain
+        description: Delete a domain by id
+      get:
+        displayName: Get Domain
+        description: Get detailed domain object
+        responses:
+          200:
+            body:
+              application/json:
+                type: Domain
+      put:
+        description: TODO
+
+  /coreX:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: Node[]
+        description: TODO
+    post:
+      body:
+        application/json:
+          type: Domain
+      responses:
+        200:
+          body:
+            application/json:
+              type: Domain
+        description: TODO
+    /{id}:
+      delete:
+        displayName: Delete Domain
+        description: Delete a domain by id
+      get:
+        displayName: Get Domain
+        description: Get detailed domain object
+        responses:
+          200:
+            body:
+              application/json:
+                type: Domain
+      put:
+        description: TODO
+  /info:
+    /cpu:
+      get:
+        responses:
+          200:
+            body:
+              application/json:
+                type: CPU[]
+    /disk:
+      get:
+        responses:
+          200:
+            body:
+              application/json:
+                type: Disk[]
+    /mem:
+      get:
+        responses:
+          200:
+            body:
+              application/json:
+                type: MemInfo
+    /nic:
+      get:
+        responses:
+          200:
+            body:
+              application/json:
+                type: Nic[]
+    /os:
+      get:
+        responses:
+          200:
+            body:
+              application/json:
+                type: OSInfo
