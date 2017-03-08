@@ -6,12 +6,14 @@ mediaType:  application/json
 
 types:
   Node:
+    type: object
     properties:
       id: string
       hostname: string
 
 
   CPU:
+    type: object
     properties:
       cacheSize: integer
       coreId: integer
@@ -22,15 +24,71 @@ types:
       mhz: number
 
   Memory:
+    type: object
     properties:
 
-  Domain:
+  KVMCPU:
+    type: object
+    description: Definition of a virtual cpu
     properties:
-      id: string
-      xml: string
+
+  KVMNICZerotierConfiguration:
+    type: object
+    description: Virtual nic zerotier configuration
+    properties:
+      id:
+        type: string
+        description: Zerotier network id
+
+  KVMNICVxLANConfiguration:
+    type: object
+    description: Virtual nic zerotier configuration
+    properties:
+      id:
+        type: integer
+        description: VxLAN id
+
+  KVMNIC:
+    type: object
+    description: Definition of a virtual nic
+    properties:
+      type:
+        description: Type of network to which the nic is connected
+        enum: ['VxLAN', 'Zerotier']
+      configuration:
+        type: (KVMNICZerotierConfiguration | KVMNICVxLANConfiguration)
+
+  KVMDisk:
+    type: object
+    description: Definition of a virtual disk
+    properties:
+      maxIOps:
+        description: Maximum amount of iops the virtual disk should deliver
+        type: integer
+      url:
+        description: URL to the disk
+        type: string
+
+  KVMDomain:
+    type: object
+    properties:
+      name: string
+      memory:
+        description: Amount of memory in MiB
+        type: integer
+      cpu:
+        description: List of virtual cpus
+        type: KVMCPU[]
+      nic:
+        description: List of virtual nics
+        type: KVMNIC[]
+      disk:
+        description: List of virtual disks
+        type: KVMDisk[]
 
   Bridge:
-     properties:
+    type: object
+    properties:
        name:
          displayName: Name
          description: Name of the bridge
@@ -46,6 +104,7 @@ types:
               Assign static IP to the link
 
   CoreX:
+    type: object
     properties:
       id:
         description: identifier
