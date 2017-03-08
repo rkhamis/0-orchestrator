@@ -24,6 +24,7 @@ types:
       mhz: number
 
   MemInfo:
+    type: object
     properties:
       active: integer
       available: integer
@@ -37,6 +38,7 @@ types:
       wired: integer
 
   OSInfo:
+    type: object
     properties:
       bootTime: integer
       hostname: string
@@ -50,21 +52,38 @@ types:
       virtualizationSystem: string
 
   Nic:
+    type: object
+    description: Information about network interface
     properties:
-      addrs: string[]
+      addrs:
+        type: string[]
+        description: List of IP Addresses
       flags: string[]
-      hardwareaddr: string
+      hardwareaddr:
+        type: string
+        description: Hardware address of network interface
       mtu: integer
       name: string
 
   Disk:
+    type: object
+    description: Information about disk
     properties:
-      device: string
-      fstype: string
-      mountpoint: string
-      opts: string
+      device:
+        type: string
+        description: Name of the device
+      fstype:
+        type: string
+        description: Type of filesystem
+      mountpoint:
+        type: string
+        description: Mountpoint of the device
+      opts:
+        type: string
+        description: Mount options
 
   ProcessCommand:
+    type: object
     properties:
       arguments: string[]
       name: string
@@ -74,6 +93,7 @@ types:
       tags: string
 
   Process:
+    type: object
     properties:
       cmd: ProcessCommand
       cpu: number
@@ -187,120 +207,115 @@ types:
         body:
           application/json:
             type: Node[]
-  /domain:
-    get:
-      responses:
-        200:
-          body:
-            application/json:
-              type: Node[]
-        description: TODO
-    post:
-      body:
-        application/json:
-          type: Domain
-      responses:
-        200:
-          body:
-            application/json:
-              type: Domain
-        description: TODO
-    /{id}:
-      delete:
-        displayName: Delete Domain
-        description: Delete a domain by id
+  /{id}:
+    /kvmdomain:
       get:
-        displayName: Get Domain
-        description: Get detailed domain object
         responses:
           200:
             body:
               application/json:
-                type: Domain
-      put:
-        description: TODO
+                type: Node[]
+      post:
+        body:
+          application/json:
+            type: KVMDomain
+        responses:
+          200:
+            body:
+              application/json:
+                type: KVMDomain
+      /{id}:
+        delete:
+          displayName: Delete Domain
+          description: Delete a domain by id
+        get:
+          displayName: Get Domain
+          description: Get detailed domain object
+          responses:
+            200:
+              body:
+                application/json:
+                  type: KVMDomain
+        put:
+          description: TODO
 
-  /coreX:
-    get:
-      responses:
-        200:
-          body:
-            application/json:
-              type: Node[]
-        description: TODO
-    post:
-      body:
-        application/json:
-          type: Domain
-      responses:
-        200:
-          body:
-            application/json:
-              type: Domain
-        description: TODO
-    /{id}:
-      delete:
-        displayName: Delete Domain
-        description: Delete a domain by id
-      get:
-        displayName: Get Domain
-        description: Get detailed domain object
-        responses:
-          200:
-            body:
-              application/json:
-                type: Domain
-      put:
-        description: TODO
-  /info:
-    /cpu:
+    /coreX:
       get:
         responses:
           200:
             body:
               application/json:
-                type: CPU[]
-    /disk:
-      get:
+                type: CoreX[]
+      post:
+        body:
+          application/json:
+            type: CoreX
         responses:
           200:
             body:
               application/json:
-                type: Disk[]
-    /mem:
-      get:
-        responses:
-          200:
-            body:
-              application/json:
-                type: MemInfo
-    /nic:
-      get:
-        responses:
-          200:
-            body:
-              application/json:
-                type: Nic[]
-    /os:
-      get:
-        responses:
-          200:
-            body:
-              application/json:
-                type: OSInfo
+                type: CoreX
+      /{id}:
+        delete:
+          displayName: Delete CoreX instance
+          description: Delete a CoreX instance its id
+        get:
+          displayName: Get Corex
+          description: Get detailed CoreX object
+          responses:
+            200:
+              body:
+                application/json:
+                  type: CoreX
+    /info:
+      /cpu:
+        get:
+          responses:
+            200:
+              body:
+                application/json:
+                  type: CPU[]
+      /disk:
+        get:
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Disk[]
+      /mem:
+        get:
+          responses:
+            200:
+              body:
+                application/json:
+                  type: MemInfo
+      /nic:
+        get:
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Nic[]
+      /os:
+        get:
+          responses:
+            200:
+              body:
+                application/json:
+                  type: OSInfo
 
-  /process:
-     get:
-       displayName: Get Processes
-       description: Get processes
-       responses:
-         200:
-           body:
-             application/json:
-               type: Process[]
-    /{id}:
-      delete:
-        displayName: Kill Process
-        description: Kill Process
-        response:
-           204:
+    /process:
+       get:
+         displayName: Get Processes
+         description: Get processes
+         responses:
+           200:
+             body:
+               application/json:
+                 type: Process[]
+       /{id}:
+         delete:
+           displayName: Kill Process
+           description: Kill Process
+           responses:
+             204:
