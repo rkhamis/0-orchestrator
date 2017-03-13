@@ -87,3 +87,7 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# nim cache
+src/nim/nimcache
+src/nim/g8os/tests/nimcache
