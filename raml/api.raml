@@ -1,30 +1,32 @@
 #%RAML 1.0
-title: G8OS Stateless GRID API
+title: G8OS Stateless GRID
 version: v0.1.0
 mediaType:  application/json
 
-
 types:
-  Node:
+
+  Core0:
     type: object
+    description: Core0 node in the g8os grid
     properties:
       id: string
       hostname: string
 
-
-  CPU:
+  CPUInfo:
     type: object
+    description: Information about physical CPUs
     properties:
       cacheSize: integer
       coreId: integer
       cores: integer
-      cpu: integer
+      CPUInfo: integer
       family: string
       flags: string[]
       mhz: number
 
   MemInfo:
     type: object
+    description: Information about memory
     properties:
       active: integer
       available: integer
@@ -39,6 +41,7 @@ types:
 
   OSInfo:
     type: object
+    description: Information on the operating system
     properties:
       bootTime: integer
       hostname: string
@@ -51,7 +54,7 @@ types:
       virtualizationRole: string
       virtualizationSystem: string
 
-  Nic:
+  NicInfo:
     type: object
     description: Information about network interface
     properties:
@@ -65,9 +68,9 @@ types:
       mtu: integer
       name: string
 
-  Disk:
+  DiskInfo:
     type: object
-    description: Information about disk
+    description: Information about DiskInfo
     properties:
       device:
         type: string
@@ -82,66 +85,282 @@ types:
         type: string
         description: Mount options
 
-  ProcessCommand:
+  DiskExtInfo:
     type: object
+    description: Extended disk information. See https://github.com/karelzak/util-linux/blob/master/misc-utils/lsblk.c#L156
     properties:
-      arguments: string[]
+      alignment: integer
+      disc-aln: integer
+      disc-gran: integer
+      disc-max: integer
+      disc-zero: integer
+      fstype: string
+      group: string
+      hctl: string
+      hotplug: integer
+      kname: string
+      label: string
+      log-sec: integer
+      maj_min: string
+      min-io: integer
+      mode: string
+      model: string
+      mountpoint: string
       name: string
-      command: string
-      id: string
-      queue: string
-      tags: string
+      opt-io: integer
+      owner: string
+      partflags: string
+      partlabel: string
+      parttype: integer
+      partuuid: string
+      phy-sec: integer
+      pkname: string
+      ra: integer
+      rand: integer
+      rev: string
+      rm: integer
+      ro: integer
+      rota: integer
+      rq-size: integer
+      sched: string
+      serial: string
+      size: integer
+      state: string
+      subsystems: string
+      tran: string
+      type: string
+      uuid: string
+      vendor: string
+      wsame: integer
+      wwn: string
+
+  KeyValuePair:
+    type: object
+    description: Key value pair
+    properties:
+      name: string
+      value: string
+
+  PortMap:
+    type: object
+    description: Port mapping
+    properties:
+      core0port: integer
+      coreXport: integer
+
+  CoreSystemArguments:
+    type: object
+    description: Arguments for a core.system command
+    properties:
+      name:
+        description: Name of the executable that needs to be run
+        type: string
+      pwd:
+        description: Directory in which the process needs to be started
+        type: string
+      args:
+        description: List of commandline arguments
+        type: string[]
+      environment:
+        description: Environment variables of the process
+        type: KeyValuePair[]
+      stdin:
+        description: Data that needs to be passed into the stdin of the started process
+        type: string
+
+  CoreKillArguments:
+    type: object
+    description: Arguments for a core.kill command
+    properties:
+      id:
+        description: Id of the command that should be killed
+        type: string
+
+  CoreXCreateArguments:
+    type: object
+    description: Arguments for a corex.create command
+    properties:
+      name:
+        description: Hostname for the container
+        type: string
+      plist:
+        description: Url to plist for the root filesystem
+        type: string
+      mounts:
+        description: Key value pairs of host directory to container directory (Core0 to CoreX)
+        type: KeyValuePair[]
+      zerotierNetworks:
+        required: false
+        description: List of zerotiernetworks in which the coreX schould be present
+        type: string[]
+      networkBridges:
+        required: false
+        description: List of existing core0 bridges that should be exposed to the coreX
+        type: Bridge[]
+      portMaps:
+        description: List of core0/coreX port mappings
+        type: PortMap[]
+
+  CoreXTerminateArguments:
+    type: object
+    description: Arguments for a corex.terminate command
+    properties:
+      coreX:
+        description: Id of the coreX that should be terminated
+        type: integer
+
+  CoreXDispatchArguments:
+    type: object
+    description: Arguments for a corex.dispatch command
+    properties:
+      coreX:
+        description: Id of the coreX to which the command should be dispatched
+        type: integer
+      command: Command
+
+  BridgeCreateArguments:
+    type: object
+    description: Arguments for a bridge.create command
+    properties:
+      name:
+        description: Name for the bridge to be created
+        type: string
+      hwaddr:
+        description: Macaddress for the bridge to be created
+        type: string
+        required: false
+
+  BridgeDeleteArguments:
+    type: object
+    description: Arguments for a bridge.delete command
+    properties:
+      name:
+        description: Name for the bridge to be deleted
+        type: string
+
+  DiskMKTableArguments:
+    description: Arguments for a disk.mktable command
+    properties:
+      device: string
+      tableType:
+        description: Any value that is supported by parted mktable
+        type: string
+
+  DiskCreatePartitionArguments:
+    description: |
+      Arguments for a disk.mkpart command
+      part_type, start & end values must be supported by the parted mkpart command
+    properties:
+      part_type: string
+      start:
+        type: integer
+        displayName: Start sector
+      end:
+        type: string
+        displayName: End sector, can be number or percentage (eg 80%)
+
+  DiskMountArguments:
+    description: Arguments for a disk.mount command
+    properties:
+      options:
+        displayName: Mount options
+        type: string
+      target:
+        displayName: Location to mount disk or partition
+        type: string
+
+  Command:
+    type: object
+    description: Command that can be executed in the Core0/CoreX. More information can be found here https://github.com/g8os/core0/blob/master/docs/commands.md
+    properties:
+      id:
+        description: A unique id for the command with which later on results can be retrieved. If not supplied an id will be generated.
+        type: string
+        required: false
+      queue:
+        description: Name of the queue in which this command should be enqued.
+        type: string
+        required: false
+      tags:
+        description: Metadata that can be submitted together with the command and is returned with the result.
+        type: string
+        required: false
+      statsInterval:
+        description: Stats gathering interval.
+        default: 0
+        required: false
+        type: integer
+      maxTime:
+        description: Max run time of the command, if exceeded command will be killed
+        default: 0
+        required: false
+        type: integer
+      maxRestart:
+        description: Max number of retries to start the command if failed before giving up.
+        default: 0
+        required: false
+        type: integer
+      recurringPeriod:
+        description: If provided command is executed every X seconds.
+        default: 0
+        required: false
+        type: integer
+      logLevels:
+        description: Log levels to store locally and not discard.
+        type: integer[]
+        default: [0]
+        required: false
 
   Process:
     type: object
     properties:
-      cmd: ProcessCommand
-      cpu: number
+      cmd: Command
+      CPUInfo: number
       debug: string
       rss: number
       swap: number
       vms: number
 
-  KVMCPU:
+  KVMCPUInfo:
     type: object
-    description: Definition of a virtual cpu
+    description: Definition of a virtual CPUInfo
     properties:
 
-  KVMNICZerotierConfiguration:
+  KVMNicInfoZerotierConfiguration:
     type: object
-    description: Virtual nic zerotier configuration
+    description: Virtual NicInfo zerotier configuration
     properties:
       id:
         type: string
         description: Zerotier network id
 
-  KVMNICVxLANConfiguration:
+  KVMNicInfoVxLANConfiguration:
     type: object
-    description: Virtual nic zerotier configuration
+    description: Virtual NicInfo zerotier configuration
     properties:
       id:
         type: integer
         description: VxLAN id
 
-  KVMNIC:
+  KVMNicInfo:
     type: object
-    description: Definition of a virtual nic
+    description: Definition of a virtual NicInfo
     properties:
       type:
-        description: Type of network to which the nic is connected
+        description: Type of network to which the NicInfo is connected
         enum: ['VxLAN', 'Zerotier']
       configuration:
-        type: (KVMNICZerotierConfiguration | KVMNICVxLANConfiguration)
+        type: (KVMNicInfoZerotierConfiguration | KVMNicInfoVxLANConfiguration)
 
-  KVMDisk:
+  KVMDiskInfo:
     type: object
-    description: Definition of a virtual disk
+    description: Definition of a virtual DiskInfo
     properties:
       maxIOps:
-        description: Maximum amount of iops the virtual disk should deliver
+        description: Maximum amount of iops the virtual DiskInfo should deliver
         type: integer
       url:
-        description: URL to the disk
+        description: URL to the DiskInfo
         type: string
 
   KVMDomain:
@@ -151,15 +370,15 @@ types:
       memory:
         description: Amount of memory in MiB
         type: integer
-      cpu:
-        description: List of virtual cpus
-        type: KVMCPU[]
-      nic:
-        description: List of virtual nics
-        type: KVMNIC[]
-      disk:
-        description: List of virtual disks
-        type: KVMDisk[]
+      CPUInfo:
+        description: List of virtual CPUInfos
+        type: KVMCPUInfo[]
+      NicInfo:
+        description: List of virtual NicInfos
+        type: KVMNicInfo[]
+      DiskInfo:
+        description: List of virtual DiskInfos
+        type: KVMDiskInfo[]
 
   Bridge:
     type: object
@@ -167,6 +386,7 @@ types:
        name:
          displayName: Name
          description: Name of the bridge
+         type: string
        config:
          displayName: Bridge config
          description: |
@@ -177,16 +397,13 @@ types:
               only work if the `bridge` is created with `dnsmasq` networking
             'CIDR':
               Assign static IP to the link
+         type: string
 
   MountMapping:
+    type: object
     properties:
       source: string
       destination: string
-
-  PortMapping:
-    properties:
-      source: integer
-      destination: integer
 
   CoreX:
     type: object
@@ -211,40 +428,192 @@ types:
         type: Bridge[]
         displayName: Bridge mapping
       ports:
-         type: PortMapping[]
+         type: PortMap[]
          displayName: Port Mapping
          description: Maps ports from container to host
+
+  Location:
+    type: object
+    displayName: Url to object details
+    properties:
+      url:
+        displayName: Url to object details
+        type: string
+      id:
+        displayName: Object id
+        type: string
+      name:
+        displayName: Object name
+        type: string
+
+  CommandResult:
+    type: object
+    displayName: Result object of a command
+    properties:
+      id:
+        description: The unique identifier with which the command was executed
+        type: string
+      name:
+        description: The kind of command to which this result belongs to.
+        enum: ['core.ping', 'core.system', 'core.kill', 'core.killall',
+               'core.state', 'core.reboot', 'info.cpu', 'info.disk',
+               'info.mem', 'info.nic', 'info.os', 'corex.create',
+               'corex.list', 'corex.dispatch', 'corex.terminate',
+               'bridge.create', 'bridge.list', 'bridge.delete',
+               'disk.list', 'disk.mktable', 'disk.mkpart', 'disk.rmpart',
+               'disk.mount', 'disk.umount', 'btrfs.create', 'btrfs.list',
+               'btrfs.subvol_create', 'btrfs.subvol_list', 'btrfs.subvol_delete']
+      level:
+        description: 20 means that the data is json serialized object
+        type: string
+      starttime:
+        description: Epoch timestamp when the command was started
+        type: integer
+      state:
+        description: Status of the command
+        enum: ['SCHEDULED', 'RUNNING', 'SUCCES', 'KILLED', 'KILLED_TIMEOUT', 'FAILED']
+      data:
+        description: The result of executing the command
+        type: string
+
+  CoreStateResult:
+    type: object
+    displayName: Result of a core.state command
+    properties:
+      cpu:
+        displayName: percentage cpu used in a core0
+        type: integer
+      rss: integer
+      vms: integer
+      swap: integer
+
 /core0:
-  displayName: Nodes
+  displayName: Core0s
   get:
-    displayName: List Nodes
-    description: List Nodes
+    displayName: List Core0s
     responses:
       200:
         body:
           application/json:
-            type: Node[]
+            type: Location[]
   /{id}:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: Core0
+    /command:
+      displayName: Commands for this Core0
+      get:
+        displayName: List running commands
+        responses:
+          200:
+            body:
+              application/json:
+                type: Location[]
+      /{commandid}:
+        displayName: Get status of command
+        get:
+          responses:
+            200:
+              body:
+                application/json:
+                  type: CommandResult
+    /core:
+      /ping:
+        post:
+          displayName: Execute a ping command to this Core0
+          body:
+            application/json:
+              type: Command
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
+      /system:
+        post:
+          displayName: Execute a new process  on this Core0
+          body:
+            application/json:
+              type: [ Command, CoreSystemArguments ]
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
+      /kill:
+        post:
+          displayName: Kill a process / command
+          body:
+            application/json:
+              type: [ Command, CoreKillArguments ]
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
+      /killall:
+        post:
+          displayName: Kills all running commands
+          body:
+            application/json:
+              type: Command
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
+      /state:
+        get:
+          displayName: The aggregated consumption of core0 + all processes (cpu, memory, etc...)
+          responses:
+            200:
+              body:
+                application/json:
+                  type:
+                    CoreStateResult
+      /reboot:
+        post:
+          displayName: Immediately reboot the machine.
+          body:
+            application/json:
+              type: Command
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
     /kvmdomain:
       get:
+        displayName: List kvmdomain
         responses:
           200:
             body:
               application/json:
-                type: Node[]
+                type: Location[]
       post:
+        displayName: Create a new kvmdomain
         body:
           application/json:
-            type: KVMDomain
+            type: [ Command, KVMDomain ]
         responses:
           200:
             body:
               application/json:
-                type: KVMDomain
-      /{id}:
+                type: Location
+      /{domainid}:
         delete:
           displayName: Delete Domain
-          description: Delete a domain by id
+          body:
+            application/json:
+              type: Command
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
         get:
           displayName: Get Domain
           description: Get detailed domain object
@@ -253,37 +622,50 @@ types:
               body:
                 application/json:
                   type: KVMDomain
-        put:
-          description: TODO
-
-    /coreX:
-      get:
-        responses:
-          200:
+        /start:
+          post:
+            displayName: Start the kvmdomain
             body:
               application/json:
-                type: CoreX[]
-      post:
-        body:
-          application/json:
-            type: CoreX
-        responses:
-          200:
+                type: Command
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location
+        /stop:
+          post:
+            displayName: Gracefully stop the kvmdomain
             body:
               application/json:
-                type: CoreX
-      /{id}:
-        delete:
-          displayName: Delete CoreX instance
-          description: Delete a CoreX instance its id
-        get:
-          displayName: Get Corex
-          description: Get detailed CoreX object
-          responses:
-            200:
-              body:
-                application/json:
-                  type: CoreX
+                type: Command
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location
+        /destroy:
+          post:
+            displayName: Destroy the kvmdomain
+            body:
+              application/json:
+                type: Command
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location
+        /pause:
+          post:
+            displayName: Destroy the kvmdomain
+            body:
+              application/json:
+                type: Command
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location
     /info:
       /cpu:
         get:
@@ -291,14 +673,14 @@ types:
             200:
               body:
                 application/json:
-                  type: CPU[]
+                  type: CPUInfo[]
       /disk:
         get:
           responses:
             200:
               body:
                 application/json:
-                  type: Disk[]
+                  type: DiskInfo[]
       /mem:
         get:
           responses:
@@ -312,7 +694,7 @@ types:
             200:
               body:
                 application/json:
-                  type: Nic[]
+                  type: NicInfo[]
       /os:
         get:
           responses:
@@ -320,19 +702,208 @@ types:
               body:
                 application/json:
                   type: OSInfo
-
     /process:
        get:
          displayName: Get Processes
-         description: Get processes
          responses:
            200:
              body:
                application/json:
-                 type: Process[]
-       /{id}:
+                 type: Location[]
+       /{proccessid}:
+         get:
+           displayName: Get process details
+           responses:
+             200:
+               body:
+                 application/json:
+                   type: Process
          delete:
            displayName: Kill Process
-           description: Kill Process
+           body:
+             application/json:
+               type: Command
            responses:
-             204:
+             200:
+               body:
+                 application/json:
+                   type: Location
+    /bridge:
+      post:
+        displayName: Creates a new bridge
+        body:
+          application/json:
+            type: [ Command, BridgeCreateArguments ]
+        responses:
+          200:
+            body:
+              application/json:
+                type: Location
+      get:
+        displayName: List bridges
+        responses:
+          200:
+            body:
+              application/json:
+                type: Location[]
+      /{bridgeid}:
+        get:
+          displayName: Get bridge details
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Bridge
+        delete:
+          displayName: Remove bridge
+          body:
+            application/json:
+              type: Command
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
+    /disk:
+      get:
+        displayName: List blockdevices present in the Core0
+        responses:
+          200:
+            body:
+              application/json:
+                type: Location[]
+      /{diskidOrdiskserial}:
+        get:
+          displayName: Get disk details
+          responses:
+            200:
+              body:
+                application/json:
+                  type: DiskExtInfo
+      /mktable:
+        post:
+          displayName: Creates a partition table on a blockdevice
+          body:
+            application/json:
+              type: [ Command, DiskMKTableArguments ]
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
+      /mount:
+        post:
+          displayName: Mounts the disk
+          body:
+            application/json:
+              type: [ Command, DiskMountArguments]
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
+      /umount:
+        post:
+          displayName: Unmount the disk
+          body:
+            application/json:
+              type: Command
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
+      /partitions:
+        post:
+          displayName: Create a new partition
+          body:
+            application/json:
+              type: [ Command, DiskCreatePartitionArguments ]
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
+        get:
+          displayName: Lists partitions
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location[]
+        /{partitionid}:
+          get:
+            displayName: Gets partition info. (TODO Needs further speccing)
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: string # Needs further speccing
+          delete:
+            displayName: Removes a partition
+            body:
+              application/json:
+                type: Command
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location
+          /mount:
+            post:
+              displayName: Mounts the partition
+              body:
+                application/json:
+                  type: [ Command, DiskMountArguments]
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: Location
+          /umount:
+            post:
+              displayName: Unmount the partition
+              body:
+                application/json:
+                  type: Command
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: Location
+    /coreX:
+      get:
+        displayName: List running CoreXses
+        responses:
+          200:
+            body:
+              application/json:
+                type: Location[]
+      post:
+        displayName: Create a new CoreX
+        body:
+          application/json:
+            type: [ Command, CoreX ]
+        responses:
+          200:
+            body:
+              application/json:
+                type: Location
+      /{coreXid}:
+        delete:
+          displayName: Delete CoreX instance
+          body:
+            application/json:
+              type: Command
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
+        get:
+          displayName: Get CoreX
+          responses:
+            200:
+              body:
+                application/json:
+                  type: CoreX
