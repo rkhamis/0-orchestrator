@@ -90,30 +90,30 @@ types:
     description: Extended disk information. See https://github.com/karelzak/util-linux/blob/master/misc-utils/lsblk.c#L156
     properties:
       alignment: integer
-      disc-aln: integer
-      disc-gran: integer
-      disc-max: integer
-      disc-zero: integer
+      discAln: integer
+      discGran: integer
+      discMax: integer
+      discZero: integer
       fstype: string
       group: string
       hctl: string
       hotplug: integer
       kname: string
       label: string
-      log-sec: integer
+      logSec: integer
       maj_min: string
-      min-io: integer
+      minIO: integer
       mode: string
       model: string
       mountpoint: string
       name: string
-      opt-io: integer
+      optIO: integer
       owner: string
       partflags: string
       partlabel: string
       parttype: integer
       partuuid: string
-      phy-sec: integer
+      phySec: integer
       pkname: string
       ra: integer
       rand: integer
@@ -121,7 +121,7 @@ types:
       rm: integer
       ro: integer
       rota: integer
-      rq-size: integer
+      rqSize: integer
       sched: string
       serial: string
       size: integer
@@ -918,7 +918,7 @@ types:
         displayName: Create a new CoreX
         body:
           application/json:
-            type: [ Command, CoreX ]
+            type: CoreXCreate
         responses:
           200:
             body:
