@@ -148,7 +148,7 @@ types:
       core0port: integer
       coreXport: integer
 
-  CoreSystemArguments:
+  CoreSystem:
     type: object
     description: Arguments for a core.system command
     properties:
@@ -168,15 +168,19 @@ types:
         description: Data that needs to be passed into the stdin of the started process
         type: string
 
-  CoreKillArguments:
+  CoreKill:
     type: object
     description: Arguments for a core.kill command
     properties:
       id:
         description: Id of the command that should be killed
         type: string
+      command:
+        description: Details how to pass the command to the core0/coreX
+        type: Command
+        required: false
 
-  CoreXCreateArguments:
+  CoreXCreate:
     type: object
     description: Arguments for a corex.create command
     properties:
@@ -200,25 +204,24 @@ types:
       portMaps:
         description: List of core0/coreX port mappings
         type: PortMap[]
+      command:
+        description: Details how to pass the command to the core0/coreX
+        type: Command
+        required: false
 
-  CoreXTerminateArguments:
+  CoreXTerminate:
     type: object
     description: Arguments for a corex.terminate command
     properties:
       coreX:
         description: Id of the coreX that should be terminated
         type: integer
+      command:
+        description: Details how to pass the command to the core0/coreX
+        type: Command
+        required: false
 
-  CoreXDispatchArguments:
-    type: object
-    description: Arguments for a corex.dispatch command
-    properties:
-      coreX:
-        description: Id of the coreX to which the command should be dispatched
-        type: integer
-      command: Command
-
-  BridgeCreateArguments:
+  BridgeCreate:
     type: object
     description: Arguments for a bridge.create command
     properties:
@@ -229,24 +232,36 @@ types:
         description: Macaddress for the bridge to be created
         type: string
         required: false
+      command:
+        description: Details how to pass the command to the core0/coreX
+        type: Command
+        required: false
 
-  BridgeDeleteArguments:
+  BridgeDelete:
     type: object
     description: Arguments for a bridge.delete command
     properties:
       name:
         description: Name for the bridge to be deleted
         type: string
+      command:
+        description: Details how to pass the command to the core0/coreX
+        type: Command
+        required: false
 
-  DiskMKTableArguments:
+  DiskMKTable:
     description: Arguments for a disk.mktable command
     properties:
       device: string
       tableType:
         description: Any value that is supported by parted mktable
         type: string
+      command:
+        description: Details how to pass the command to the core0/coreX
+        type: Command
+        required: false
 
-  DiskCreatePartitionArguments:
+  DiskCreatePartition:
     description: |
       Arguments for a disk.mkpart command
       part_type, start & end values must be supported by the parted mkpart command
@@ -258,16 +273,24 @@ types:
       end:
         type: string
         displayName: End sector, can be number or percentage (eg 80%)
+      command:
+        description: Details how to pass the command to the core0/coreX
+        type: Command
+        required: false
 
-  DiskMountArguments:
+  DiskMount:
     description: Arguments for a disk.mount command
     properties:
-      options:
+      mount_options:
         displayName: Mount options
         type: string
       target:
         displayName: Location to mount disk or partition
         type: string
+      command:
+        description: Details how to pass the command to the core0/coreX
+        type: Command
+        required: false
 
   Command:
     type: object
@@ -363,6 +386,18 @@ types:
         description: URL to the DiskInfo
         type: string
 
+  KVMCreate:
+    type: object
+    displayName:
+    properties:
+      domain:
+        displayName: Details how to setup the new KVM domain
+        type: KVMDomain
+      command:
+        description: Details how to pass the command to the core0/coreX
+        type: Command
+        required: false
+
   KVMDomain:
     type: object
     properties:
@@ -370,13 +405,13 @@ types:
       memory:
         description: Amount of memory in MiB
         type: integer
-      CPUInfo:
+      cpu:
         description: List of virtual CPUInfos
         type: KVMCPUInfo[]
-      NicInfo:
+      nic:
         description: List of virtual NicInfos
         type: KVMNicInfo[]
-      DiskInfo:
+      disk:
         description: List of virtual DiskInfos
         type: KVMDiskInfo[]
 
@@ -537,7 +572,7 @@ types:
           displayName: Execute a new process  on this Core0
           body:
             application/json:
-              type: [ Command, CoreSystemArguments ]
+              type: CoreSystem
           responses:
             200:
               body:
@@ -548,7 +583,7 @@ types:
           displayName: Kill a process / command
           body:
             application/json:
-              type: [ Command, CoreKillArguments ]
+              type: CoreKill
           responses:
             200:
               body:
@@ -597,7 +632,7 @@ types:
         displayName: Create a new kvmdomain
         body:
           application/json:
-            type: [ Command, KVMDomain ]
+            type: KVMCreate
         responses:
           200:
             body:
@@ -733,7 +768,7 @@ types:
         displayName: Creates a new bridge
         body:
           application/json:
-            type: [ Command, BridgeCreateArguments ]
+            type: BridgeCreate
         responses:
           200:
             body:
@@ -785,7 +820,7 @@ types:
             displayName: Creates a partition table on a blockdevice
             body:
               application/json:
-                type: [ Command, DiskMKTableArguments ]
+                type: DiskMKTable
             responses:
               200:
                 body:
@@ -796,7 +831,7 @@ types:
             displayName: Mounts the disk
             body:
               application/json:
-                type: [ Command, DiskMountArguments]
+                type: DiskMount
             responses:
               200:
                 body:
@@ -818,7 +853,7 @@ types:
             displayName: Create a new partition
             body:
               application/json:
-                type: [ Command, DiskCreatePartitionArguments ]
+                type: DiskCreatePartition
             responses:
               200:
                 body:
@@ -854,7 +889,7 @@ types:
                 displayName: Mounts the partition
                 body:
                   application/json:
-                    type: [ Command, DiskMountArguments]
+                    type: DiskMount
                 responses:
                   200:
                     body:
