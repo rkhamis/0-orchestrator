@@ -269,10 +269,10 @@ types:
       part_type: string
       start:
         type: integer
-        displayName: Start sector
+        description: Start sector
       end:
         type: string
-        displayName: End sector, can be number or percentage (eg 80%)
+        description: End sector, can be number or percentage (eg 80%)
       command:
         description: Details how to pass the command to the core0/coreX
         type: Command
@@ -282,10 +282,10 @@ types:
     description: Arguments for a disk.mount command
     properties:
       mount_options:
-        displayName: Mount options
+        description: Mount options
         type: string
       target:
-        displayName: Location to mount disk or partition
+        description: Location to mount disk or partition
         type: string
       command:
         description: Details how to pass the command to the core0/coreX
@@ -388,10 +388,9 @@ types:
 
   KVMCreate:
     type: object
-    displayName:
     properties:
       domain:
-        displayName: Details how to setup the new KVM domain
+        description: Details how to setup the new KVM domain
         type: KVMDomain
       command:
         description: Details how to pass the command to the core0/coreX
@@ -419,11 +418,11 @@ types:
     type: object
     properties:
        name:
-         displayName: Name
+         description: Name
          description: Name of the bridge
          type: string
        config:
-         displayName: Bridge config
+         description: Bridge config
          description: |
             '' or 'none':
               no IP is gonna be set on the link
@@ -461,29 +460,29 @@ types:
         required: false
       bridges:
         type: Bridge[]
-        displayName: Bridge mapping
+        description: Bridge mapping
       ports:
          type: PortMap[]
-         displayName: Port Mapping
+         description: Port Mapping
          description: Maps ports from container to host
 
   Location:
     type: object
-    displayName: Url to object details
+    description: Url to object details
     properties:
       url:
-        displayName: Url to object details
+        description: Url to object details
         type: string
       id:
-        displayName: Object id
+        description: Object id
         type: string
       name:
-        displayName: Object name
+        description: Object name
         type: string
 
   CommandResult:
     type: object
-    displayName: Result object of a command
+    description: Result object of a command
     properties:
       id:
         description: The unique identifier with which the command was executed
@@ -513,19 +512,19 @@ types:
 
   CoreStateResult:
     type: object
-    displayName: Result of a core.state command
+    description: Result of a core.state command
     properties:
       cpu:
-        displayName: percentage cpu used in a core0
+        description: percentage cpu used in a core0
         type: integer
       rss: integer
       vms: integer
       swap: integer
 
 /core0:
-  displayName: Core0s
+  description: Core0s
   get:
-    displayName: List Core0s
+    description: List Core0s
     responses:
       200:
         body:
@@ -539,16 +538,16 @@ types:
             application/json:
               type: Core0
     /command:
-      displayName: Commands for this Core0
+      description: Commands for this Core0
       get:
-        displayName: List running commands
+        description: List running commands
         responses:
           200:
             body:
               application/json:
                 type: Location[]
       /{commandid}:
-        displayName: Get status of command
+        description: Get status of command
         get:
           responses:
             200:
@@ -558,7 +557,7 @@ types:
     /core:
       /ping:
         post:
-          displayName: Execute a ping command to this Core0
+          description: Execute a ping command to this Core0
           body:
             application/json:
               type: Command
@@ -569,7 +568,7 @@ types:
                   type: Location
       /system:
         post:
-          displayName: Execute a new process  on this Core0
+          description: Execute a new process  on this Core0
           body:
             application/json:
               type: CoreSystem
@@ -580,7 +579,7 @@ types:
                   type: Location
       /kill:
         post:
-          displayName: Kill a process / command
+          description: Kill a process / command
           body:
             application/json:
               type: CoreKill
@@ -591,7 +590,7 @@ types:
                   type: Location
       /killall:
         post:
-          displayName: Kills all running commands
+          description: Kills all running commands
           body:
             application/json:
               type: Command
@@ -602,7 +601,7 @@ types:
                   type: Location
       /state:
         get:
-          displayName: The aggregated consumption of core0 + all processes (cpu, memory, etc...)
+          description: The aggregated consumption of core0 + all processes (cpu, memory, etc...)
           responses:
             200:
               body:
@@ -611,7 +610,7 @@ types:
                     CoreStateResult
       /reboot:
         post:
-          displayName: Immediately reboot the machine.
+          description: Immediately reboot the machine.
           body:
             application/json:
               type: Command
@@ -622,14 +621,14 @@ types:
                   type: Location
     /kvmdomain:
       get:
-        displayName: List kvmdomain
+        description: List kvmdomain
         responses:
           200:
             body:
               application/json:
                 type: Location[]
       post:
-        displayName: Create a new kvmdomain
+        description: Create a new kvmdomain
         body:
           application/json:
             type: KVMCreate
@@ -640,7 +639,7 @@ types:
                 type: Location
       /{domainid}:
         delete:
-          displayName: Delete Domain
+          description: Delete Domain
           body:
             application/json:
               type: Command
@@ -650,7 +649,7 @@ types:
                 application/json:
                   type: Location
         get:
-          displayName: Get Domain
+          description: Get Domain
           description: Get detailed domain object
           responses:
             200:
@@ -659,7 +658,7 @@ types:
                   type: KVMDomain
         /start:
           post:
-            displayName: Start the kvmdomain
+            description: Start the kvmdomain
             body:
               application/json:
                 type: Command
@@ -670,7 +669,7 @@ types:
                     type: Location
         /stop:
           post:
-            displayName: Gracefully stop the kvmdomain
+            description: Gracefully stop the kvmdomain
             body:
               application/json:
                 type: Command
@@ -681,7 +680,7 @@ types:
                     type: Location
         /destroy:
           post:
-            displayName: Destroy the kvmdomain
+            description: Destroy the kvmdomain
             body:
               application/json:
                 type: Command
@@ -692,7 +691,7 @@ types:
                     type: Location
         /pause:
           post:
-            displayName: Destroy the kvmdomain
+            description: Pause the kvmdomain
             body:
               application/json:
                 type: Command
@@ -739,7 +738,7 @@ types:
                   type: OSInfo
     /process:
        get:
-         displayName: Get Processes
+         description: Get Processes
          responses:
            200:
              body:
@@ -747,14 +746,14 @@ types:
                  type: Location[]
        /{proccessid}:
          get:
-           displayName: Get process details
+           description: Get process details
            responses:
              200:
                body:
                  application/json:
                    type: Process
          delete:
-           displayName: Kill Process
+           description: Kill Process
            body:
              application/json:
                type: Command
@@ -765,7 +764,7 @@ types:
                    type: Location
     /bridge:
       post:
-        displayName: Creates a new bridge
+        description: Creates a new bridge
         body:
           application/json:
             type: BridgeCreate
@@ -775,7 +774,7 @@ types:
               application/json:
                 type: Location
       get:
-        displayName: List bridges
+        description: List bridges
         responses:
           200:
             body:
@@ -783,14 +782,14 @@ types:
                 type: Location[]
       /{bridgeid}:
         get:
-          displayName: Get bridge details
+          description: Get bridge details
           responses:
             200:
               body:
                 application/json:
                   type: Bridge
         delete:
-          displayName: Remove bridge
+          description: Remove bridge
           body:
             application/json:
               type: Command
@@ -801,7 +800,7 @@ types:
                   type: Location
     /disk:
       get:
-        displayName: List blockdevices present in the Core0
+        description: List blockdevices present in the Core0
         responses:
           200:
             body:
@@ -809,7 +808,7 @@ types:
                 type: Location[]
       /{devicenameOrdiskserial}:
         get:
-          displayName: Get disk details
+          description: Get disk details
           responses:
             200:
               body:
@@ -817,7 +816,7 @@ types:
                   type: DiskExtInfo
         /mktable:
           post:
-            displayName: Creates a partition table on a blockdevice
+            description: Creates a partition table on a blockdevice
             body:
               application/json:
                 type: DiskMKTable
@@ -828,7 +827,7 @@ types:
                     type: Location
         /mount:
           post:
-            displayName: Mounts the disk
+            description: Mounts the disk
             body:
               application/json:
                 type: DiskMount
@@ -839,7 +838,7 @@ types:
                     type: Location
         /umount:
           post:
-            displayName: Unmount the disk
+            description: Unmount the disk
             body:
               application/json:
                 type: Command
@@ -850,7 +849,7 @@ types:
                     type: Location
         /partitions:
           post:
-            displayName: Create a new partition
+            description: Create a new partition
             body:
               application/json:
                 type: DiskCreatePartition
@@ -860,7 +859,7 @@ types:
                   application/json:
                     type: Location
           get:
-            displayName: Lists partitions
+            description: Lists partitions
             responses:
               200:
                 body:
@@ -868,14 +867,14 @@ types:
                     type: Location[]
           /{partitionid}:
             get:
-              displayName: Gets partition info. (TODO Needs further speccing)
+              description: Gets partition info. (TODO Needs further speccing)
               responses:
                 200:
                   body:
                     application/json:
                       type: string # Needs further speccing
             delete:
-              displayName: Removes a partition
+              description: Removes a partition
               body:
                 application/json:
                   type: Command
@@ -886,7 +885,7 @@ types:
                       type: Location
             /mount:
               post:
-                displayName: Mounts the partition
+                description: Mounts the partition
                 body:
                   application/json:
                     type: DiskMount
@@ -897,7 +896,7 @@ types:
                         type: Location
             /umount:
               post:
-                displayName: Unmount the partition
+                description: Unmount the partition
                 body:
                   application/json:
                     type: Command
@@ -908,14 +907,14 @@ types:
                         type: Location
     /coreX:
       get:
-        displayName: List running CoreXses
+        description: List running CoreXses
         responses:
           200:
             body:
               application/json:
                 type: Location[]
       post:
-        displayName: Create a new CoreX
+        description: Create a new CoreX
         body:
           application/json:
             type: CoreXCreate
@@ -926,7 +925,7 @@ types:
                 type: Location
       /{coreXid}:
         delete:
-          displayName: Delete CoreX instance
+          description: Delete CoreX instance
           body:
             application/json:
               type: Command
@@ -936,7 +935,7 @@ types:
                 application/json:
                   type: Location
         get:
-          displayName: Get CoreX
+          description: Get CoreX
           responses:
             200:
               body:
