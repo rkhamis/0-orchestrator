@@ -315,7 +315,7 @@ types:
     type: object
     properties:
       cmd: Command
-      CPUInfo: number
+      cpu: number
       debug: string
       rss: number
       swap: number
@@ -772,7 +772,7 @@ types:
             body:
               application/json:
                 type: Location[]
-      /{diskidOrdiskserial}:
+      /{devicenameOrdiskserial}:
         get:
           displayName: Get disk details
           responses:
@@ -780,67 +780,31 @@ types:
               body:
                 application/json:
                   type: DiskExtInfo
-      /mktable:
-        post:
-          displayName: Creates a partition table on a blockdevice
-          body:
-            application/json:
-              type: [ Command, DiskMKTableArguments ]
-          responses:
-            200:
-              body:
-                application/json:
-                  type: Location
-      /mount:
-        post:
-          displayName: Mounts the disk
-          body:
-            application/json:
-              type: [ Command, DiskMountArguments]
-          responses:
-            200:
-              body:
-                application/json:
-                  type: Location
-      /umount:
-        post:
-          displayName: Unmount the disk
-          body:
-            application/json:
-              type: Command
-          responses:
-            200:
-              body:
-                application/json:
-                  type: Location
-      /partitions:
-        post:
-          displayName: Create a new partition
-          body:
-            application/json:
-              type: [ Command, DiskCreatePartitionArguments ]
-          responses:
-            200:
-              body:
-                application/json:
-                  type: Location
-        get:
-          displayName: Lists partitions
-          responses:
-            200:
-              body:
-                application/json:
-                  type: Location[]
-        /{partitionid}:
-          get:
-            displayName: Gets partition info. (TODO Needs further speccing)
+        /mktable:
+          post:
+            displayName: Creates a partition table on a blockdevice
+            body:
+              application/json:
+                type: [ Command, DiskMKTableArguments ]
             responses:
               200:
                 body:
                   application/json:
-                    type: string # Needs further speccing
-          delete:
-            displayName: Removes a partition
+                    type: Location
+        /mount:
+          post:
+            displayName: Mounts the disk
+            body:
+              application/json:
+                type: [ Command, DiskMountArguments]
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location
+        /umount:
+          post:
+            displayName: Unmount the disk
             body:
               application/json:
                 type: Command
@@ -849,20 +813,34 @@ types:
                 body:
                   application/json:
                     type: Location
-          /mount:
-            post:
-              displayName: Mounts the partition
-              body:
-                application/json:
-                  type: [ Command, DiskMountArguments]
+        /partitions:
+          post:
+            displayName: Create a new partition
+            body:
+              application/json:
+                type: [ Command, DiskCreatePartitionArguments ]
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location
+          get:
+            displayName: Lists partitions
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location[]
+          /{partitionid}:
+            get:
+              displayName: Gets partition info. (TODO Needs further speccing)
               responses:
                 200:
                   body:
                     application/json:
-                      type: Location
-          /umount:
-            post:
-              displayName: Unmount the partition
+                      type: string # Needs further speccing
+            delete:
+              displayName: Removes a partition
               body:
                 application/json:
                   type: Command
@@ -871,6 +849,28 @@ types:
                   body:
                     application/json:
                       type: Location
+            /mount:
+              post:
+                displayName: Mounts the partition
+                body:
+                  application/json:
+                    type: [ Command, DiskMountArguments]
+                responses:
+                  200:
+                    body:
+                      application/json:
+                        type: Location
+            /umount:
+              post:
+                displayName: Unmount the partition
+                body:
+                  application/json:
+                    type: Command
+                responses:
+                  200:
+                    body:
+                      application/json:
+                        type: Location
     /coreX:
       get:
         displayName: List running CoreXses
