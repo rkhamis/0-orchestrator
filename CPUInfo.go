@@ -8,7 +8,7 @@ import (
 type CPUInfo struct {
 	CPUInfo   int      `json:"CPUInfo" validate:"nonzero"`
 	CacheSize int      `json:"cacheSize" validate:"nonzero"`
-	CoreId    int      `json:"coreId" validate:"nonzero"`
+	CoreId    string   `json:"coreId" validate:"nonzero"`
 	Cores     int      `json:"cores" validate:"nonzero"`
 	Family    string   `json:"family" validate:"nonzero"`
 	Flags     []string `json:"flags" validate:"nonzero"`
