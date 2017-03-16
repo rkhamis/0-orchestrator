@@ -1210,7 +1210,6 @@ types:
                   body:
                     application/json:
                       type: Location
-                  
     /coreX:
       get:
         displayName: CoreXList
@@ -1251,3 +1250,173 @@ types:
               body:
                 application/json:
                   type: CoreX
+        /command:
+          description: Commands for this Core0
+          displayName: CommandsList
+          get:
+            description: List running commands
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location[]
+          /{commandid}:
+            description: Get status of command
+            displayName: CommandGet
+            get:
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: CommandResult
+        /core:
+          /ping:
+            post:
+              description: Execute a ping command to this CoreX
+              displayName: Ping
+              body:
+                application/json:
+                  type: Command
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: Location
+          /system:
+            post:
+              displayName: System
+              description: Execute a new process  on this CoreX
+              body:
+                application/json:
+                  type: CoreSystem
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: Location
+          /kill:
+            post:
+              displayName: Kill
+              description: Kill a process / command
+              body:
+                application/json:
+                  type: CoreKill
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: Location
+          /killall:
+            post:
+              displayName: KillAll
+              description: Kills all running commands
+              body:
+                application/json:
+                  type: Command
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: Location
+          /state:
+            get:
+              description: The aggregated consumption of coreX + all processes (cpu, memory, etc...)
+              displayName: StateGet
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type:
+                        CoreStateResult
+        /info:
+          /cpu:
+            get:
+              displayName: CPUInfo
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: CPUInfo[]
+          /mem:
+            get:
+              displayName: MemInfo
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: MemInfo
+          /nic:
+            get:
+              displayName: NicInfo
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: NicInfo[]
+          /os:
+            get:
+              displayName: OSInfo
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: OSInfo
+        /process:
+           get:
+             displayName: ProcessList
+             description: Get Processes
+             responses:
+               200:
+                 body:
+                   application/json:
+                     type: Location[]
+           /{proccessid}:
+             get:
+               displayName: ProcessGet
+               description: Get process details
+               responses:
+                 200:
+                   body:
+                     application/json:
+                       type: Process
+             delete:
+               displayName: ProcessKill
+               description: Kill Process
+               body:
+                 application/json:
+                   type: Command
+               responses:
+                 200:
+                   body:
+                     application/json:
+                       type: Location
+        /filesystem:
+          post:
+            displayName: Upload file to Core0
+            body:
+              application/json:
+                type: WriteFile
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location
+          get:
+            displayName: Download file from Core0
+            queryString:
+              properties:
+                path: string
+            responses:
+              200:
+                body:
+                  application/octet-stream:
+          delete:
+            displayName: Delete file from Core0
+            body:
+              application/json:
+                type: DeleteFile
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location
