@@ -31,6 +31,9 @@ type Core0Interface interface { // CoresList is the handler for GET /core0
 	idcommandGet(http.ResponseWriter, *http.Request)
 	// idcommandcommandidGet is the handler for GET /core0/{id}/command/{commandid}
 	idcommandcommandidGet(http.ResponseWriter, *http.Request)
+	// StateGet is the handler for GET /core0/{id}/core/state
+	// The aggregated consumption of core0 + all processes (cpu, memory, etc...)
+	StateGet(http.ResponseWriter, *http.Request)
 	// Reboot is the handler for POST /core0/{id}/core/reboot
 	// Immediately reboot the machine.
 	Reboot(http.ResponseWriter, *http.Request)
@@ -46,9 +49,6 @@ type Core0Interface interface { // CoresList is the handler for GET /core0
 	// KillAll is the handler for POST /core0/{id}/core/killall
 	// Kills all running commands
 	KillAll(http.ResponseWriter, *http.Request)
-	// StateGet is the handler for GET /core0/{id}/core/state
-	// The aggregated consumption of core0 + all processes (cpu, memory, etc...)
-	StateGet(http.ResponseWriter, *http.Request)
 	// KVMList is the handler for GET /core0/{id}/kvm
 	// List kvmdomain
 	KVMList(http.ResponseWriter, *http.Request)
@@ -131,12 +131,12 @@ type Core0Interface interface { // CoresList is the handler for GET /core0
 	// DiskPartitionDelete is the handler for DELETE /core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}
 	// Removes a partition
 	DiskPartitionDelete(http.ResponseWriter, *http.Request)
-	// DiskPartitionMount is the handler for POST /core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}/mount
-	// Mounts the partition
-	DiskPartitionMount(http.ResponseWriter, *http.Request)
 	// DiskPartitionUmount is the handler for POST /core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}/umount
 	// Unmount the partition
 	DiskPartitionUmount(http.ResponseWriter, *http.Request)
+	// DiskPartitionMount is the handler for POST /core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}/mount
+	// Mounts the partition
+	DiskPartitionMount(http.ResponseWriter, *http.Request)
 }
 
 // Core0InterfaceRoutes is routing for /core0 root endpoint
@@ -149,12 +149,12 @@ func Core0InterfaceRoutes(r *mux.Router, i Core0Interface) {
 	r.HandleFunc("/core0/{id}/coreX/{coreXid}", i.CoreXDelete).Methods("DELETE")
 	r.HandleFunc("/core0/{id}/command", i.idcommandGet).Methods("GET")
 	r.HandleFunc("/core0/{id}/command/{commandid}", i.idcommandcommandidGet).Methods("GET")
+	r.HandleFunc("/core0/{id}/core/state", i.StateGet).Methods("GET")
 	r.HandleFunc("/core0/{id}/core/reboot", i.Reboot).Methods("POST")
 	r.HandleFunc("/core0/{id}/core/ping", i.Ping).Methods("POST")
 	r.HandleFunc("/core0/{id}/core/system", i.System).Methods("POST")
 	r.HandleFunc("/core0/{id}/core/kill", i.Kill).Methods("POST")
 	r.HandleFunc("/core0/{id}/core/killall", i.KillAll).Methods("POST")
-	r.HandleFunc("/core0/{id}/core/state", i.StateGet).Methods("GET")
 	r.HandleFunc("/core0/{id}/kvm", i.KVMList).Methods("GET")
 	r.HandleFunc("/core0/{id}/kvm", i.KVMCreate).Methods("POST")
 	r.HandleFunc("/core0/{id}/kvm/{domainid}", i.KVMGet).Methods("GET")
@@ -184,6 +184,6 @@ func Core0InterfaceRoutes(r *mux.Router, i Core0Interface) {
 	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions", i.DiskPartitionCreate).Methods("POST")
 	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}", i.DiskPartitionGet).Methods("GET")
 	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}", i.DiskPartitionDelete).Methods("DELETE")
-	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}/mount", i.DiskPartitionMount).Methods("POST")
 	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}/umount", i.DiskPartitionUmount).Methods("POST")
+	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}/mount", i.DiskPartitionMount).Methods("POST")
 }
