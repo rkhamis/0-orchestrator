@@ -16,6 +16,7 @@ func (api Core0API) Get(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(&respBody)
 	// uncomment below line to add header
 	// w.Header().Set("key","value")
+
 }
 
 // idGet is the handler for GET /core0/{id}
