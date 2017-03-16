@@ -545,6 +545,38 @@ types:
       vms: integer
       swap: integer
 
+  ZeroTierRoute:
+    type: object
+    description: Zerotier route
+    properties:
+      flags: integer
+      metric: integer
+      target: string
+      via: string
+
+  ZeroTier:
+    type: object
+    description: Zerotier details
+    properties:
+      allowDefault: boolean
+      allowGlobal: boolean
+      allowManaged: boolean
+      assignedAddresses: string[]
+      bridge: boolean
+      broadcastEnabled: boolean
+      dhcp: boolean
+      mac: string
+      mtu: integer
+      name: string
+      netconfRevision: integer
+      nwid: string
+      portDeviceName: string
+      portError: integer
+      routes: ZeroTierRoute[]
+      status: string
+      type:
+        enum: ['PUBLIC', 'PRIVATE']
+
 /core0:
   description: Core0s
   get:
@@ -999,6 +1031,47 @@ types:
             body:
               application/json:
                 type: Location
+    /zerotier:
+      get:
+        displayName: ZerotierList
+        description: List running zerotier networks
+        responses:
+          200:
+            body:
+              application/json:
+                type: Location[]
+      /{zerotierid}:
+        get:
+          displayName: Zerotier
+          description: Get zerotier network details
+          responses:
+            200:
+              body:
+                application/json:
+                  type: ZeroTier
+        post:
+          displayName: JoinZeroTier
+          description: Join zerotier network
+          body:
+            application/json:
+              type: Command
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
+        delete:
+          displayName: DeleteZeroTier
+          description: Delete zerotier network
+          body:
+            application/json:
+              type: Command
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
+
     /coreX:
       get:
         displayName: CoreXList
