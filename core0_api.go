@@ -2,9 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/g8os/go-client"
 	"github.com/gorilla/mux"
-	"net/http"
 )
 
 // Core0API is API implementation of /core0 root endpoint
@@ -391,9 +392,6 @@ func (api Core0API) KVMPause(w http.ResponseWriter, r *http.Request) {
 
 // CPUInfo is the handler for GET /core0/{id}/info/cpu
 func (api Core0API) CPUInfo(w http.ResponseWriter, r *http.Request) {
-
-	// uncomment below line to add header
-	// w.Header().Set("key","value")
 	vars := mux.Vars(r)
 	id := vars["id"]
 
@@ -421,39 +419,128 @@ func (api Core0API) CPUInfo(w http.ResponseWriter, r *http.Request) {
 		respBody = append(respBody, info)
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(&respBody)
 }
 
 // DiskInfo is the handler for GET /core0/{id}/info/disk
 func (api Core0API) DiskInfo(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	cl := GetConnection(r, id)
+	info := client.Info(cl)
+	result, err := info.Disk()
+	if err != nil {
+		json.NewEncoder(w).Encode(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	var respBody []DiskInfo
+	for _, disk := range result {
+		var info DiskInfo
+		info.Device = disk.Device
+		info.Fstype = disk.Fstype
+		info.Mountpoint = disk.Mountpoint
+		info.Opts = disk.Opts
+		respBody = append(respBody, info)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(&respBody)
-	// uncomment below line to add header
-	// w.Header().Set("key","value")
 }
 
 // MemInfo is the handler for GET /core0/{id}/info/mem
 func (api Core0API) MemInfo(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	cl := GetConnection(r, id)
+	info := client.Info(cl)
+	result, err := info.Mem()
+	if err != nil {
+		json.NewEncoder(w).Encode(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	var respBody MemInfo
+	respBody.Active = int(result.Active)
+	respBody.Available = int(result.Available)
+	respBody.Buffers = int(result.Buffers)
+	respBody.Cached = int(result.Cached)
+	respBody.Free = int(result.Free)
+	respBody.Inactive = int(result.Inactive)
+	respBody.Total = int(result.Total)
+	respBody.Used = int(result.Used)
+	respBody.UsedPercent = result.UsedPercent
+	respBody.Wired = int(result.Wired)
+
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(&respBody)
-	// uncomment below line to add header
-	// w.Header().Set("key","value")
 }
 
 // NicInfo is the handler for GET /core0/{id}/info/nic
 func (api Core0API) NicInfo(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	cl := GetConnection(r, id)
+	info := client.Info(cl)
+	result, err := info.Nic()
+	if err != nil {
+		json.NewEncoder(w).Encode(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	var respBody []NicInfo
+	for _, nic := range result {
+		var info NicInfo
+		for _, addr := range nic.Addrs {
+			info.Addrs = append(info.Addrs, addr.Addr)
+		}
+		// info.Addrs = nic.Addrs
+		info.Flags = nic.Flags
+		info.Hardwareaddr = nic.HardwareAddr
+		info.Mtu = nic.MTU
+		info.Name = nic.Name
+		respBody = append(respBody, info)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(&respBody)
-	// uncomment below line to add header
-	// w.Header().Set("key","value")
 }
 
 // OSInfo is the handler for GET /core0/{id}/info/os
 func (api Core0API) OSInfo(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	cl := GetConnection(r, id)
+	info := client.Info(cl)
+	result, err := info.OS()
+	if err != nil {
+		json.NewEncoder(w).Encode(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	var respBody OSInfo
+	respBody.BootTime = int(result.BootTime)
+	respBody.Hostname = result.Hostname
+	respBody.Os = result.OS
+	respBody.Platform = result.Platform
+	respBody.PlatformFamily = result.PlatformFamily
+	respBody.PlatformVersion = result.PlatformVersion
+	respBody.Procs = int(result.Procs)
+	respBody.Uptime = int(result.Uptime)
+	respBody.VirtualizationRole = result.VirtualizationRole
+	respBody.VirtualizationSystem = result.VirtualizationSystem
+
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(&respBody)
-	// uncomment below line to add header
-	// w.Header().Set("key","value")
 }
 
 // ProcessList is the handler for GET /core0/{id}/process
