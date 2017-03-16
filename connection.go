@@ -104,8 +104,9 @@ func (c *connectionMiddleware) onEvict(_ string, x interface{}) {
 func ConnectionMiddleware(opt ...ConnectionOptions) func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		p := &connectionMiddleware{
-			pools: cache.New(5*time.Minute, 1*time.Minute),
-			port:  connectionPoolMiddlewareDefaultPort,
+			pools:   cache.New(5*time.Minute, 1*time.Minute),
+			port:    connectionPoolMiddlewareDefaultPort,
+			handler: h,
 		}
 
 		p.pools.OnEvicted(p.onEvict)

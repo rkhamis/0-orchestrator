@@ -14,23 +14,12 @@ type Core0Interface interface { // CoresList is the handler for GET /core0
 	CoresList(http.ResponseWriter, *http.Request)
 	// CoreGet is the handler for GET /core0/{id}
 	CoreGet(http.ResponseWriter, *http.Request)
-	// CoreXList is the handler for GET /core0/{id}/coreX
-	// List running CoreXses
-	CoreXList(http.ResponseWriter, *http.Request)
-	// CoreXCreate is the handler for POST /core0/{id}/coreX
-	// Create a new CoreX
-	CoreXCreate(http.ResponseWriter, *http.Request)
-	// CoreXGet is the handler for GET /core0/{id}/coreX/{coreXid}
-	// Get CoreX
-	CoreXGet(http.ResponseWriter, *http.Request)
-	// CoreXDelete is the handler for DELETE /core0/{id}/coreX/{coreXid}
-	// Delete CoreX instance
-	CoreXDelete(http.ResponseWriter, *http.Request)
-	// idcommandGet is the handler for GET /core0/{id}/command
-	// List running commands
-	idcommandGet(http.ResponseWriter, *http.Request)
-	// idcommandcommandidGet is the handler for GET /core0/{id}/command/{commandid}
-	idcommandcommandidGet(http.ResponseWriter, *http.Request)
+	// Kill is the handler for POST /core0/{id}/core/kill
+	// Kill a process / command
+	Kill(http.ResponseWriter, *http.Request)
+	// KillAll is the handler for POST /core0/{id}/core/killall
+	// Kills all running commands
+	KillAll(http.ResponseWriter, *http.Request)
 	// StateGet is the handler for GET /core0/{id}/core/state
 	// The aggregated consumption of core0 + all processes (cpu, memory, etc...)
 	StateGet(http.ResponseWriter, *http.Request)
@@ -43,12 +32,6 @@ type Core0Interface interface { // CoresList is the handler for GET /core0
 	// System is the handler for POST /core0/{id}/core/system
 	// Execute a new process  on this Core0
 	System(http.ResponseWriter, *http.Request)
-	// Kill is the handler for POST /core0/{id}/core/kill
-	// Kill a process / command
-	Kill(http.ResponseWriter, *http.Request)
-	// KillAll is the handler for POST /core0/{id}/core/killall
-	// Kills all running commands
-	KillAll(http.ResponseWriter, *http.Request)
 	// KVMList is the handler for GET /core0/{id}/kvm
 	// List kvmdomain
 	KVMList(http.ResponseWriter, *http.Request)
@@ -137,24 +120,35 @@ type Core0Interface interface { // CoresList is the handler for GET /core0
 	// DiskPartitionMount is the handler for POST /core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}/mount
 	// Mounts the partition
 	DiskPartitionMount(http.ResponseWriter, *http.Request)
+	// CoreXList is the handler for GET /core0/{id}/coreX
+	// List running CoreXses
+	CoreXList(http.ResponseWriter, *http.Request)
+	// CoreXCreate is the handler for POST /core0/{id}/coreX
+	// Create a new CoreX
+	CoreXCreate(http.ResponseWriter, *http.Request)
+	// CoreXGet is the handler for GET /core0/{id}/coreX/{coreXid}
+	// Get CoreX
+	CoreXGet(http.ResponseWriter, *http.Request)
+	// CoreXDelete is the handler for DELETE /core0/{id}/coreX/{coreXid}
+	// Delete CoreX instance
+	CoreXDelete(http.ResponseWriter, *http.Request)
+	// idcommandGet is the handler for GET /core0/{id}/command
+	// List running commands
+	idcommandGet(http.ResponseWriter, *http.Request)
+	// idcommandcommandidGet is the handler for GET /core0/{id}/command/{commandid}
+	idcommandcommandidGet(http.ResponseWriter, *http.Request)
 }
 
 // Core0InterfaceRoutes is routing for /core0 root endpoint
 func Core0InterfaceRoutes(r *mux.Router, i Core0Interface) {
 	r.HandleFunc("/core0", i.CoresList).Methods("GET")
 	r.HandleFunc("/core0/{id}", i.CoreGet).Methods("GET")
-	r.HandleFunc("/core0/{id}/coreX", i.CoreXList).Methods("GET")
-	r.HandleFunc("/core0/{id}/coreX", i.CoreXCreate).Methods("POST")
-	r.HandleFunc("/core0/{id}/coreX/{coreXid}", i.CoreXGet).Methods("GET")
-	r.HandleFunc("/core0/{id}/coreX/{coreXid}", i.CoreXDelete).Methods("DELETE")
-	r.HandleFunc("/core0/{id}/command", i.idcommandGet).Methods("GET")
-	r.HandleFunc("/core0/{id}/command/{commandid}", i.idcommandcommandidGet).Methods("GET")
+	r.HandleFunc("/core0/{id}/core/kill", i.Kill).Methods("POST")
+	r.HandleFunc("/core0/{id}/core/killall", i.KillAll).Methods("POST")
 	r.HandleFunc("/core0/{id}/core/state", i.StateGet).Methods("GET")
 	r.HandleFunc("/core0/{id}/core/reboot", i.Reboot).Methods("POST")
 	r.HandleFunc("/core0/{id}/core/ping", i.Ping).Methods("POST")
 	r.HandleFunc("/core0/{id}/core/system", i.System).Methods("POST")
-	r.HandleFunc("/core0/{id}/core/kill", i.Kill).Methods("POST")
-	r.HandleFunc("/core0/{id}/core/killall", i.KillAll).Methods("POST")
 	r.HandleFunc("/core0/{id}/kvm", i.KVMList).Methods("GET")
 	r.HandleFunc("/core0/{id}/kvm", i.KVMCreate).Methods("POST")
 	r.HandleFunc("/core0/{id}/kvm/{domainid}", i.KVMGet).Methods("GET")
@@ -186,4 +180,10 @@ func Core0InterfaceRoutes(r *mux.Router, i Core0Interface) {
 	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}", i.DiskPartitionDelete).Methods("DELETE")
 	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}/umount", i.DiskPartitionUmount).Methods("POST")
 	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}/mount", i.DiskPartitionMount).Methods("POST")
+	r.HandleFunc("/core0/{id}/coreX", i.CoreXList).Methods("GET")
+	r.HandleFunc("/core0/{id}/coreX", i.CoreXCreate).Methods("POST")
+	r.HandleFunc("/core0/{id}/coreX/{coreXid}", i.CoreXGet).Methods("GET")
+	r.HandleFunc("/core0/{id}/coreX/{coreXid}", i.CoreXDelete).Methods("DELETE")
+	r.HandleFunc("/core0/{id}/command", i.idcommandGet).Methods("GET")
+	r.HandleFunc("/core0/{id}/command/{commandid}", i.idcommandcommandidGet).Methods("GET")
 }

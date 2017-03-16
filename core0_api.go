@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/g8os/go-client"
+	"github.com/gorilla/mux"
 	"net/http"
 )
 
@@ -389,10 +391,37 @@ func (api Core0API) KVMPause(w http.ResponseWriter, r *http.Request) {
 
 // CPUInfo is the handler for GET /core0/{id}/info/cpu
 func (api Core0API) CPUInfo(w http.ResponseWriter, r *http.Request) {
-	var respBody []CPUInfo
-	json.NewEncoder(w).Encode(&respBody)
+
 	// uncomment below line to add header
 	// w.Header().Set("key","value")
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	cl := GetConnection(r, id)
+	info := client.Info(cl)
+	result, err := info.CPU()
+	if err != nil {
+		json.NewEncoder(w).Encode(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var respBody []CPUInfo
+
+	for i, cpu := range result {
+		var info CPUInfo
+		info.CacheSize = int(cpu.CacheSize)
+		info.CPUInfo = i
+		info.CoreId = cpu.CoreID
+		info.Cores = int(cpu.Cores)
+		info.Family = cpu.Family
+		info.Flags = cpu.Flags
+		info.Mhz = cpu.Mhz
+
+		respBody = append(respBody, info)
+	}
+
+	json.NewEncoder(w).Encode(&respBody)
 }
 
 // DiskInfo is the handler for GET /core0/{id}/info/disk

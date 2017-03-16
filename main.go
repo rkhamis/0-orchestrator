@@ -27,5 +27,6 @@ func main() {
 	Core0InterfaceRoutes(r, Core0API{})
 
 	log.Println("starting server")
-	http.ListenAndServe(":5000", r)
+	http.ListenAndServe(":5000",
+		ConnectionMiddleware()(r))
 }
