@@ -334,6 +334,33 @@ types:
         default: [0]
         required: false
 
+  WriteFile:
+    type: object
+    displayName: Writes a file in the targetted system
+    properties:
+      path:
+        displayName: Path on the target system where the file should be written
+        type: string
+      contents:
+        displayName: Contents of the file that should be written
+        type: string
+      command:
+        description: Details how to pass the command to the core0/coreX
+        type: Command
+        required: false
+
+  DeleteFile:
+    type: object
+    displayName: Removes a file in the targetted system
+    properties:
+      path:
+        displayName: Path on the target system where the file should be written
+        type: string
+      command:
+        description: Details how to pass the command to the core0/coreX
+        type: Command
+        required: false
+
   Process:
     type: object
     properties:
@@ -418,11 +445,9 @@ types:
     type: object
     properties:
        name:
-         description: Name
          description: Name of the bridge
          type: string
        config:
-         description: Bridge config
          description: |
             '' or 'none':
               no IP is gonna be set on the link
@@ -463,7 +488,6 @@ types:
         description: Bridge mapping
       ports:
          type: PortMap[]
-         description: Port Mapping
          description: Maps ports from container to host
 
   Location:
@@ -649,7 +673,6 @@ types:
                 application/json:
                   type: Location
         get:
-          description: Get Domain
           description: Get detailed domain object
           responses:
             200:
@@ -905,6 +928,36 @@ types:
                     body:
                       application/json:
                         type: Location
+    /filesystem:
+      post:
+        displayName: Upload file to Core0
+        body:
+          application/json:
+            type: WriteFile
+        responses:
+          200:
+            body:
+              application/json:
+                type: Location
+      get:
+        displayName: Download file from Core0
+        queryString:
+          properties:
+            path: string
+        responses:
+          200:
+            body:
+              application/octet-stream:
+      delete:
+        displayName: Delete file from Core0
+        body:
+          application/json:
+            type: DeleteFile
+        responses:
+          200:
+            body:
+              application/json:
+                type: Location
     /coreX:
       get:
         description: List running CoreXses
