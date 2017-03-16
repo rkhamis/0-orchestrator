@@ -577,6 +577,67 @@ types:
       type:
         enum: ['PUBLIC', 'PRIVATE']
 
+  BtrfsCreate:
+    type: object
+    description: Command arguments for creating btrfs filesystems
+    properties:
+      label:
+        description: Name / label for the btrfs filesystem
+        type: string
+      devices:
+        description: Devices that will be part of the filesystem
+        type: string[]
+      metadataProfile:
+        enum: ['raid0', 'raid1', 'raid5', 'raid6', 'raid10', 'dup', 'single']
+      dataProfile:
+        enum: ['raid0', 'raid1', 'raid5', 'raid6', 'raid10', 'dup', 'single']
+      command:
+        description: Details how to pass the command to the core0/coreX
+        type: Command
+        required: false
+
+  BtrfsDevice:
+    type: object
+    description: Devices that are assigned to a btrfs filesystem
+    properties:
+      id: integer
+      path: string
+      size: integer
+      used: integer
+
+  Btrfs:
+    type: object
+    description: Btrfs details
+    properties:
+      uuid:
+        description: Unique identifier of the btrfs filesystem
+        type: string
+      label: string
+      deviceCount: integer
+      used: integer
+      devices: BtrfsDevice[]
+
+  BtrfsAddDevice:
+    type: object
+    description: Command to add a device to an existing Btrfs filesystem
+    properties:
+      path:
+        displayName: DevicePath
+        type: string
+      command:
+        description: Details how to pass the command to the core0/coreX
+        type: Command
+        required: false
+
+  BtrfsSubVolume:
+    type: object
+    description: Btrfs subvolume details
+    properties:
+      gen: integer
+      id: integer
+      path: string
+      topLevel: integer
+
 /core0:
   description: Core0s
   get:
@@ -1071,7 +1132,85 @@ types:
               body:
                 application/json:
                   type: Location
-
+    /btrfs:
+      get:
+        displayName: BtrfsList
+        description: List btrfs filesystems
+        responses:
+          200:
+            body:
+              application/json:
+                type: Location[]
+      post:
+        displayName: BtrfsCreate
+        description: Create a new btrfs filesystem
+        body:
+          application/json:
+            type: BtrfsCreate
+        responses:
+          200:
+            body:
+              application/json:
+                type: Location
+      /{btrfsUuid}:
+        get:
+          description: Get btrfs filesystem details
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Btrfs
+        post:
+          description: Add a device to an existing btrfs filesystem
+          body:
+            application/json:
+              type: BtrfsAddDevice
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
+        /subvolumes:
+          get:
+            displayName: BtrfsListSubvolumes
+            description: List subvolumes
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location[]
+          /{subvolumepath}:
+            get:
+              displayName: BtrfsGetSubvolume
+              description: Gets subvolume details
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: BtrfsSubVolume
+            post:
+              displayName: BtrfsSubVolumeCreate
+              description: Create a new subvolume
+              body:
+                application/json:
+                  type: Command
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: Location
+            delete:
+              displayName: BtrfsSubVolumeDelete
+              description: Delete subvolume
+              body:
+                application/json:
+                  type: Command
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: Location
+                  
     /coreX:
       get:
         displayName: CoreXList
