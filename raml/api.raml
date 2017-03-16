@@ -525,6 +525,7 @@ types:
   description: Core0s
   get:
     description: List Core0s
+    displayName: CoresList
     responses:
       200:
         body:
@@ -532,6 +533,7 @@ types:
             type: Location[]
   /{id}:
     get:
+      displayName: CoreGet
       responses:
         200:
           body:
@@ -539,6 +541,7 @@ types:
               type: Core0
     /command:
       description: Commands for this Core0
+      displayName: CommandsList
       get:
         description: List running commands
         responses:
@@ -548,6 +551,7 @@ types:
                 type: Location[]
       /{commandid}:
         description: Get status of command
+        displayName: CommandGet
         get:
           responses:
             200:
@@ -558,6 +562,7 @@ types:
       /ping:
         post:
           description: Execute a ping command to this Core0
+          displayName: Ping
           body:
             application/json:
               type: Command
@@ -568,6 +573,7 @@ types:
                   type: Location
       /system:
         post:
+          displayName: System
           description: Execute a new process  on this Core0
           body:
             application/json:
@@ -579,6 +585,7 @@ types:
                   type: Location
       /kill:
         post:
+          displayName: Kill
           description: Kill a process / command
           body:
             application/json:
@@ -590,6 +597,7 @@ types:
                   type: Location
       /killall:
         post:
+          displayName: KillAll
           description: Kills all running commands
           body:
             application/json:
@@ -602,6 +610,7 @@ types:
       /state:
         get:
           description: The aggregated consumption of core0 + all processes (cpu, memory, etc...)
+          displayName: StateGet
           responses:
             200:
               body:
@@ -610,6 +619,7 @@ types:
                     CoreStateResult
       /reboot:
         post:
+          displayName: Reboot
           description: Immediately reboot the machine.
           body:
             application/json:
@@ -619,15 +629,17 @@ types:
               body:
                 application/json:
                   type: Location
-    /kvmdomain:
+    /kvm:
       get:
         description: List kvmdomain
+        displayName: KVMList
         responses:
           200:
             body:
               application/json:
                 type: Location[]
       post:
+        displayName: KVMCreate
         description: Create a new kvmdomain
         body:
           application/json:
@@ -639,6 +651,7 @@ types:
                 type: Location
       /{domainid}:
         delete:
+          displayName: KVMDelete
           description: Delete Domain
           body:
             application/json:
@@ -649,7 +662,7 @@ types:
                 application/json:
                   type: Location
         get:
-          description: Get Domain
+          displayName: KVMGet
           description: Get detailed domain object
           responses:
             200:
@@ -658,6 +671,7 @@ types:
                   type: KVMDomain
         /start:
           post:
+            displayName: KVMStart
             description: Start the kvmdomain
             body:
               application/json:
@@ -669,6 +683,7 @@ types:
                     type: Location
         /stop:
           post:
+            displayName: KVMStop
             description: Gracefully stop the kvmdomain
             body:
               application/json:
@@ -680,6 +695,7 @@ types:
                     type: Location
         /destroy:
           post:
+            displayName: KVMDestroy
             description: Destroy the kvmdomain
             body:
               application/json:
@@ -691,6 +707,7 @@ types:
                     type: Location
         /pause:
           post:
+            displayName: KVMPause
             description: Pause the kvmdomain
             body:
               application/json:
@@ -703,6 +720,7 @@ types:
     /info:
       /cpu:
         get:
+          displayName: CPUInfo
           responses:
             200:
               body:
@@ -710,6 +728,7 @@ types:
                   type: CPUInfo[]
       /disk:
         get:
+          displayName: DiskInfo
           responses:
             200:
               body:
@@ -717,6 +736,7 @@ types:
                   type: DiskInfo[]
       /mem:
         get:
+          displayName: MemInfo
           responses:
             200:
               body:
@@ -724,6 +744,7 @@ types:
                   type: MemInfo
       /nic:
         get:
+          displayName: NicInfo
           responses:
             200:
               body:
@@ -731,6 +752,7 @@ types:
                   type: NicInfo[]
       /os:
         get:
+          displayName: OSInfo
           responses:
             200:
               body:
@@ -738,6 +760,7 @@ types:
                   type: OSInfo
     /process:
        get:
+         displayName: ProcessList
          description: Get Processes
          responses:
            200:
@@ -746,6 +769,7 @@ types:
                  type: Location[]
        /{proccessid}:
          get:
+           displayName: ProcessGet
            description: Get process details
            responses:
              200:
@@ -753,6 +777,7 @@ types:
                  application/json:
                    type: Process
          delete:
+           displayName: ProcessKill
            description: Kill Process
            body:
              application/json:
@@ -764,6 +789,7 @@ types:
                    type: Location
     /bridge:
       post:
+        displayName: BridgeCreate
         description: Creates a new bridge
         body:
           application/json:
@@ -774,6 +800,7 @@ types:
               application/json:
                 type: Location
       get:
+        displayName: BridgeList
         description: List bridges
         responses:
           200:
@@ -782,6 +809,7 @@ types:
                 type: Location[]
       /{bridgeid}:
         get:
+          displayName: BridgeGet
           description: Get bridge details
           responses:
             200:
@@ -789,6 +817,7 @@ types:
                 application/json:
                   type: Bridge
         delete:
+          displayName: BridgeDelete
           description: Remove bridge
           body:
             application/json:
@@ -800,6 +829,7 @@ types:
                   type: Location
     /disk:
       get:
+        displayName: DiskList
         description: List blockdevices present in the Core0
         responses:
           200:
@@ -808,6 +838,7 @@ types:
                 type: Location[]
       /{devicenameOrdiskserial}:
         get:
+          displayName: DiskGet
           description: Get disk details
           responses:
             200:
@@ -816,6 +847,7 @@ types:
                   type: DiskExtInfo
         /mktable:
           post:
+            displayName: DiskMakeTable
             description: Creates a partition table on a blockdevice
             body:
               application/json:
@@ -827,6 +859,7 @@ types:
                     type: Location
         /mount:
           post:
+            displayName: DiskMount
             description: Mounts the disk
             body:
               application/json:
@@ -838,6 +871,7 @@ types:
                     type: Location
         /umount:
           post:
+            displayName: DiskUmount
             description: Unmount the disk
             body:
               application/json:
@@ -849,6 +883,7 @@ types:
                     type: Location
         /partitions:
           post:
+            displayName: DiskPartitionCreate
             description: Create a new partition
             body:
               application/json:
@@ -859,6 +894,7 @@ types:
                   application/json:
                     type: Location
           get:
+            displayName: DiskPartitionsList
             description: Lists partitions
             responses:
               200:
@@ -867,6 +903,7 @@ types:
                     type: Location[]
           /{partitionid}:
             get:
+              displayName: DiskPartitionGet
               description: Gets partition info. (TODO Needs further speccing)
               responses:
                 200:
@@ -874,6 +911,7 @@ types:
                     application/json:
                       type: string # Needs further speccing
             delete:
+              displayName: DiskPartitionDelete
               description: Removes a partition
               body:
                 application/json:
@@ -885,6 +923,7 @@ types:
                       type: Location
             /mount:
               post:
+                displayName: DiskPartitionMount
                 description: Mounts the partition
                 body:
                   application/json:
@@ -896,6 +935,7 @@ types:
                         type: Location
             /umount:
               post:
+                displayName: DiskPartitionUmount
                 description: Unmount the partition
                 body:
                   application/json:
@@ -907,6 +947,7 @@ types:
                         type: Location
     /coreX:
       get:
+        displayName: CoreXList
         description: List running CoreXses
         responses:
           200:
@@ -914,6 +955,7 @@ types:
               application/json:
                 type: Location[]
       post:
+        displayName: CoreXCreate
         description: Create a new CoreX
         body:
           application/json:
@@ -925,6 +967,7 @@ types:
                 type: Location
       /{coreXid}:
         delete:
+          displayName: CoreXDelete
           description: Delete CoreX instance
           body:
             application/json:
@@ -935,6 +978,7 @@ types:
                 application/json:
                   type: Location
         get:
+          displayName: CoreXGet
           description: Get CoreX
           responses:
             200:
