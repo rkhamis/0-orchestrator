@@ -541,8 +541,8 @@ types:
               type: Core0
     /command:
       description: Commands for this Core0
-      displayName: CommandsList
       get:
+        displayName: CommandsList
         description: List running commands
         responses:
           200:
@@ -551,8 +551,8 @@ types:
                 type: Location[]
       /{commandid}:
         description: Get status of command
-        displayName: CommandGet
         get:
+          displayName: CommandGet
           responses:
             200:
               body:

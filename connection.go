@@ -6,6 +6,7 @@ import (
 	"github.com/g8os/go-client"
 	"github.com/garyburd/redigo/redis"
 	//"github.com/pmylund/go-cache"
+	"github.com/gorilla/mux"
 	"github.com/patrickmn/go-cache"
 	"net/http"
 	"sync"
@@ -118,11 +119,14 @@ func ConnectionMiddleware(opt ...ConnectionOptions) func(h http.Handler) http.Ha
 	}
 }
 
-func GetConnection(r *http.Request, id string) client.Client {
+func GetConnection(r *http.Request) client.Client {
 	p := r.Context().Value(connectionPoolMiddlewareKey)
 	if p == nil {
 		panic("middleware not injected")
 	}
+
+	vars := mux.Vars(r)
+	id := vars["id"]
 
 	mw := p.(*connectionMiddleware)
 

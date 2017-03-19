@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"fmt"
 	"github.com/g8os/go-client"
 	"github.com/gorilla/mux"
 )
@@ -93,18 +94,37 @@ func (api Core0API) CoreXDelete(w http.ResponseWriter, r *http.Request) {
 	// w.Header().Set("key","value")
 }
 
-// idcommandGet is the handler for GET /core0/{id}/command
+// CommandsList is the handler for GET /core0/{id}/command
 // List running commands
-func (api Core0API) idcommandGet(w http.ResponseWriter, r *http.Request) {
+func (api Core0API) CommandsList(w http.ResponseWriter, r *http.Request) {
 	var respBody []Location
 	json.NewEncoder(w).Encode(&respBody)
 	// uncomment below line to add header
 	// w.Header().Set("key","value")
 }
 
-// idcommandcommandidGet is the handler for GET /core0/{id}/command/{commandid}
-func (api Core0API) idcommandcommandidGet(w http.ResponseWriter, r *http.Request) {
+// CommandGet is the handler for GET /core0/{id}/command/{commandid}
+func (api Core0API) CommandGet(w http.ResponseWriter, r *http.Request) {
+	v := mux.Vars(r)
+
+	cl := GetConnection(r)
+
+	res, err := cl.Result(client.Job(v["commandid"]), 10)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+
+		return
+	}
+
 	var respBody CommandResult
+	respBody.Id = res.ID
+	respBody.Data = res.Data
+	respBody.Level = fmt.Sprintf("%d", res.Level)
+	respBody.Name = res.Command
+	respBody.State = EnumCommandResultState(res.State)
+	respBody.Starttime = int(res.StartTime)
+
 	json.NewEncoder(w).Encode(&respBody)
 	// uncomment below line to add header
 	// w.Header().Set("key","value")
@@ -392,10 +412,7 @@ func (api Core0API) KVMPause(w http.ResponseWriter, r *http.Request) {
 
 // CPUInfo is the handler for GET /core0/{id}/info/cpu
 func (api Core0API) CPUInfo(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-
-	cl := GetConnection(r, id)
+	cl := GetConnection(r)
 	info := client.Info(cl)
 	result, err := info.CPU()
 	if err != nil {
@@ -425,10 +442,7 @@ func (api Core0API) CPUInfo(w http.ResponseWriter, r *http.Request) {
 
 // DiskInfo is the handler for GET /core0/{id}/info/disk
 func (api Core0API) DiskInfo(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-
-	cl := GetConnection(r, id)
+	cl := GetConnection(r)
 	info := client.Info(cl)
 	result, err := info.Disk()
 	if err != nil {
@@ -453,10 +467,7 @@ func (api Core0API) DiskInfo(w http.ResponseWriter, r *http.Request) {
 
 // MemInfo is the handler for GET /core0/{id}/info/mem
 func (api Core0API) MemInfo(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-
-	cl := GetConnection(r, id)
+	cl := GetConnection(r)
 	info := client.Info(cl)
 	result, err := info.Mem()
 	if err != nil {
@@ -483,10 +494,7 @@ func (api Core0API) MemInfo(w http.ResponseWriter, r *http.Request) {
 
 // NicInfo is the handler for GET /core0/{id}/info/nic
 func (api Core0API) NicInfo(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-
-	cl := GetConnection(r, id)
+	cl := GetConnection(r)
 	info := client.Info(cl)
 	result, err := info.Nic()
 	if err != nil {
@@ -515,10 +523,7 @@ func (api Core0API) NicInfo(w http.ResponseWriter, r *http.Request) {
 
 // OSInfo is the handler for GET /core0/{id}/info/os
 func (api Core0API) OSInfo(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-
-	cl := GetConnection(r, id)
+	cl := GetConnection(r)
 	info := client.Info(cl)
 	result, err := info.OS()
 	if err != nil {
