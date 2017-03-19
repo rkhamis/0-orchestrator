@@ -158,15 +158,19 @@ types:
       pwd:
         description: Directory in which the process needs to be started
         type: string
+        required: false
       args:
         description: List of commandline arguments
         type: string[]
+        required: false
       environment:
         description: Environment variables of the process
         type: KeyValuePair[]
+        required: false
       stdin:
         description: Data that needs to be passed into the stdin of the started process
         type: string
+        required: false
 
   CoreKill:
     type: object

@@ -6,11 +6,11 @@ import (
 
 // Arguments for a core.system command
 type CoreSystem struct {
-	Args        []string       `json:"args" validate:"nonzero"`
-	Environment []KeyValuePair `json:"environment" validate:"nonzero"`
+	Args        []string       `json:"args,omitempty"`
+	Environment []KeyValuePair `json:"environment,omitempty"`
 	Name        string         `json:"name" validate:"nonzero"`
-	Pwd         string         `json:"pwd" validate:"nonzero"`
-	Stdin       string         `json:"stdin" validate:"nonzero"`
+	Pwd         string         `json:"pwd,omitempty"`
+	Stdin       string         `json:"stdin,omitempty"`
 }
 
 func (s CoreSystem) Validate() error {

@@ -111,9 +111,7 @@ func (api Core0API) CommandGet(w http.ResponseWriter, r *http.Request) {
 
 	res, err := cl.Result(client.Job(v["commandid"]), 10)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(err.Error())
-
+		WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -123,6 +121,8 @@ func (api Core0API) CommandGet(w http.ResponseWriter, r *http.Request) {
 	respBody.Level = fmt.Sprintf("%d", res.Level)
 	respBody.Name = EnumCommandResultName(res.Command)
 	respBody.State = EnumCommandResultState(res.State)
+	respBody.Stdout = res.Streams.Stdout()
+	respBody.Stderr = res.Streams.Stderr()
 	respBody.Starttime = int(res.StartTime)
 
 	json.NewEncoder(w).Encode(&respBody)
@@ -202,7 +202,30 @@ func (api Core0API) System(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
 		return
 	}
-	var respBody Location
+
+	cl := GetConnection(r)
+	system := client.Core(cl)
+
+	var env map[string]string
+	if len(reqBody.Environment) > 0 {
+		env = make(map[string]string)
+		for _, pair := range reqBody.Environment {
+			env[pair.Name] = pair.Value
+		}
+	}
+
+	job, err := system.SystemArgs(reqBody.Name, reqBody.Args, env, reqBody.Pwd, reqBody.Stdin)
+	if err != nil {
+		WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	respBody := Location{
+		Name: "core.system",
+		Id:   string(job),
+		Url:  Url(r, "command", string(job)),
+	}
+
 	json.NewEncoder(w).Encode(&respBody)
 	// uncomment below line to add header
 	// w.Header().Set("key","value")
