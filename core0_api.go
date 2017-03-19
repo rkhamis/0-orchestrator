@@ -121,7 +121,7 @@ func (api Core0API) CommandGet(w http.ResponseWriter, r *http.Request) {
 	respBody.Id = res.ID
 	respBody.Data = res.Data
 	respBody.Level = fmt.Sprintf("%d", res.Level)
-	respBody.Name = res.Command
+	respBody.Name = EnumCommandResultName(res.Command)
 	respBody.State = EnumCommandResultState(res.State)
 	respBody.Starttime = int(res.StartTime)
 
@@ -845,6 +845,495 @@ func (api Core0API) DiskPartitionMount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var respBody Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// FileDownload is the handler for GET /core0/{id}/filesystem
+// Download file from Core0
+func (api Core0API) FileDownload(w http.ResponseWriter, r *http.Request) {
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// FileUpload is the handler for POST /core0/{id}/filesystem
+// Upload file to Core0
+func (api Core0API) FileUpload(w http.ResponseWriter, r *http.Request) {
+	var reqBody WriteFile
+
+	// decode request
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// validate request
+	if err := reqBody.Validate(); err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		return
+	}
+	var respBody Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// FileDelete is the handler for DELETE /core0/{id}/filesystem
+// Delete file from Core0
+func (api Core0API) FileDelete(w http.ResponseWriter, r *http.Request) {
+	var reqBody DeleteFile
+
+	// decode request
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// validate request
+	if err := reqBody.Validate(); err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		return
+	}
+	var respBody Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// ZerotierList is the handler for GET /core0/{id}/zerotier
+// List running zerotier networks
+func (api Core0API) ZerotierList(w http.ResponseWriter, r *http.Request) {
+	var respBody []Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// ZerotierGet is the handler for GET /core0/{id}/zerotier/{zerotierid}
+// Get zerotier network details
+func (api Core0API) ZerotierGet(w http.ResponseWriter, r *http.Request) {
+	var respBody ZeroTier
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// ZerotierJoin is the handler for POST /core0/{id}/zerotier/{zerotierid}
+// Join zerotier network
+func (api Core0API) ZerotierJoin(w http.ResponseWriter, r *http.Request) {
+	var reqBody Command
+
+	// decode request
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// validate request
+	if err := reqBody.Validate(); err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		return
+	}
+	var respBody Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// ZerotierUnjoin is the handler for DELETE /core0/{id}/zerotier/{zerotierid}
+// Delete zerotier network
+func (api Core0API) ZerotierUnjoin(w http.ResponseWriter, r *http.Request) {
+	var reqBody Command
+
+	// decode request
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// validate request
+	if err := reqBody.Validate(); err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		return
+	}
+	var respBody Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// CXFileDownload is the handler for GET /core0/{id}/coreX/{coreXid}/filesystem
+// Download file from Core0
+func (api Core0API) CXFileDownload(w http.ResponseWriter, r *http.Request) {
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// CXFileUpload is the handler for POST /core0/{id}/coreX/{coreXid}/filesystem
+// Upload file to Core0
+func (api Core0API) CXFileUpload(w http.ResponseWriter, r *http.Request) {
+	var reqBody WriteFile
+
+	// decode request
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// validate request
+	if err := reqBody.Validate(); err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		return
+	}
+	var respBody Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// CXFileDelete is the handler for DELETE /core0/{id}/coreX/{coreXid}/filesystem
+// Delete file from Core0
+func (api Core0API) CXFileDelete(w http.ResponseWriter, r *http.Request) {
+	var reqBody DeleteFile
+
+	// decode request
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// validate request
+	if err := reqBody.Validate(); err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		return
+	}
+	var respBody Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// CXKill is the handler for POST /core0/{id}/coreX/{coreXid}/core/kill
+// Kill a process / command
+func (api Core0API) CXKill(w http.ResponseWriter, r *http.Request) {
+	var reqBody CoreKill
+
+	// decode request
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// validate request
+	if err := reqBody.Validate(); err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		return
+	}
+	var respBody Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// CXKillAll is the handler for POST /core0/{id}/coreX/{coreXid}/core/killall
+// Kills all running commands
+func (api Core0API) CXKillAll(w http.ResponseWriter, r *http.Request) {
+	var reqBody Command
+
+	// decode request
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// validate request
+	if err := reqBody.Validate(); err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		return
+	}
+	var respBody Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// CXStateGet is the handler for GET /core0/{id}/coreX/{coreXid}/core/state
+// The aggregated consumption of coreX + all processes (cpu, memory, etc...)
+func (api Core0API) CXStateGet(w http.ResponseWriter, r *http.Request) {
+	var respBody CoreStateResult
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// CXPing is the handler for POST /core0/{id}/coreX/{coreXid}/core/ping
+// Execute a ping command to this CoreX
+func (api Core0API) CXPing(w http.ResponseWriter, r *http.Request) {
+	var reqBody Command
+
+	// decode request
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// validate request
+	if err := reqBody.Validate(); err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		return
+	}
+	var respBody Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// CXSystem is the handler for POST /core0/{id}/coreX/{coreXid}/core/system
+// Execute a new process  on this CoreX
+func (api Core0API) CXSystem(w http.ResponseWriter, r *http.Request) {
+	var reqBody CoreSystem
+
+	// decode request
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// validate request
+	if err := reqBody.Validate(); err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		return
+	}
+	var respBody Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// CXCPUInfo is the handler for GET /core0/{id}/coreX/{coreXid}/info/cpu
+func (api Core0API) CXCPUInfo(w http.ResponseWriter, r *http.Request) {
+	var respBody []CPUInfo
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// CXMemInfo is the handler for GET /core0/{id}/coreX/{coreXid}/info/mem
+func (api Core0API) CXMemInfo(w http.ResponseWriter, r *http.Request) {
+	var respBody MemInfo
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// CXNicInfo is the handler for GET /core0/{id}/coreX/{coreXid}/info/nic
+func (api Core0API) CXNicInfo(w http.ResponseWriter, r *http.Request) {
+	var respBody []NicInfo
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// CXOSInfo is the handler for GET /core0/{id}/coreX/{coreXid}/info/os
+func (api Core0API) CXOSInfo(w http.ResponseWriter, r *http.Request) {
+	var respBody OSInfo
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// CXProcessList is the handler for GET /core0/{id}/coreX/{coreXid}/process
+// Get Processes
+func (api Core0API) CXProcessList(w http.ResponseWriter, r *http.Request) {
+	var respBody []Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// CXProcessGet is the handler for GET /core0/{id}/coreX/{coreXid}/process/{proccessid}
+// Get process details
+func (api Core0API) CXProcessGet(w http.ResponseWriter, r *http.Request) {
+	var respBody Process
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// CXProcessKill is the handler for DELETE /core0/{id}/coreX/{coreXid}/process/{proccessid}
+// Kill Process
+func (api Core0API) CXProcessKill(w http.ResponseWriter, r *http.Request) {
+	var reqBody Command
+
+	// decode request
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// validate request
+	if err := reqBody.Validate(); err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		return
+	}
+	var respBody Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// BtrfsList is the handler for GET /core0/{id}/btrfs
+// List btrfs filesystems
+func (api Core0API) BtrfsList(w http.ResponseWriter, r *http.Request) {
+	var respBody []Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// BtrfsCreate is the handler for POST /core0/{id}/btrfs
+// Create a new btrfs filesystem
+func (api Core0API) BtrfsCreate(w http.ResponseWriter, r *http.Request) {
+	var reqBody BtrfsCreate
+
+	// decode request
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// validate request
+	if err := reqBody.Validate(); err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		return
+	}
+	var respBody Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// BtrfsGet is the handler for GET /core0/{id}/btrfs/{btrfsUuid}
+// Get btrfs filesystem details
+func (api Core0API) BtrfsGet(w http.ResponseWriter, r *http.Request) {
+	var respBody Btrfs
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// BtrfsAddDevice is the handler for POST /core0/{id}/btrfs/{btrfsUuid}
+// Add a device to an existing btrfs filesystem
+func (api Core0API) BtrfsAddDevice(w http.ResponseWriter, r *http.Request) {
+	var reqBody BtrfsAddDevice
+
+	// decode request
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// validate request
+	if err := reqBody.Validate(); err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		return
+	}
+	var respBody Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// BtrfsSubvolList is the handler for GET /core0/{id}/btrfs/{btrfsUuid}/subvolumes
+// Btrfs List Subvolumes
+func (api Core0API) BtrfsSubvolList(w http.ResponseWriter, r *http.Request) {
+	var respBody []Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// BtrfsSubvolGet is the handler for GET /core0/{id}/btrfs/{btrfsUuid}/subvolumes/{subvolumepath}
+// Gets subvolume details
+func (api Core0API) BtrfsSubvolGet(w http.ResponseWriter, r *http.Request) {
+	var respBody BtrfsSubVolume
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// BtrfsSubvolCreate is the handler for POST /core0/{id}/btrfs/{btrfsUuid}/subvolumes/{subvolumepath}
+// Create a new subvolume
+func (api Core0API) BtrfsSubvolCreate(w http.ResponseWriter, r *http.Request) {
+	var reqBody Command
+
+	// decode request
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// validate request
+	if err := reqBody.Validate(); err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		return
+	}
+	var respBody Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// BtrfsSubvolDelete is the handler for DELETE /core0/{id}/btrfs/{btrfsUuid}/subvolumes/{subvolumepath}
+// Delete subvolume
+func (api Core0API) BtrfsSubvolDelete(w http.ResponseWriter, r *http.Request) {
+	var reqBody Command
+
+	// decode request
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	// validate request
+	if err := reqBody.Validate(); err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		return
+	}
+	var respBody Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// CXCommandsList is the handler for GET /core0/{id}/coreX/{coreXid}/command
+// List running commands
+func (api Core0API) CXCommandsList(w http.ResponseWriter, r *http.Request) {
+	var respBody []Location
+	json.NewEncoder(w).Encode(&respBody)
+	// uncomment below line to add header
+	// w.Header().Set("key","value")
+}
+
+// CXCommandGet is the handler for GET /core0/{id}/coreX/{coreXid}/command/{commandid}
+func (api Core0API) CXCommandGet(w http.ResponseWriter, r *http.Request) {
+	var respBody CommandResult
 	json.NewEncoder(w).Encode(&respBody)
 	// uncomment below line to add header
 	// w.Header().Set("key","value")

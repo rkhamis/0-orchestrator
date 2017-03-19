@@ -334,6 +334,33 @@ types:
         default: [0]
         required: false
 
+  WriteFile:
+    type: object
+    displayName: Writes a file in the targetted system
+    properties:
+      path:
+        displayName: Path on the target system where the file should be written
+        type: string
+      contents:
+        displayName: Contents of the file that should be written
+        type: string
+      command:
+        description: Details how to pass the command to the core0/coreX
+        type: Command
+        required: false
+
+  DeleteFile:
+    type: object
+    displayName: Removes a file in the targetted system
+    properties:
+      path:
+        displayName: Path on the target system where the file should be written
+        type: string
+      command:
+        description: Details how to pass the command to the core0/coreX
+        type: Command
+        required: false
+
   Process:
     type: object
     properties:
@@ -418,11 +445,9 @@ types:
     type: object
     properties:
        name:
-         description: Name
          description: Name of the bridge
          type: string
        config:
-         description: Bridge config
          description: |
             '' or 'none':
               no IP is gonna be set on the link
@@ -463,7 +488,6 @@ types:
         description: Bridge mapping
       ports:
          type: PortMap[]
-         description: Port Mapping
          description: Maps ports from container to host
 
   Location:
@@ -503,9 +527,15 @@ types:
       starttime:
         description: Epoch timestamp when the command was started
         type: integer
+      stdout:
+        type: string
+        description: Stdout of process/command
+      stderr:
+        type: string
+        description: Stderr of process/command
       state:
         description: Status of the command
-        enum: ['SCHEDULED', 'RUNNING', 'SUCCES', 'KILLED', 'KILLED_TIMEOUT', 'FAILED']
+        enum: ['SCHEDULED', 'RUNNING', 'SUCCESS', 'KILLED', 'KILLED_TIMEOUT', 'FAILED']
       data:
         description: The result of executing the command
         type: string
@@ -520,6 +550,99 @@ types:
       rss: integer
       vms: integer
       swap: integer
+
+  ZeroTierRoute:
+    type: object
+    description: Zerotier route
+    properties:
+      flags: integer
+      metric: integer
+      target: string
+      via: string
+
+  ZeroTier:
+    type: object
+    description: Zerotier details
+    properties:
+      allowDefault: boolean
+      allowGlobal: boolean
+      allowManaged: boolean
+      assignedAddresses: string[]
+      bridge: boolean
+      broadcastEnabled: boolean
+      dhcp: boolean
+      mac: string
+      mtu: integer
+      name: string
+      netconfRevision: integer
+      nwid: string
+      portDeviceName: string
+      portError: integer
+      routes: ZeroTierRoute[]
+      status: string
+      type:
+        enum: ['PUBLIC', 'PRIVATE']
+
+  BtrfsCreate:
+    type: object
+    description: Command arguments for creating btrfs filesystems
+    properties:
+      label:
+        description: Name / label for the btrfs filesystem
+        type: string
+      devices:
+        description: Devices that will be part of the filesystem
+        type: string[]
+      metadataProfile:
+        enum: ['raid0', 'raid1', 'raid5', 'raid6', 'raid10', 'dup', 'single']
+      dataProfile:
+        enum: ['raid0', 'raid1', 'raid5', 'raid6', 'raid10', 'dup', 'single']
+      command:
+        description: Details how to pass the command to the core0/coreX
+        type: Command
+        required: false
+
+  BtrfsDevice:
+    type: object
+    description: Devices that are assigned to a btrfs filesystem
+    properties:
+      id: integer
+      path: string
+      size: integer
+      used: integer
+
+  Btrfs:
+    type: object
+    description: Btrfs details
+    properties:
+      uuid:
+        description: Unique identifier of the btrfs filesystem
+        type: string
+      label: string
+      deviceCount: integer
+      used: integer
+      devices: BtrfsDevice[]
+
+  BtrfsAddDevice:
+    type: object
+    description: Command to add a device to an existing Btrfs filesystem
+    properties:
+      path:
+        displayName: DevicePath
+        type: string
+      command:
+        description: Details how to pass the command to the core0/coreX
+        type: Command
+        required: false
+
+  BtrfsSubVolume:
+    type: object
+    description: Btrfs subvolume details
+    properties:
+      gen: integer
+      id: integer
+      path: string
+      topLevel: integer
 
 /core0:
   description: Core0s
@@ -696,7 +819,7 @@ types:
         /destroy:
           post:
             displayName: KVMDestroy
-            description: Destroy the kvmdomain
+            description: Destroy the kvm domain
             body:
               application/json:
                 type: Command
@@ -708,7 +831,7 @@ types:
         /pause:
           post:
             displayName: KVMPause
-            description: Pause the kvmdomain
+            description: Pause the kvm domain
             body:
               application/json:
                 type: Command
@@ -945,6 +1068,159 @@ types:
                     body:
                       application/json:
                         type: Location
+    /filesystem:
+      post:
+        description: Upload file to Core0
+        displayName: FileUpload
+        body:
+          application/json:
+            type: WriteFile
+        responses:
+          200:
+            body:
+              application/json:
+                type: Location
+      get:
+        description: Download file from Core0
+        displayName: FileDownload
+        queryString:
+          properties:
+            path: string
+        responses:
+          200:
+            body:
+              application/octet-stream:
+      delete:
+        description: Delete file from Core0
+        displayName: FileDelete
+        body:
+          application/json:
+            type: DeleteFile
+        responses:
+          200:
+            body:
+              application/json:
+                type: Location
+    /zerotier:
+      get:
+        displayName: ZerotierList
+        description: List running zerotier networks
+        responses:
+          200:
+            body:
+              application/json:
+                type: Location[]
+      /{zerotierid}:
+        get:
+          displayName: ZerotierGet
+          description: Get zerotier network details
+          responses:
+            200:
+              body:
+                application/json:
+                  type: ZeroTier
+        post:
+          displayName: ZerotierJoin
+          description: Join zerotier network
+          body:
+            application/json:
+              type: Command
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
+        delete:
+          displayName: ZerotierUnjoin
+          description: Delete zerotier network
+          body:
+            application/json:
+              type: Command
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
+    /btrfs:
+      get:
+        displayName: BtrfsList
+        description: List btrfs filesystems
+        responses:
+          200:
+            body:
+              application/json:
+                type: Location[]
+      post:
+        displayName: BtrfsCreate
+        description: Create a new btrfs filesystem
+        body:
+          application/json:
+            type: BtrfsCreate
+        responses:
+          200:
+            body:
+              application/json:
+                type: Location
+      /{btrfsUuid}:
+        get:
+          description: Get btrfs filesystem details
+          displayName: BtrfsGet
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Btrfs
+        post:
+          description: Add a device to an existing btrfs filesystem
+          displayName: BtrfsAddDevice
+          body:
+            application/json:
+              type: BtrfsAddDevice
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
+        /subvolumes:
+          get:
+            description: Btrfs List Subvolumes
+            displayName: BtrfsSubvolList
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location[]
+          /{subvolumepath}:
+            get:
+              displayName: BtrfsSubvolGet
+              description: Gets subvolume details
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: BtrfsSubVolume
+            post:
+              displayName: BtrfsSubvolCreate
+              description: Create a new subvolume
+              body:
+                application/json:
+                  type: Command
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: Location
+            delete:
+              displayName: BtrfsSubvolDelete
+              description: Delete subvolume
+              body:
+                application/json:
+                  type: Command
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: Location
     /coreX:
       get:
         displayName: CoreXList
@@ -985,3 +1261,176 @@ types:
               body:
                 application/json:
                   type: CoreX
+        /command:
+          description: Commands for this Core0
+          get:
+            description: List running commands
+            displayName: CXCommandsList
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location[]
+          /{commandid}:
+            description: Get status of command
+            get:
+              displayName: CXCommandGet
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: CommandResult
+        /core:
+          /ping:
+            post:
+              description: Execute a ping command to this CoreX
+              displayName: CXPing
+              body:
+                application/json:
+                  type: Command
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: Location
+          /system:
+            post:
+              displayName: CXSystem
+              description: Execute a new process  on this CoreX
+              body:
+                application/json:
+                  type: CoreSystem
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: Location
+          /kill:
+            post:
+              displayName: CXKill
+              description: Kill a process / command
+              body:
+                application/json:
+                  type: CoreKill
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: Location
+          /killall:
+            post:
+              displayName: CXKillAll
+              description: Kills all running commands
+              body:
+                application/json:
+                  type: Command
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: Location
+          /state:
+            get:
+              description: The aggregated consumption of coreX + all processes (cpu, memory, etc...)
+              displayName: CXStateGet
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type:
+                        CoreStateResult
+        /info:
+          /cpu:
+            get:
+              displayName: CXCPUInfo
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: CPUInfo[]
+          /mem:
+            get:
+              displayName: CXMemInfo
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: MemInfo
+          /nic:
+            get:
+              displayName: CXNicInfo
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: NicInfo[]
+          /os:
+            get:
+              displayName: CXOSInfo
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: OSInfo
+        /process:
+           get:
+             displayName: CXProcessList
+             description: Get Processes
+             responses:
+               200:
+                 body:
+                   application/json:
+                     type: Location[]
+           /{proccessid}:
+             get:
+               displayName: CXProcessGet
+               description: Get process details
+               responses:
+                 200:
+                   body:
+                     application/json:
+                       type: Process
+             delete:
+               displayName: CXProcessKill
+               description: Kill Process
+               body:
+                 application/json:
+                   type: Command
+               responses:
+                 200:
+                   body:
+                     application/json:
+                       type: Location
+        /filesystem:
+          post:
+            description: Upload file to Core0
+            displayName: CXFileUpload
+            body:
+              application/json:
+                type: WriteFile
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location
+          get:
+            description: Download file from Core0
+            displayName: CXFileDownload
+            queryString:
+              properties:
+                path: string
+            responses:
+              200:
+                body:
+                  application/octet-stream:
+          delete:
+            description: Delete file from Core0
+            displayName: CXFileDelete
+            body:
+              application/json:
+                type: DeleteFile
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location

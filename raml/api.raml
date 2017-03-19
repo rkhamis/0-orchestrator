@@ -528,11 +528,11 @@ types:
         description: Epoch timestamp when the command was started
         type: integer
       stdout:
-      	type: string
-      	description: Stdout of the command
+        type: string
+        description: Stdout of process/command
       stderr:
         type: string
-        description: Stderr of the command
+        description: Stderr of process/command
       state:
         description: Status of the command
         enum: ['SCHEDULED', 'RUNNING', 'SUCCESS', 'KILLED', 'KILLED_TIMEOUT', 'FAILED']
@@ -1183,8 +1183,8 @@ types:
                   type: Location
         /subvolumes:
           get:
-            displayName: BtrfsListSubvolumes
-            description: BtrfsSubvolList
+            description: Btrfs List Subvolumes
+            displayName: BtrfsSubvolList
             responses:
               200:
                 body:
@@ -1263,9 +1263,9 @@ types:
                   type: CoreX
         /command:
           description: Commands for this Core0
-          displayName: CXCommandsList
           get:
             description: List running commands
+            displayName: CXCommandsList
             responses:
               200:
                 body:
@@ -1273,8 +1273,8 @@ types:
                     type: Location[]
           /{commandid}:
             description: Get status of command
-            displayName: CXCommandGet
             get:
+              displayName: CXCommandGet
               responses:
                 200:
                   body:
