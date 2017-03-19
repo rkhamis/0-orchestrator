@@ -223,7 +223,7 @@ func (api Core0API) System(w http.ResponseWriter, r *http.Request) {
 	respBody := Location{
 		Name: "core.system",
 		Id:   string(job),
-		Url:  Url(r, "command", string(job)),
+		Url:  ResultUrl(r, job),
 	}
 
 	json.NewEncoder(w).Encode(&respBody)
