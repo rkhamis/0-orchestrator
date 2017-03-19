@@ -179,7 +179,23 @@ func (api Core0API) Ping(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
 		return
 	}
-	var respBody Location
+
+	cl := GetConnection(r)
+
+	//NOTE: we use Raw instead of the client ping method, because the client ping method
+	//is synchronous. Should we change client implementation ?
+	job, err := cl.Raw("core.ping", client.A{}, Options(reqBody)...)
+	if err != nil {
+		WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	respBody := Location{
+		Name: "core.ping",
+		Url:  ResultUrl(r, job),
+		Id:   string(job),
+	}
+
 	json.NewEncoder(w).Encode(&respBody)
 	// uncomment below line to add header
 	// w.Header().Set("key","value")
