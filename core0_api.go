@@ -953,23 +953,49 @@ func (api Core0API) FileDownload(w http.ResponseWriter, r *http.Request) {
 // FileUpload is the handler for POST /core0/{id}/filesystem
 // Upload file to Core0
 func (api Core0API) FileUpload(w http.ResponseWriter, r *http.Request) {
-	var reqBody WriteFile
 
-	// decode request
-	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
-		w.WriteHeader(400)
+	if err := r.ParseMultipartForm(4 * 1024 * 1024); err != nil { //4MiB
+		WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	// validate request
-	if err := reqBody.Validate(); err != nil {
-		w.WriteHeader(400)
-		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+	defer r.MultipartForm.RemoveAll()
+	pathList, ok := r.MultipartForm.Value["path"]
+	if !ok {
+		WriteError(w, http.StatusBadRequest, fmt.Errorf("missing path"))
+		return
+	}
+	path := pathList[0]
+
+	filesList, ok := r.MultipartForm.File["file"]
+	if !ok {
+		WriteError(w, http.StatusBadRequest, fmt.Errorf("missing file"))
 		return
 	}
 
-	var respBody Location
+	file := filesList[0]
+	fd, err := file.Open()
+	if err != nil {
+		WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	cl := GetConnection(r)
+	fs := client.Filesystem(cl)
+
+	if err := fs.Upload(fd, path); err != nil {
+		WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	respBody := Location{
+		Id:  path,
+		Url: Url(r, "filesystem") + fmt.Sprintf("?path=%s", path),
+	}
+
+	w.Header().Set("content-type", "application/json")
 	json.NewEncoder(w).Encode(&respBody)
+
 	// uncomment below line to add header
 	// w.Header().Set("key","value")
 }
@@ -1071,20 +1097,6 @@ func (api Core0API) CXFileDownload(w http.ResponseWriter, r *http.Request) {
 // CXFileUpload is the handler for POST /core0/{id}/coreX/{coreXid}/filesystem
 // Upload file to Core0
 func (api Core0API) CXFileUpload(w http.ResponseWriter, r *http.Request) {
-	var reqBody WriteFile
-
-	// decode request
-	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
-		w.WriteHeader(400)
-		return
-	}
-
-	// validate request
-	if err := reqBody.Validate(); err != nil {
-		w.WriteHeader(400)
-		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
-		return
-	}
 	var respBody Location
 	json.NewEncoder(w).Encode(&respBody)
 	// uncomment below line to add header
