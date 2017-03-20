@@ -664,6 +664,7 @@ types:
             type: Location[]
   /{id}:
     get:
+      description: Get detailed information of a core0
       displayName: CoreGet
       responses:
         200:
@@ -684,6 +685,7 @@ types:
         description: Get status of command
         get:
           displayName: CommandGet
+          description: Get details of a submitted command
           responses:
             200:
               body:
@@ -852,6 +854,7 @@ types:
       /cpu:
         get:
           displayName: CPUInfo
+          description: Get detailed information of all CPUs in the core0
           responses:
             200:
               body:
@@ -860,6 +863,7 @@ types:
       /disk:
         get:
           displayName: DiskInfo
+          description: Get detailed information of all the disks in the core0
           responses:
             200:
               body:
@@ -868,6 +872,7 @@ types:
       /mem:
         get:
           displayName: MemInfo
+          description: Get detailed information about the memory in the core0
           responses:
             200:
               body:
@@ -876,6 +881,7 @@ types:
       /nic:
         get:
           displayName: NicInfo
+          description: Get detailed information about the network interfaces in the cor0
           responses:
             200:
               body:
@@ -884,6 +890,7 @@ types:
       /os:
         get:
           displayName: OSInfo
+          description: Get detailed information of the core0 os
           responses:
             200:
               body:
@@ -1287,9 +1294,9 @@ types:
                   application/json:
                     type: Location[]
           /{commandid}:
-            description: Get status of command
             get:
               displayName: CXCommandGet
+              description: Get status of command
               responses:
                 200:
                   body:
@@ -1358,6 +1365,7 @@ types:
           /cpu:
             get:
               displayName: CXCPUInfo
+              description: Get detailed information about the CPUs in the coreX
               responses:
                 200:
                   body:
@@ -1366,6 +1374,7 @@ types:
           /mem:
             get:
               displayName: CXMemInfo
+              description: Get detailed information about the memory of the coreX
               responses:
                 200:
                   body:
@@ -1374,6 +1383,7 @@ types:
           /nic:
             get:
               displayName: CXNicInfo
+              description: Get detailed information about the network interface of the coreX
               responses:
                 200:
                   body:
@@ -1382,6 +1392,7 @@ types:
           /os:
             get:
               displayName: CXOSInfo
+              description: Get detailed information about the coreX os
               responses:
                 200:
                   body:
