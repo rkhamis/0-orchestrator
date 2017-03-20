@@ -140,9 +140,35 @@ types:
         description: Name for the bridge to be created
         type: string
       hwaddr:
-        description: Macaddress for the bridge to be created
+        description: Macaddress for the bridge to be created. If none, a random macaddress will be assigned
         type: string
         required: false
+      networkMode:
+        description: Networking mode
+        enum: ['none', 'static', 'dnsmasq']
+      nat:
+        description: If true, SNAT will be enabled on this bridge.
+        type: boolean
+      settings:
+        type: object
+        description: |
+          Networking settings, depending on the selected mode.
+            none:
+              no settings, bridge won't get any ip settings
+            static:
+              settings={'cidr': 'ip/net'}
+              bridge will get assigned the given IP address
+            dnsmasq:
+              settings={'cidr': 'ip/net', 'start': 'ip', 'end': 'ip'}
+              bridge will get assigned the ip in cidr
+              and each running container that is attached to this IP will get
+              IP from the start/end range. Netmask of the range is the netmask
+              part of the provided cidr.
+              if nat is true, SNAT rules will be automatically added in the firewall.
+        properties:
+          cidr: string
+          start: string
+          end: string
 
   Job:
     type: object
@@ -201,6 +227,8 @@ types:
     type: object
     properties:
       cmd: Job
+      pid: integer
+      name: string
       cpu: number
       debug: string
       rss: number
@@ -217,6 +245,15 @@ types:
       url:
         description: File path to the NBD unix domain socket
         type: string
+
+  VMListItem:
+    type: object
+    description: Virtual machine list item
+    properties:
+      pid:
+        description: Runtime id of the virtual machine (process id)
+        type: integer
+      name: string
 
   VM:
     type: object
@@ -258,6 +295,19 @@ types:
               Assign static IP to the link
          type: string
 
+  ContainerListItem:
+    type: object
+    properties:
+      id:
+        description: identifier
+        type: string
+      hostname:
+        description: Hostname for the Container
+        type: string
+      plist:
+        type: string
+        description: Url to the root filesystem plist
+
   Container:
     type: object
     properties:
@@ -275,7 +325,7 @@ types:
           List of host directory to container directory mappings (Node to Container)
           eg: /mnt/volume34:/var
         type: string[]
-      zerotier:
+      Zerotier:
         description: Zerotier network id
         type: string
         required: false
@@ -288,19 +338,29 @@ types:
           List of node to container post mappings.
           eg: 8080:80
 
-  Location:
+  JobListItem:
     type: object
-    description: Url to object details
+    description: Result object of a job
     properties:
-      url:
-        description: Url to object details
-        type: string
       id:
-        description: Object id
+        description: The unique identifier for the job
         type: string
       name:
-        description: Object name
-        type: string
+        description: The kind of job to which this result belongs to.
+        enum: ['core.ping', 'core.system', 'core.kill', 'core.killall',
+               'core.state', 'core.reboot', 'info.cpu', 'info.disk',
+               'info.mem', 'info.nic', 'info.os', 'container.create',
+               'container.list', 'container.dispatch', 'container.terminate',
+               'bridge.create', 'bridge.list', 'bridge.delete',
+               'disk.list', 'disk.mktable', 'disk.mkpart', 'disk.rmpart',
+               'disk.mount', 'disk.umount', 'btrfs.create', 'btrfs.list',
+               'btrfs.subvol_create', 'btrfs.subvol_list', 'btrfs.subvol_delete']
+      starttime:
+        description: Epoch timestamp when the job was started
+        type: integer
+      state:
+        description: Status of the job
+        enum: ['SCHEDULED', 'RUNNING', 'SUCCESS', 'KILLED', 'KILLED_TIMEOUT', 'FAILED']
 
   JobResult:
     type: object
@@ -349,7 +409,7 @@ types:
       vms: integer
       swap: integer
 
-  ZeroTierRoute:
+  ZerotierRoute:
     type: object
     description: Zerotier route
     properties:
@@ -358,7 +418,17 @@ types:
       target: string
       via: string
 
-  ZeroTier:
+  ZerotierListItem:
+    type: object
+    description: Zerotier details
+    properties:
+      name: string
+      nwid: string
+      status: string
+      type:
+        enum: ['PUBLIC', 'PRIVATE']
+
+  Zerotier:
     type: object
     description: Zerotier details
     properties:
@@ -376,7 +446,7 @@ types:
       nwid: string
       portDeviceName: string
       portError: integer
-      routes: ZeroTierRoute[]
+      routes: ZerotierRoute[]
       status: string
       type:
         enum: ['PUBLIC', 'PRIVATE']
@@ -408,7 +478,6 @@ types:
         required: false
 
 /node:
-  description: Nodes
   get:
     description: List Nodes
     displayName: ListNodes
@@ -416,7 +485,7 @@ types:
       200:
         body:
           application/json:
-            type: Location[]
+            type: Node[]
   /{nodeid}:
     get:
       description: Get detailed information of a node
@@ -435,19 +504,14 @@ types:
           200:
             body:
               application/json:
-                type: Location[]
+                type: JobListItem[]
       delete:
         displayName: KillAllNodeJobs
         description: Kills all running jobs
-        responses:
-          200:
-            body:
-              application/json:
-                type: Location
       /{jobid}:
         get:
           displayName: GetNodeJob
-          description: Get details of a submitted job
+          description: Get the details of a submitted job
           responses:
             200:
               body:
@@ -456,11 +520,6 @@ types:
         delete:
           displayName: KillNodeJob
           description: Kills the job
-          responses:
-            200:
-              body:
-                application/json:
-                  type: Location
     /ping:
       post:
         displayName: PingNode
@@ -469,7 +528,8 @@ types:
           200:
             body:
               application/json:
-                type: Location
+                description: Returns true when the g8os responds
+                type: boolean
     /state:
       get:
         displayName: GetNodeState
@@ -484,11 +544,6 @@ types:
       post:
         displayName: RebootNode
         description: Immediately reboot the machine.
-        responses:
-          200:
-            body:
-              application/json:
-                type: Location
     /cpu:
       get:
         displayName: GetCPUInfo
@@ -525,7 +580,7 @@ types:
             body:
               application/json:
                 type: NicInfo[]
-    /os:
+    /info:
       get:
         displayName: GetNodeOSInfo
         description: Get detailed information of the os of the node
@@ -542,7 +597,7 @@ types:
            200:
              body:
                application/json:
-                 type: Location[]
+                 type: Process[]
        /{proccessid}:
          get:
            displayName: GetNodeProcess
@@ -555,11 +610,6 @@ types:
          delete:
            displayName: KillNodeProcess
            description: Kill Process
-           responses:
-             200:
-               body:
-                 application/json:
-                   type: Location
     /bridge:
       post:
         displayName: CreateBridge
@@ -567,11 +617,6 @@ types:
         body:
           application/json:
             type: BridgeCreate
-        responses:
-          200:
-            body:
-              application/json:
-                type: Location
       get:
         displayName: ListBridges
         description: List bridges
@@ -579,7 +624,7 @@ types:
           200:
             body:
               application/json:
-                type: Location[]
+                type: Bridge[]
       /{bridgeid}:
         get:
           displayName: GetBridge
@@ -592,11 +637,6 @@ types:
         delete:
           displayName: DeleteBridge
           description: Remove bridge
-          responses:
-            200:
-              body:
-                application/json:
-                  type: Location
     /storagepool:
       get:
         description: List storage pools present in the node
@@ -609,7 +649,7 @@ types:
           description: Add extra devices to this storage pool
         delete:
           description: Delete the storage pool
-        /devices:
+        /device:
           get:
             description: Lists the devices in the storage pool
           /{deviceid}:
@@ -617,7 +657,7 @@ types:
               description: Get detailed information on the device
             delete:
               description: Removes the device from the storagepool
-        /volumes:
+        /volume:
           get:
             description: List volumes
           post:
@@ -636,40 +676,30 @@ types:
             /children:
               get:
                 description: List child volumes of this volume
-    /zerotier:
+    /Zerotier:
       get:
         displayName: ListZerotier
-        description: List running zerotier networks
+        description: List running Zerotier networks
         responses:
           200:
             body:
               application/json:
-                type: Location[]
+                type: ZerotierListItem[]
       /{zerotierid}:
         get:
           displayName: GetZerotier
-          description: Get zerotier network details
+          description: Get Zerotier network details
           responses:
             200:
               body:
                 application/json:
-                  type: ZeroTier
+                  type: Zerotier
         post:
           displayName: JoinZerotier
-          description: Join zerotier network
-          responses:
-            200:
-              body:
-                application/json:
-                  type: Location
+          description: Join Zerotier network
         delete:
           displayName: ExitZerotier
           description: Exit the Zerotier network
-          responses:
-            200:
-              body:
-                application/json:
-                  type: Location
     /container:
       get:
         displayName: ListContainers
@@ -678,27 +708,17 @@ types:
           200:
             body:
               application/json:
-                type: Location[]
+                type: ContainerListItem[]
       post:
         displayName: CreateContainer
         description: Create a new Container
         body:
           application/json:
             type: Container
-        responses:
-          200:
-            body:
-              application/json:
-                type: Location
       /{containerid}:
         delete:
           displayName: DeleteContainer
           description: Delete Container instance
-          responses:
-            200:
-              body:
-                application/json:
-                  type: Location
         get:
           displayName: GetContainer
           description: Get Container
@@ -721,11 +741,6 @@ types:
                     type: file
                     required: true
                     description: the file to upload
-            responses:
-              200:
-                body:
-                  application/json:
-                    type: Location
           get:
             description: Download file from container
             displayName: FileDownload
@@ -742,11 +757,6 @@ types:
             body:
               application/json:
                 type: DeleteFile
-            responses:
-              200:
-                body:
-                  application/json:
-                    type: Location
         /job:
           get:
             displayName: ListContainerJobs
@@ -755,15 +765,10 @@ types:
               200:
                 body:
                   application/json:
-                    type: Location[]
+                    type: JobListItem[]
           delete:
             displayName: KillAllContainerJobs
             description: Kills all running jobs on the container
-            responses:
-              200:
-                body:
-                  application/json:
-                    type: Location
           /{jobid}:
             get:
               displayName: GetContainerJob
@@ -776,11 +781,6 @@ types:
             delete:
               displayName: KillContainerJob
               description: Kills the job
-              responses:
-                200:
-                  body:
-                    application/json:
-                      type: Location
         /ping:
           post:
             displayName: PingContainer
@@ -789,7 +789,7 @@ types:
               200:
                 body:
                   application/json:
-                    type: Location
+                    type: boolean
         /state:
           get:
             displayName: GetContainerState
@@ -800,7 +800,7 @@ types:
                   application/json:
                     type:
                       CoreStateResult
-        /os:
+        /info:
           get:
             displayName: GetContainerOSInfo
             description: Get detailed information of the container os
@@ -817,7 +817,7 @@ types:
                200:
                  body:
                    application/json:
-                     type: Location[]
+                     type: Process[]
            post:
              displayName: StartContainerProcess
              description: Start a new process in this container
@@ -825,10 +825,10 @@ types:
                application/json:
                  type: CoreSystem
              responses:
-               200:
-                 body:
-                   application/json:
-                     type: Location
+               202:
+                 headers:
+                   Location:
+                     description: Url to the job object handling this request
            /{proccessid}:
              get:
                displayName: GetContainerProcess
@@ -841,11 +841,6 @@ types:
              delete:
                displayName: KillContainerProcess
                description: Kill Process
-               responses:
-                 200:
-                   body:
-                     application/json:
-                       type: Location
     /vm:
       get:
         description: List running VMs
@@ -854,7 +849,7 @@ types:
           200:
             body:
               application/json:
-                type: Location[]
+                type: VMListItem[]
       post:
         description: Starts the VM
         displayName: StartVM
@@ -865,16 +860,12 @@ types:
           200:
             body:
               application/json:
-                type: Location
-      /{vmid}:
+                description: Runtime id of the virtual machine (process id)
+                type: integer
+      /{vmpid}:
         delete:
           displayName: StopVM
           description: Stops the VM
-          responses:
-            200:
-              body:
-                application/json:
-                  type: Location
         get:
           displayName: GetVM
           description: Get detailed virtual machine object
