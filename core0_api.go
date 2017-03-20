@@ -125,9 +125,8 @@ func (api Core0API) CommandGet(w http.ResponseWriter, r *http.Request) {
 	respBody.Stderr = res.Streams.Stderr()
 	respBody.Starttime = int(res.StartTime)
 
+	w.Header().Set("content-type", "application/json")
 	json.NewEncoder(w).Encode(&respBody)
-	// uncomment below line to add header
-	// w.Header().Set("key","value")
 }
 
 // StateGet is the handler for GET /core0/{id}/core/state
@@ -196,9 +195,8 @@ func (api Core0API) Ping(w http.ResponseWriter, r *http.Request) {
 		Id:   string(job),
 	}
 
+	w.Header().Set("content-type", "application/json")
 	json.NewEncoder(w).Encode(&respBody)
-	// uncomment below line to add header
-	// w.Header().Set("key","value")
 }
 
 // System is the handler for POST /core0/{id}/core/system
@@ -249,6 +247,7 @@ func (api Core0API) System(w http.ResponseWriter, r *http.Request) {
 		Url:  ResultUrl(r, job),
 	}
 
+	w.Header().Set("content-type", "application/json")
 	json.NewEncoder(w).Encode(&respBody)
 	// uncomment below line to add header
 	// w.Header().Set("key","value")
@@ -295,9 +294,8 @@ func (api Core0API) KillAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var respBody Location
+	w.Header().Set("content-type", "application/json")
 	json.NewEncoder(w).Encode(&respBody)
-	// uncomment below line to add header
-	// w.Header().Set("key","value")
 }
 
 // KVMList is the handler for GET /core0/{id}/kvm
@@ -482,7 +480,7 @@ func (api Core0API) CPUInfo(w http.ResponseWriter, r *http.Request) {
 		respBody = append(respBody, info)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("content-type", "application/json")
 	json.NewEncoder(w).Encode(&respBody)
 }
 
@@ -507,7 +505,7 @@ func (api Core0API) DiskInfo(w http.ResponseWriter, r *http.Request) {
 		respBody = append(respBody, info)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("content-type", "application/json")
 	json.NewEncoder(w).Encode(&respBody)
 }
 
@@ -534,7 +532,7 @@ func (api Core0API) MemInfo(w http.ResponseWriter, r *http.Request) {
 	respBody.UsedPercent = result.UsedPercent
 	respBody.Wired = int(result.Wired)
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("content-type", "application/json")
 	json.NewEncoder(w).Encode(&respBody)
 }
 
@@ -563,7 +561,7 @@ func (api Core0API) NicInfo(w http.ResponseWriter, r *http.Request) {
 		respBody = append(respBody, info)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("content-type", "application/json")
 	json.NewEncoder(w).Encode(&respBody)
 }
 
@@ -590,7 +588,7 @@ func (api Core0API) OSInfo(w http.ResponseWriter, r *http.Request) {
 	respBody.VirtualizationRole = result.VirtualizationRole
 	respBody.VirtualizationSystem = result.VirtualizationSystem
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("content-type", "application/json")
 	json.NewEncoder(w).Encode(&respBody)
 }
 
