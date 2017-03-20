@@ -230,7 +230,14 @@ func (api Core0API) System(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	job, err := system.SystemArgs(reqBody.Name, reqBody.Args, env, reqBody.Pwd, reqBody.Stdin)
+	job, err := system.SystemArgs(
+		reqBody.Name,
+		reqBody.Args,
+		env,
+		reqBody.Pwd,
+		reqBody.Stdin,
+		Options(reqBody.Command)...)
+
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, err)
 		return
@@ -591,8 +598,26 @@ func (api Core0API) OSInfo(w http.ResponseWriter, r *http.Request) {
 // Get Processes
 func (api Core0API) ProcessList(w http.ResponseWriter, r *http.Request) {
 	var respBody []Location
+	cl := GetConnection(r)
+	core := client.Core(cl)
+
+	processes, err := core.Processes()
+	if err != nil {
+		WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	for _, ps := range processes {
+		respBody = append(respBody,
+			Location{
+				Name: ps.Command.Command,
+				Url:  Url(r, "process", ps.Command.ID),
+				Id:   ps.Command.ID,
+			},
+		)
+	}
+
 	json.NewEncoder(w).Encode(&respBody)
-	// uncomment below line to add header
 	// w.Header().Set("key","value")
 }
 
@@ -601,6 +626,21 @@ func (api Core0API) ProcessList(w http.ResponseWriter, r *http.Request) {
 func (api Core0API) ProcessGet(w http.ResponseWriter, r *http.Request) {
 	var respBody Process
 	json.NewEncoder(w).Encode(&respBody)
+	cl := GetConnection(r)
+	core := client.Core(cl)
+
+	vars := mux.Vars(r)
+	ps, err := core.Process(client.Job(vars["processid"]))
+	if err != nil {
+		WriteError(w, http.StatusNotFound, err)
+		return
+	}
+
+	respBody.Cpu = ps.CPU
+	respBody.Rss = float64(ps.RSS)
+	respBody.Swap = float64(ps.Swap)
+	respBody.Vms = float64(ps.VMS)
+
 	// uncomment below line to add header
 	// w.Header().Set("key","value")
 }

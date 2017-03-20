@@ -60,3 +60,16 @@ func Options(cmd Command) []client.Option {
 
 	return opts
 }
+
+func GetCommandFromClientCommand(cmd client.Command) Command {
+	return Command{
+		Id:              cmd.ID,
+		LogLevels:       cmd.LogLevels,
+		MaxRestart:      cmd.MaxRestart,
+		MaxTime:         cmd.MaxTime,
+		Queue:           cmd.Queue,
+		RecurringPeriod: cmd.RecurringPeriod,
+		StatsInterval:   cmd.StatsInterval,
+		Tags:            cmd.Tags,
+	}
+}

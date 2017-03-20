@@ -7,6 +7,7 @@ import (
 // Arguments for a core.system command
 type CoreSystem struct {
 	Args        []string       `json:"args,omitempty"`
+	Command     Command        `json:"command,omitempty"`
 	Environment []KeyValuePair `json:"environment,omitempty"`
 	Name        string         `json:"name" validate:"nonzero"`
 	Pwd         string         `json:"pwd,omitempty"`
