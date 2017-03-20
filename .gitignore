@@ -93,3 +93,6 @@ src/nim/nimcache
 src/nim/g8os/tests/nimcache
 *.iml
 grid
+
+# windows binaries
+*.exe
