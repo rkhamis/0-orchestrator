@@ -17,12 +17,10 @@ types:
     description: Information about physical CPUs
     properties:
       cacheSize: integer
-      coreId: string
       cores: integer
-      CPUInfo: integer
       family: string
       flags: string[]
-      mhz: number
+      mhz: integer
 
   MemInfo:
     type: object
@@ -134,104 +132,9 @@ types:
       wsame: integer
       wwn: string
 
-  KeyValuePair:
-    type: object
-    description: Key value pair
-    properties:
-      name: string
-      value: string
-
-  PortMap:
-    type: object
-    description: Port mapping
-    properties:
-      nodeport: integer
-      containerport: integer
-
-  CoreSystem:
-    type: object
-    description: Arguments for a core.system command
-    properties:
-      name:
-        description: Name of the executable that needs to be run
-        type: string
-      pwd:
-        description: Directory in which the process needs to be started
-        type: string
-        required: false
-      args:
-        description: List of commandline arguments
-        type: string[]
-        required: false
-      environment:
-        description: Environment variables of the process
-        type: KeyValuePair[]
-        required: false
-      stdin:
-        description: Data that needs to be passed into the stdin of the started process
-        type: string
-        required: false
-      command:
-        description: Details how to pass the command to the node/container
-        type: Command
-        required: false
-
-  CoreKill:
-    type: object
-    description: Arguments for a core.kill command
-    properties:
-      id:
-        description: Id of the command that should be killed
-        type: string
-      command:
-        description: Details how to pass the command to the node/container
-        type: Command
-        required: false
-
-  ContainerCreate:
-    type: object
-    description: Arguments for a container.create command
-    properties:
-      name:
-        description: Hostname for the container
-        type: string
-      plist:
-        description: Url to plist for the root filesystem
-        type: string
-      mounts:
-        description: Key value pairs of host directory to container directory (Node to Container)
-        type: KeyValuePair[]
-      zerotierNetworks:
-        required: false
-        description: List of zerotiernetworks in which the container schould be present
-        type: string[]
-      networkBridges:
-        required: false
-        description: List of existing node bridges that should be exposed to the container
-        type: Bridge[]
-      portMaps:
-        description: List of node/container port mappings
-        type: PortMap[]
-      command:
-        description: Details how to pass the command to the node/container
-        type: Command
-        required: false
-
-  ContainerTerminate:
-    type: object
-    description: Arguments for a container.terminate command
-    properties:
-      container:
-        description: Id of the container that should be terminated
-        type: integer
-      command:
-        description: Details how to pass the command to the node/container
-        type: Command
-        required: false
-
   BridgeCreate:
     type: object
-    description: Arguments for a bridge.create command
+    description: Arguments for a bridge.create job
     properties:
       name:
         description: Name for the bridge to be created
@@ -240,107 +143,40 @@ types:
         description: Macaddress for the bridge to be created
         type: string
         required: false
-      command:
-        description: Details how to pass the command to the node/container
-        type: Command
-        required: false
 
-  BridgeDelete:
+  Job:
     type: object
-    description: Arguments for a bridge.delete command
-    properties:
-      name:
-        description: Name for the bridge to be deleted
-        type: string
-      command:
-        description: Details how to pass the command to the node/container
-        type: Command
-        required: false
-
-  DiskMKTable:
-    description: Arguments for a disk.mktable command
-    properties:
-      device: string
-      tableType:
-        description: Any value that is supported by parted mktable
-        type: string
-      command:
-        description: Details how to pass the command to the node/container
-        type: Command
-        required: false
-
-  DiskCreatePartition:
-    description: |
-      Arguments for a disk.mkpart command
-      part_type, start & end values must be supported by the parted mkpart command
-    properties:
-      part_type: string
-      start:
-        type: integer
-        description: Start sector
-      end:
-        type: string
-        description: End sector, can be number or percentage (eg 80%)
-      command:
-        description: Details how to pass the command to the node/container
-        type: Command
-        required: false
-
-  DiskMount:
-    description: Arguments for a disk.mount command
-    properties:
-      mount_options:
-        description: Mount options
-        type: string
-      target:
-        description: Location to mount disk or partition
-        type: string
-      command:
-        description: Details how to pass the command to the node/container
-        type: Command
-        required: false
-
-  Command:
-    type: object
-    description: Command that can be executed in the Node/Container. More information can be found here https://github.com/g8os/node/blob/master/docs/commands.md
+    description: Job that is be executed in the Node/Container. More information can be found here https://github.com/g8os/node/blob/master/docs/commands.md
     properties:
       id:
-        description: A unique id for the command with which later on results can be retrieved. If not supplied an id will be generated.
+        description: A unique id for the job with which later on results can be retrieved. If not supplied an id will be generated.
         type: string
-        required: false
       queue:
-        description: Name of the queue in which this command should be enqued.
+        description: Name of the queue in which this job was be enqued.
         type: string
-        required: false
       tags:
-        description: Metadata that can be submitted together with the command and is returned with the result.
+        description: Metadata that is be submitted together with the job and is returned with the result.
         type: string
-        required: false
       statsInterval:
         description: Stats gathering interval.
         default: 0
-        required: false
         type: integer
       maxTime:
-        description: Max run time of the command, if exceeded command will be killed
+        description: Max run time of the job, if exceeded job will be killed
         default: 0
-        required: false
         type: integer
       maxRestart:
-        description: Max number of retries to start the command if failed before giving up.
+        description: Max number of retries to start the job if failed before giving up.
         default: 0
-        required: false
         type: integer
       recurringPeriod:
-        description: If provided command is executed every X seconds.
+        description: If provided job is executed every X seconds.
         default: 0
-        required: false
         type: integer
       logLevels:
         description: Log levels to store locally and not discard.
         type: integer[]
         default: [0]
-        required: false
 
   WriteFile:
     type: object
@@ -352,10 +188,6 @@ types:
       contents:
         displayName: Contents of the file that should be written
         type: string
-      command:
-        description: Details how to pass the command to the node/container
-        type: Command
-        required: false
 
   DeleteFile:
     type: object
@@ -364,75 +196,29 @@ types:
       path:
         displayName: Path on the target system where the file should be written
         type: string
-      command:
-        description: Details how to pass the command to the node/container
-        type: Command
-        required: false
 
   Process:
     type: object
     properties:
-      cmd: Command
+      cmd: Job
       cpu: number
       debug: string
       rss: number
       swap: number
       vms: number
 
-  KVMCPUInfo:
+  VDiskLink:
     type: object
-    description: Definition of a virtual CPUInfo
-    properties:
-
-  KVMNicInfoZerotierConfiguration:
-    type: object
-    description: Virtual NicInfo zerotier configuration
-    properties:
-      id:
-        type: string
-        description: Zerotier network id
-
-  KVMNicInfoVxLANConfiguration:
-    type: object
-    description: Virtual NicInfo zerotier configuration
-    properties:
-      id:
-        type: integer
-        description: VxLAN id
-
-  KVMNicInfo:
-    type: object
-    description: Definition of a virtual NicInfo
-    properties:
-      type:
-        description: Type of network to which the NicInfo is connected
-        enum: ['VxLAN', 'Zerotier']
-      configuration:
-        type: (KVMNicInfoZerotierConfiguration | KVMNicInfoVxLANConfiguration)
-
-  KVMDiskInfo:
-    type: object
-    description: Definition of a virtual DiskInfo
+    description: Definition of a virtual disk
     properties:
       maxIOps:
-        description: Maximum amount of iops the virtual DiskInfo should deliver
+        description: Maximum amount of iops the virtual disk should deliver
         type: integer
       url:
-        description: URL to the DiskInfo
+        description: File path to the NBD unix domain socket
         type: string
 
-  KVMCreate:
-    type: object
-    properties:
-      domain:
-        description: Details how to setup the new KVM domain
-        type: KVMDomain
-      command:
-        description: Details how to pass the command to the node/container
-        type: Command
-        required: false
-
-  KVMDomain:
+  VM:
     type: object
     properties:
       name: string
@@ -440,14 +226,20 @@ types:
         description: Amount of memory in MiB
         type: integer
       cpu:
-        description: List of virtual CPUInfos
-        type: KVMCPUInfo[]
+        description: Number of virtual CUPs
+        type: integer
       nic:
-        description: List of virtual NicInfos
-        type: KVMNicInfo[]
+        description: |
+          List of nic specifications.
+          Possible formats:
+          - "VxLAN:<<VxLAN id>>"
+            eg "VxLAN:200" Attaches the nic to VxLan 200
+          - "Zerotier:<<Zerotier network id>>"
+            eg "Zerotier:fsjyhgu76fsd87ydzf86t7dfygis" Attaches the noc to Zeroteir network fsjyhgu76fsd87ydzf86t7dfygis
+        type: string[]
       disk:
-        description: List of virtual DiskInfos
-        type: KVMDiskInfo[]
+        description: List of virtual disks
+        type: VDiskLink[]
 
   Bridge:
     type: object
@@ -466,12 +258,6 @@ types:
               Assign static IP to the link
          type: string
 
-  MountMapping:
-    type: object
-    properties:
-      source: string
-      destination: string
-
   Container:
     type: object
     properties:
@@ -481,12 +267,14 @@ types:
       hostname:
         description: Hostname for the Container
         type: string
-      root_url:
+      plist:
         type: string
-        description: The root filesystem plist
+        description: Url to the root filesystem plist
       mounts:
-        description: Mapping of mounts
-        type: MountMapping[]
+        description: |
+          List of host directory to container directory mappings (Node to Container)
+          eg: /mnt/volume34:/var
+        type: string[]
       zerotier:
         description: Zerotier network id
         type: string
@@ -495,8 +283,10 @@ types:
         type: Bridge[]
         description: Bridge mapping
       ports:
-         type: PortMap[]
-         description: Maps ports from container to host
+        type: string[]
+        description: |
+          List of node to container post mappings.
+          eg: 8080:80
 
   Location:
     type: object
@@ -512,15 +302,15 @@ types:
         description: Object name
         type: string
 
-  CommandResult:
+  JobResult:
     type: object
-    description: Result object of a command
+    description: Result object of a job
     properties:
       id:
-        description: The unique identifier with which the command was executed
+        description: The unique identifier for the job
         type: string
       name:
-        description: The kind of command to which this result belongs to.
+        description: The kind of job to which this result belongs to.
         enum: ['core.ping', 'core.system', 'core.kill', 'core.killall',
                'core.state', 'core.reboot', 'info.cpu', 'info.disk',
                'info.mem', 'info.nic', 'info.os', 'container.create',
@@ -533,19 +323,19 @@ types:
         description: 20 means that the data is json serialized object
         type: string
       starttime:
-        description: Epoch timestamp when the command was started
+        description: Epoch timestamp when the job was started
         type: integer
       stdout:
         type: string
-        description: Stdout of process/command
+        description: Stdout of process/job
       stderr:
         type: string
-        description: Stderr of process/command
+        description: Stderr of process/job
       state:
-        description: Status of the command
+        description: Status of the job
         enum: ['SCHEDULED', 'RUNNING', 'SUCCESS', 'KILLED', 'KILLED_TIMEOUT', 'FAILED']
       data:
-        description: The result of executing the command
+        description: The result of executing the job
         type: string
 
   CoreStateResult:
@@ -591,314 +381,162 @@ types:
       type:
         enum: ['PUBLIC', 'PRIVATE']
 
-  BtrfsCreate:
+  CoreSystem:
     type: object
-    description: Command arguments for creating btrfs filesystems
+    description: Arguments for a core.system command
     properties:
-      label:
-        description: Name / label for the btrfs filesystem
+      name:
+        description: Name of the executable that needs to be run
         type: string
-      devices:
-        description: Devices that will be part of the filesystem
+      pwd:
+        description: Directory in which the process needs to be started
+        type: string
+        required: false
+      args:
+        description: List of commandline arguments
         type: string[]
-      metadataProfile:
-        enum: ['raid0', 'raid1', 'raid5', 'raid6', 'raid10', 'dup', 'single']
-      dataProfile:
-        enum: ['raid0', 'raid1', 'raid5', 'raid6', 'raid10', 'dup', 'single']
-      command:
-        description: Details how to pass the command to the node/container
-        type: Command
         required: false
-
-  BtrfsDevice:
-    type: object
-    description: Devices that are assigned to a btrfs filesystem
-    properties:
-      id: integer
-      path: string
-      size: integer
-      used: integer
-
-  Btrfs:
-    type: object
-    description: Btrfs details
-    properties:
-      uuid:
-        description: Unique identifier of the btrfs filesystem
-        type: string
-      label: string
-      deviceCount: integer
-      used: integer
-      devices: BtrfsDevice[]
-
-  BtrfsAddDevice:
-    type: object
-    description: Command to add a device to an existing Btrfs filesystem
-    properties:
-      path:
-        displayName: DevicePath
-        type: string
-      command:
-        description: Details how to pass the command to the node/container
-        type: Command
+      environment:
+        description: |
+          Environment variables for the process.
+          eg: PATH=/usr/bin/local
+        type: string[]
         required: false
-
-  BtrfsSubVolume:
-    type: object
-    description: Btrfs subvolume details
-    properties:
-      gen: integer
-      id: integer
-      path: string
-      topLevel: integer
+      stdin:
+        description: Data that needs to be passed into the stdin of the started process
+        type: string
+        required: false
 
 /node:
   description: Nodes
   get:
     description: List Nodes
-    displayName: CoresList
+    displayName: ListNodes
     responses:
       200:
         body:
           application/json:
             type: Location[]
-  /{id}:
+  /{nodeid}:
     get:
-      description: Get detailed information of a core0
-      displayName: CoreGet
+      description: Get detailed information of a node
+      displayName: GetNode
       responses:
         200:
           body:
             application/json:
               type: Node
-    /command:
-      description: Commands for this Node
+    /job:
+      description: Jobs for this Node
       get:
-        displayName: CommandsList
-        description: List running commands
+        displayName: ListNodeJobs
+        description: List running jobs
         responses:
           200:
             body:
               application/json:
                 type: Location[]
-      /{commandid}:
-        description: Get status of command
-        get:
-          displayName: CommandGet
-          description: Get details of a submitted command
-          responses:
-            200:
-              body:
-                application/json:
-                  type: CommandResult
-    /core:
-      /ping:
-        post:
-          description: Execute a ping command to this Node
-          displayName: Ping
-          body:
-            application/json:
-              type: Command
-          responses:
-            200:
-              body:
-                application/json:
-                  type: Location
-      /system:
-        post:
-          displayName: System
-          description: Execute a new process  on this Node
-          body:
-            application/json:
-              type: CoreSystem
-          responses:
-            200:
-              body:
-                application/json:
-                  type: Location
-      /kill:
-        post:
-          displayName: Kill
-          description: Kill a process / command
-          body:
-            application/json:
-              type: CoreKill
-          responses:
-            200:
-              body:
-                application/json:
-                  type: Location
-      /killall:
-        post:
-          displayName: KillAll
-          description: Kills all running commands
-          body:
-            application/json:
-              type: Command
-          responses:
-            200:
-              body:
-                application/json:
-                  type: Location
-      /state:
-        get:
-          description: The aggregated consumption of node + all processes (cpu, memory, etc...)
-          displayName: StateGet
-          responses:
-            200:
-              body:
-                application/json:
-                  type:
-                    CoreStateResult
-      /reboot:
-        post:
-          displayName: Reboot
-          description: Immediately reboot the machine.
-          body:
-            application/json:
-              type: Command
-          responses:
-            200:
-              body:
-                application/json:
-                  type: Location
-    /kvm:
-      get:
-        description: List kvmdomain
-        displayName: KVMList
-        responses:
-          200:
-            body:
-              application/json:
-                type: Location[]
-      post:
-        displayName: KVMCreate
-        description: Create a new kvmdomain
-        body:
-          application/json:
-            type: KVMCreate
+      delete:
+        displayName: KillAllNodeJobs
+        description: Kills all running jobs
         responses:
           200:
             body:
               application/json:
                 type: Location
-      /{domainid}:
+      /{jobid}:
+        get:
+          displayName: GetNodeJob
+          description: Get details of a submitted job
+          responses:
+            200:
+              body:
+                application/json:
+                  type: JobResult
         delete:
-          displayName: KVMDelete
-          description: Delete Domain
-          body:
-            application/json:
-              type: Command
+          displayName: KillNodeJob
+          description: Kills the job
           responses:
             200:
               body:
                 application/json:
                   type: Location
-        get:
-          displayName: KVMGet
-          description: Get detailed domain object
-          responses:
-            200:
-              body:
-                application/json:
-                  type: KVMDomain
-        /start:
-          post:
-            displayName: KVMStart
-            description: Start the kvmdomain
+    /ping:
+      post:
+        displayName: PingNode
+        description: Ping this node
+        responses:
+          200:
             body:
               application/json:
-                type: Command
-            responses:
-              200:
-                body:
-                  application/json:
-                    type: Location
-        /stop:
-          post:
-            displayName: KVMStop
-            description: Gracefully stop the kvmdomain
+                type: Location
+    /state:
+      get:
+        displayName: GetNodeState
+        description: The aggregated consumption of node + all processes (cpu, memory, etc...)
+        responses:
+          200:
             body:
               application/json:
-                type: Command
-            responses:
-              200:
-                body:
-                  application/json:
-                    type: Location
-        /destroy:
-          post:
-            displayName: KVMDestroy
-            description: Destroy the kvm domain
+                type:
+                  CoreStateResult
+    /reboot:
+      post:
+        displayName: RebootNode
+        description: Immediately reboot the machine.
+        responses:
+          200:
             body:
               application/json:
-                type: Command
-            responses:
-              200:
-                body:
-                  application/json:
-                    type: Location
-        /pause:
-          post:
-            displayName: KVMPause
-            description: Pause the kvm domain
+                type: Location
+    /cpu:
+      get:
+        displayName: GetCPUInfo
+        description: Get detailed information of all CPUs in the node
+        responses:
+          200:
             body:
               application/json:
-                type: Command
-            responses:
-              200:
-                body:
-                  application/json:
-                    type: Location
-    /info:
-      /cpu:
-        get:
-          displayName: CPUInfo
-          description: Get detailed information of all CPUs in the core0
-          responses:
-            200:
-              body:
-                application/json:
-                  type: CPUInfo[]
-      /disk:
-        get:
-          displayName: DiskInfo
-          description: Get detailed information of all the disks in the core0
-          responses:
-            200:
-              body:
-                application/json:
-                  type: DiskInfo[]
-      /mem:
-        get:
-          displayName: MemInfo
-          description: Get detailed information about the memory in the core0
-          responses:
-            200:
-              body:
-                application/json:
-                  type: MemInfo
-      /nic:
-        get:
-          displayName: NicInfo
-          description: Get detailed information about the network interfaces in the cor0
-          responses:
-            200:
-              body:
-                application/json:
-                  type: NicInfo[]
-      /os:
-        get:
-          displayName: OSInfo
-          description: Get detailed information of the core0 os
-          responses:
-            200:
-              body:
-                application/json:
-                  type: OSInfo
+                type: CPUInfo[]
+    /disk:
+      get:
+        displayName: GetDiskInfo
+        description: Get detailed information of all the disks in the node
+        responses:
+          200:
+            body:
+              application/json:
+                type: DiskInfo[]
+    /mem:
+      get:
+        displayName: GetMemInfo
+        description: Get detailed information about the memory in the node
+        responses:
+          200:
+            body:
+              application/json:
+                type: MemInfo
+    /nic:
+      get:
+        displayName: GetNicInfo
+        description: Get detailed information about the network interfaces in the node
+        responses:
+          200:
+            body:
+              application/json:
+                type: NicInfo[]
+    /os:
+      get:
+        displayName: GetNodeOSInfo
+        description: Get detailed information of the os of the node
+        responses:
+          200:
+            body:
+              application/json:
+                type: OSInfo
     /process:
        get:
-         displayName: ProcessList
+         displayName: ListNodeProcesses
          description: Get Processes
          responses:
            200:
@@ -907,7 +545,7 @@ types:
                  type: Location[]
        /{proccessid}:
          get:
-           displayName: ProcessGet
+           displayName: GetNodeProcess
            description: Get process details
            responses:
              200:
@@ -915,11 +553,8 @@ types:
                  application/json:
                    type: Process
          delete:
-           displayName: ProcessKill
+           displayName: KillNodeProcess
            description: Kill Process
-           body:
-             application/json:
-               type: Command
            responses:
              200:
                body:
@@ -927,7 +562,7 @@ types:
                    type: Location
     /bridge:
       post:
-        displayName: BridgeCreate
+        displayName: CreateBridge
         description: Creates a new bridge
         body:
           application/json:
@@ -938,7 +573,7 @@ types:
               application/json:
                 type: Location
       get:
-        displayName: BridgeList
+        displayName: ListBridges
         description: List bridges
         responses:
           200:
@@ -947,7 +582,7 @@ types:
                 type: Location[]
       /{bridgeid}:
         get:
-          displayName: BridgeGet
+          displayName: GetBridge
           description: Get bridge details
           responses:
             200:
@@ -955,177 +590,55 @@ types:
                 application/json:
                   type: Bridge
         delete:
-          displayName: BridgeDelete
+          displayName: DeleteBridge
           description: Remove bridge
-          body:
-            application/json:
-              type: Command
           responses:
             200:
               body:
                 application/json:
                   type: Location
-    /disk:
+    /storagepool:
       get:
-        displayName: DiskList
-        description: List blockdevices present in the Node
-        responses:
-          200:
-            body:
-              application/json:
-                type: Location[]
-      /{devicenameOrdiskserial}:
-        get:
-          displayName: DiskGet
-          description: Get disk details
-          responses:
-            200:
-              body:
-                application/json:
-                  type: DiskExtInfo
-        /mktable:
-          post:
-            displayName: DiskMakeTable
-            description: Creates a partition table on a blockdevice
-            body:
-              application/json:
-                type: DiskMKTable
-            responses:
-              200:
-                body:
-                  application/json:
-                    type: Location
-        /mount:
-          post:
-            displayName: DiskMount
-            description: Mounts the disk
-            body:
-              application/json:
-                type: DiskMount
-            responses:
-              200:
-                body:
-                  application/json:
-                    type: Location
-        /umount:
-          post:
-            displayName: DiskUmount
-            description: Unmount the disk
-            body:
-              application/json:
-                type: Command
-            responses:
-              200:
-                body:
-                  application/json:
-                    type: Location
-        /partitions:
-          post:
-            displayName: DiskPartitionCreate
-            description: Create a new partition
-            body:
-              application/json:
-                type: DiskCreatePartition
-            responses:
-              200:
-                body:
-                  application/json:
-                    type: Location
-          get:
-            displayName: DiskPartitionsList
-            description: Lists partitions
-            responses:
-              200:
-                body:
-                  application/json:
-                    type: Location[]
-          /{partitionid}:
-            get:
-              displayName: DiskPartitionGet
-              description: Gets partition info. (TODO Needs further speccing)
-              responses:
-                200:
-                  body:
-                    application/json:
-                      type: string # Needs further speccing
-            delete:
-              displayName: DiskPartitionDelete
-              description: Removes a partition
-              body:
-                application/json:
-                  type: Command
-              responses:
-                200:
-                  body:
-                    application/json:
-                      type: Location
-            /mount:
-              post:
-                displayName: DiskPartitionMount
-                description: Mounts the partition
-                body:
-                  application/json:
-                    type: DiskMount
-                responses:
-                  200:
-                    body:
-                      application/json:
-                        type: Location
-            /umount:
-              post:
-                displayName: DiskPartitionUmount
-                description: Unmount the partition
-                body:
-                  application/json:
-                    type: Command
-                responses:
-                  200:
-                    body:
-                      application/json:
-                        type: Location
-    /filesystem:
+        description: List storage pools present in the node
       post:
-        description: Upload file to Node
-        displayName: FileUpload
-        queryString:
-          properties:
-            path: string
-        body:
-          multipart/form-data:
-            formParameters:
-              file:
-                type: file
-                required: true
-                description: the file to upload
-        responses:
-          200:
-            body:
-              application/json:
-                type: Location
-      get:
-        description: Download file from Node
-        displayName: FileDownload
-        queryString:
-          properties:
-            path: string
-        responses:
-          200:
-            body:
-              application/octet-stream:
-      delete:
-        description: Delete file from Node
-        displayName: FileDelete
-        body:
-          application/json:
-            type: DeleteFile
-        responses:
-          200:
-            body:
-              application/json:
-                type: Location
+        description: Create a new storage pool
+      /{storagepoolid}:
+        get:
+          description: Get detailed information of this storage pool
+        post:
+          description: Add extra devices to this storage pool
+        delete:
+          description: Delete the storage pool
+        /devices:
+          get:
+            description: Lists the devices in the storage pool
+          /{deviceid}:
+            get:
+              description: Get detailed information on the device
+            delete:
+              description: Removes the device from the storagepool
+        /volumes:
+          get:
+            description: List volumes
+          post:
+            description: Create a new volume
+          /{volumeid}:
+            get:
+              description: Get detailed volume information
+            delete:
+              description: Delete volume
+            /snapshot:
+              post:
+                description: Create a new readonly volume of the current state of the volume
+            /clone:
+              post:
+                description: Create a new writable volume that starts with the current state of the volume
+            /children:
+              get:
+                description: List child volumes of this volume
     /zerotier:
       get:
-        displayName: ZerotierList
+        displayName: ListZerotier
         description: List running zerotier networks
         responses:
           200:
@@ -1134,7 +647,7 @@ types:
                 type: Location[]
       /{zerotierid}:
         get:
-          displayName: ZerotierGet
+          displayName: GetZerotier
           description: Get zerotier network details
           responses:
             200:
@@ -1142,122 +655,36 @@ types:
                 application/json:
                   type: ZeroTier
         post:
-          displayName: ZerotierJoin
+          displayName: JoinZerotier
           description: Join zerotier network
-          body:
-            application/json:
-              type: Command
           responses:
             200:
               body:
                 application/json:
                   type: Location
         delete:
-          displayName: ZerotierUnjoin
-          description: Delete zerotier network
-          body:
-            application/json:
-              type: Command
+          displayName: ExitZerotier
+          description: Exit the Zerotier network
           responses:
             200:
               body:
                 application/json:
                   type: Location
-    /btrfs:
-      get:
-        displayName: BtrfsList
-        description: List btrfs filesystems
-        responses:
-          200:
-            body:
-              application/json:
-                type: Location[]
-      post:
-        displayName: BtrfsCreate
-        description: Create a new btrfs filesystem
-        body:
-          application/json:
-            type: BtrfsCreate
-        responses:
-          200:
-            body:
-              application/json:
-                type: Location
-      /{btrfsUuid}:
-        get:
-          description: Get btrfs filesystem details
-          displayName: BtrfsGet
-          responses:
-            200:
-              body:
-                application/json:
-                  type: Btrfs
-        post:
-          description: Add a device to an existing btrfs filesystem
-          displayName: BtrfsAddDevice
-          body:
-            application/json:
-              type: BtrfsAddDevice
-          responses:
-            200:
-              body:
-                application/json:
-                  type: Location
-        /subvolumes:
-          get:
-            description: Btrfs List Subvolumes
-            displayName: BtrfsSubvolList
-            responses:
-              200:
-                body:
-                  application/json:
-                    type: Location[]
-          /{subvolumepath}:
-            get:
-              displayName: BtrfsSubvolGet
-              description: Gets subvolume details
-              responses:
-                200:
-                  body:
-                    application/json:
-                      type: BtrfsSubVolume
-            post:
-              displayName: BtrfsSubvolCreate
-              description: Create a new subvolume
-              body:
-                application/json:
-                  type: Command
-              responses:
-                200:
-                  body:
-                    application/json:
-                      type: Location
-            delete:
-              displayName: BtrfsSubvolDelete
-              description: Delete subvolume
-              body:
-                application/json:
-                  type: Command
-              responses:
-                200:
-                  body:
-                    application/json:
-                      type: Location
     /container:
       get:
-        displayName: ContainerList
-        description: List running Containerses
+        displayName: ListContainers
+        description: List running Containers
         responses:
           200:
             body:
               application/json:
                 type: Location[]
       post:
-        displayName: ContainerCreate
+        displayName: CreateContainer
         description: Create a new Container
         body:
           application/json:
-            type: ContainerCreate
+            type: Container
         responses:
           200:
             body:
@@ -1265,178 +692,31 @@ types:
                 type: Location
       /{containerid}:
         delete:
-          displayName: ContainerDelete
+          displayName: DeleteContainer
           description: Delete Container instance
-          body:
-            application/json:
-              type: Command
           responses:
             200:
               body:
                 application/json:
                   type: Location
         get:
-          displayName: ContainerGet
+          displayName: GetContainer
           description: Get Container
           responses:
             200:
               body:
                 application/json:
                   type: Container
-        /command:
-          description: Commands for this Node
-          get:
-            description: List running commands
-            displayName: CXCommandsList
-            responses:
-              200:
-                body:
-                  application/json:
-                    type: Location[]
-          /{commandid}:
-            get:
-              displayName: CXCommandGet
-              description: Get status of command
-              responses:
-                200:
-                  body:
-                    application/json:
-                      type: CommandResult
-        /core:
-          /ping:
-            post:
-              description: Execute a ping command to this Container
-              displayName: CXPing
-              body:
-                application/json:
-                  type: Command
-              responses:
-                200:
-                  body:
-                    application/json:
-                      type: Location
-          /system:
-            post:
-              displayName: CXSystem
-              description: Execute a new process  on this Container
-              body:
-                application/json:
-                  type: CoreSystem
-              responses:
-                200:
-                  body:
-                    application/json:
-                      type: Location
-          /kill:
-            post:
-              displayName: CXKill
-              description: Kill a process / command
-              body:
-                application/json:
-                  type: CoreKill
-              responses:
-                200:
-                  body:
-                    application/json:
-                      type: Location
-          /killall:
-            post:
-              displayName: CXKillAll
-              description: Kills all running commands
-              body:
-                application/json:
-                  type: Command
-              responses:
-                200:
-                  body:
-                    application/json:
-                      type: Location
-          /state:
-            get:
-              description: The aggregated consumption of container + all processes (cpu, memory, etc...)
-              displayName: CXStateGet
-              responses:
-                200:
-                  body:
-                    application/json:
-                      type:
-                        CoreStateResult
-        /info:
-          /cpu:
-            get:
-              displayName: CXCPUInfo
-              description: Get detailed information about the CPUs in the coreX
-              responses:
-                200:
-                  body:
-                    application/json:
-                      type: CPUInfo[]
-          /mem:
-            get:
-              displayName: CXMemInfo
-              description: Get detailed information about the memory of the coreX
-              responses:
-                200:
-                  body:
-                    application/json:
-                      type: MemInfo
-          /nic:
-            get:
-              displayName: CXNicInfo
-              description: Get detailed information about the network interface of the coreX
-              responses:
-                200:
-                  body:
-                    application/json:
-                      type: NicInfo[]
-          /os:
-            get:
-              displayName: CXOSInfo
-              description: Get detailed information about the coreX os
-              responses:
-                200:
-                  body:
-                    application/json:
-                      type: OSInfo
-        /process:
-           get:
-             displayName: CXProcessList
-             description: Get Processes
-             responses:
-               200:
-                 body:
-                   application/json:
-                     type: Location[]
-           /{proccessid}:
-             get:
-               displayName: CXProcessGet
-               description: Get process details
-               responses:
-                 200:
-                   body:
-                     application/json:
-                       type: Process
-             delete:
-               displayName: CXProcessKill
-               description: Kill Process
-               body:
-                 application/json:
-                   type: Command
-               responses:
-                 200:
-                   body:
-                     application/json:
-                       type: Location
         /filesystem:
           post:
-            description: Upload file to Node
-            displayName: CXFileUpload
+            description: Upload file to container
+            displayName: FileUpload
             queryString:
               properties:
                 path: string
             body:
               multipart/form-data:
-                formParameters:
+                properties:
                   file:
                     type: file
                     required: true
@@ -1447,8 +727,8 @@ types:
                   application/json:
                     type: Location
           get:
-            description: Download file from Node
-            displayName: CXFileDownload
+            description: Download file from container
+            displayName: FileDownload
             queryString:
               properties:
                 path: string
@@ -1457,8 +737,8 @@ types:
                 body:
                   application/octet-stream:
           delete:
-            description: Delete file from Node
-            displayName: CXFileDelete
+            description: Delete file from container
+            displayName: FileDelete
             body:
               application/json:
                 type: DeleteFile
@@ -1467,3 +747,139 @@ types:
                 body:
                   application/json:
                     type: Location
+        /job:
+          get:
+            displayName: ListContainerJobs
+            description: List running jobs on the container
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location[]
+          delete:
+            displayName: KillAllContainerJobs
+            description: Kills all running jobs on the container
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location
+          /{jobid}:
+            get:
+              displayName: GetContainerJob
+              description: Get details of a submitted job on the container
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: JobResult
+            delete:
+              displayName: KillContainerJob
+              description: Kills the job
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: Location
+        /ping:
+          post:
+            displayName: PingContainer
+            description: Ping this container
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Location
+        /state:
+          get:
+            displayName: GetContainerState
+            description: The aggregated consumption of container + all processes (cpu, memory, etc...)
+            responses:
+              200:
+                body:
+                  application/json:
+                    type:
+                      CoreStateResult
+        /os:
+          get:
+            displayName: GetContainerOSInfo
+            description: Get detailed information of the container os
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: OSInfo
+        /process:
+           get:
+             displayName: ListContainerProcesses
+             description: Get running processes in this container
+             responses:
+               200:
+                 body:
+                   application/json:
+                     type: Location[]
+           post:
+             displayName: StartContainerProcess
+             description: Start a new process in this container
+             body:
+               application/json:
+                 type: CoreSystem
+             responses:
+               200:
+                 body:
+                   application/json:
+                     type: Location
+           /{proccessid}:
+             get:
+               displayName: GetContainerProcess
+               description: Get process details
+               responses:
+                 200:
+                   body:
+                     application/json:
+                       type: Process
+             delete:
+               displayName: KillContainerProcess
+               description: Kill Process
+               responses:
+                 200:
+                   body:
+                     application/json:
+                       type: Location
+    /vm:
+      get:
+        description: List running VMs
+        displayName: ListVMs
+        responses:
+          200:
+            body:
+              application/json:
+                type: Location[]
+      post:
+        description: Starts the VM
+        displayName: StartVM
+        body:
+          application/json:
+            type: VM
+        responses:
+          200:
+            body:
+              application/json:
+                type: Location
+      /{vmid}:
+        delete:
+          displayName: StopVM
+          description: Stops the VM
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Location
+        get:
+          displayName: GetVM
+          description: Get detailed virtual machine object
+          responses:
+            200:
+              body:
+                application/json:
+                  type: VM
