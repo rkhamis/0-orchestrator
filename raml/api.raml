@@ -5,9 +5,9 @@ mediaType:  application/json
 
 types:
 
-  Core0:
+  Node:
     type: object
-    description: Core0 node in the g8os grid
+    description: Node node in the g8os grid
     properties:
       id: string
       hostname: string
@@ -145,8 +145,8 @@ types:
     type: object
     description: Port mapping
     properties:
-      core0port: integer
-      coreXport: integer
+      nodeport: integer
+      containerport: integer
 
   CoreSystem:
     type: object
@@ -172,7 +172,7 @@ types:
         type: string
         required: false
       command:
-        description: Details how to pass the command to the core0/coreX
+        description: Details how to pass the command to the node/container
         type: Command
         required: false
 
@@ -184,13 +184,13 @@ types:
         description: Id of the command that should be killed
         type: string
       command:
-        description: Details how to pass the command to the core0/coreX
+        description: Details how to pass the command to the node/container
         type: Command
         required: false
 
-  CoreXCreate:
+  ContainerCreate:
     type: object
-    description: Arguments for a corex.create command
+    description: Arguments for a container.create command
     properties:
       name:
         description: Hostname for the container
@@ -199,33 +199,33 @@ types:
         description: Url to plist for the root filesystem
         type: string
       mounts:
-        description: Key value pairs of host directory to container directory (Core0 to CoreX)
+        description: Key value pairs of host directory to container directory (Node to Container)
         type: KeyValuePair[]
       zerotierNetworks:
         required: false
-        description: List of zerotiernetworks in which the coreX schould be present
+        description: List of zerotiernetworks in which the container schould be present
         type: string[]
       networkBridges:
         required: false
-        description: List of existing core0 bridges that should be exposed to the coreX
+        description: List of existing node bridges that should be exposed to the container
         type: Bridge[]
       portMaps:
-        description: List of core0/coreX port mappings
+        description: List of node/container port mappings
         type: PortMap[]
       command:
-        description: Details how to pass the command to the core0/coreX
+        description: Details how to pass the command to the node/container
         type: Command
         required: false
 
-  CoreXTerminate:
+  ContainerTerminate:
     type: object
-    description: Arguments for a corex.terminate command
+    description: Arguments for a container.terminate command
     properties:
-      coreX:
-        description: Id of the coreX that should be terminated
+      container:
+        description: Id of the container that should be terminated
         type: integer
       command:
-        description: Details how to pass the command to the core0/coreX
+        description: Details how to pass the command to the node/container
         type: Command
         required: false
 
@@ -241,7 +241,7 @@ types:
         type: string
         required: false
       command:
-        description: Details how to pass the command to the core0/coreX
+        description: Details how to pass the command to the node/container
         type: Command
         required: false
 
@@ -253,7 +253,7 @@ types:
         description: Name for the bridge to be deleted
         type: string
       command:
-        description: Details how to pass the command to the core0/coreX
+        description: Details how to pass the command to the node/container
         type: Command
         required: false
 
@@ -265,7 +265,7 @@ types:
         description: Any value that is supported by parted mktable
         type: string
       command:
-        description: Details how to pass the command to the core0/coreX
+        description: Details how to pass the command to the node/container
         type: Command
         required: false
 
@@ -282,7 +282,7 @@ types:
         type: string
         description: End sector, can be number or percentage (eg 80%)
       command:
-        description: Details how to pass the command to the core0/coreX
+        description: Details how to pass the command to the node/container
         type: Command
         required: false
 
@@ -296,13 +296,13 @@ types:
         description: Location to mount disk or partition
         type: string
       command:
-        description: Details how to pass the command to the core0/coreX
+        description: Details how to pass the command to the node/container
         type: Command
         required: false
 
   Command:
     type: object
-    description: Command that can be executed in the Core0/CoreX. More information can be found here https://github.com/g8os/core0/blob/master/docs/commands.md
+    description: Command that can be executed in the Node/Container. More information can be found here https://github.com/g8os/node/blob/master/docs/commands.md
     properties:
       id:
         description: A unique id for the command with which later on results can be retrieved. If not supplied an id will be generated.
@@ -353,7 +353,7 @@ types:
         displayName: Contents of the file that should be written
         type: string
       command:
-        description: Details how to pass the command to the core0/coreX
+        description: Details how to pass the command to the node/container
         type: Command
         required: false
 
@@ -365,7 +365,7 @@ types:
         displayName: Path on the target system where the file should be written
         type: string
       command:
-        description: Details how to pass the command to the core0/coreX
+        description: Details how to pass the command to the node/container
         type: Command
         required: false
 
@@ -428,7 +428,7 @@ types:
         description: Details how to setup the new KVM domain
         type: KVMDomain
       command:
-        description: Details how to pass the command to the core0/coreX
+        description: Details how to pass the command to the node/container
         type: Command
         required: false
 
@@ -472,14 +472,14 @@ types:
       source: string
       destination: string
 
-  CoreX:
+  Container:
     type: object
     properties:
       id:
         description: identifier
         type: string
       hostname:
-        description: Hostname for the CoreX
+        description: Hostname for the Container
         type: string
       root_url:
         type: string
@@ -523,8 +523,8 @@ types:
         description: The kind of command to which this result belongs to.
         enum: ['core.ping', 'core.system', 'core.kill', 'core.killall',
                'core.state', 'core.reboot', 'info.cpu', 'info.disk',
-               'info.mem', 'info.nic', 'info.os', 'corex.create',
-               'corex.list', 'corex.dispatch', 'corex.terminate',
+               'info.mem', 'info.nic', 'info.os', 'container.create',
+               'container.list', 'container.dispatch', 'container.terminate',
                'bridge.create', 'bridge.list', 'bridge.delete',
                'disk.list', 'disk.mktable', 'disk.mkpart', 'disk.rmpart',
                'disk.mount', 'disk.umount', 'btrfs.create', 'btrfs.list',
@@ -553,7 +553,7 @@ types:
     description: Result of a core.state command
     properties:
       cpu:
-        description: percentage cpu used in a core0
+        description: percentage cpu used in a node
         type: integer
       rss: integer
       vms: integer
@@ -606,7 +606,7 @@ types:
       dataProfile:
         enum: ['raid0', 'raid1', 'raid5', 'raid6', 'raid10', 'dup', 'single']
       command:
-        description: Details how to pass the command to the core0/coreX
+        description: Details how to pass the command to the node/container
         type: Command
         required: false
 
@@ -639,7 +639,7 @@ types:
         displayName: DevicePath
         type: string
       command:
-        description: Details how to pass the command to the core0/coreX
+        description: Details how to pass the command to the node/container
         type: Command
         required: false
 
@@ -652,10 +652,10 @@ types:
       path: string
       topLevel: integer
 
-/core0:
-  description: Core0s
+/node:
+  description: Nodes
   get:
-    description: List Core0s
+    description: List Nodes
     displayName: CoresList
     responses:
       200:
@@ -670,9 +670,9 @@ types:
         200:
           body:
             application/json:
-              type: Core0
+              type: Node
     /command:
-      description: Commands for this Core0
+      description: Commands for this Node
       get:
         displayName: CommandsList
         description: List running commands
@@ -694,7 +694,7 @@ types:
     /core:
       /ping:
         post:
-          description: Execute a ping command to this Core0
+          description: Execute a ping command to this Node
           displayName: Ping
           body:
             application/json:
@@ -707,7 +707,7 @@ types:
       /system:
         post:
           displayName: System
-          description: Execute a new process  on this Core0
+          description: Execute a new process  on this Node
           body:
             application/json:
               type: CoreSystem
@@ -742,7 +742,7 @@ types:
                   type: Location
       /state:
         get:
-          description: The aggregated consumption of core0 + all processes (cpu, memory, etc...)
+          description: The aggregated consumption of node + all processes (cpu, memory, etc...)
           displayName: StateGet
           responses:
             200:
@@ -968,7 +968,7 @@ types:
     /disk:
       get:
         displayName: DiskList
-        description: List blockdevices present in the Core0
+        description: List blockdevices present in the Node
         responses:
           200:
             body:
@@ -1085,7 +1085,7 @@ types:
                         type: Location
     /filesystem:
       post:
-        description: Upload file to Core0
+        description: Upload file to Node
         displayName: FileUpload
         queryString:
           properties:
@@ -1103,7 +1103,7 @@ types:
               application/json:
                 type: Location
       get:
-        description: Download file from Core0
+        description: Download file from Node
         displayName: FileDownload
         queryString:
           properties:
@@ -1113,7 +1113,7 @@ types:
             body:
               application/octet-stream:
       delete:
-        description: Delete file from Core0
+        description: Delete file from Node
         displayName: FileDelete
         body:
           application/json:
@@ -1243,30 +1243,30 @@ types:
                   body:
                     application/json:
                       type: Location
-    /coreX:
+    /container:
       get:
-        displayName: CoreXList
-        description: List running CoreXses
+        displayName: ContainerList
+        description: List running Containerses
         responses:
           200:
             body:
               application/json:
                 type: Location[]
       post:
-        displayName: CoreXCreate
-        description: Create a new CoreX
+        displayName: ContainerCreate
+        description: Create a new Container
         body:
           application/json:
-            type: CoreXCreate
+            type: ContainerCreate
         responses:
           200:
             body:
               application/json:
                 type: Location
-      /{coreXid}:
+      /{containerid}:
         delete:
-          displayName: CoreXDelete
-          description: Delete CoreX instance
+          displayName: ContainerDelete
+          description: Delete Container instance
           body:
             application/json:
               type: Command
@@ -1276,15 +1276,15 @@ types:
                 application/json:
                   type: Location
         get:
-          displayName: CoreXGet
-          description: Get CoreX
+          displayName: ContainerGet
+          description: Get Container
           responses:
             200:
               body:
                 application/json:
-                  type: CoreX
+                  type: Container
         /command:
-          description: Commands for this Core0
+          description: Commands for this Node
           get:
             description: List running commands
             displayName: CXCommandsList
@@ -1305,7 +1305,7 @@ types:
         /core:
           /ping:
             post:
-              description: Execute a ping command to this CoreX
+              description: Execute a ping command to this Container
               displayName: CXPing
               body:
                 application/json:
@@ -1318,7 +1318,7 @@ types:
           /system:
             post:
               displayName: CXSystem
-              description: Execute a new process  on this CoreX
+              description: Execute a new process  on this Container
               body:
                 application/json:
                   type: CoreSystem
@@ -1353,7 +1353,7 @@ types:
                       type: Location
           /state:
             get:
-              description: The aggregated consumption of coreX + all processes (cpu, memory, etc...)
+              description: The aggregated consumption of container + all processes (cpu, memory, etc...)
               displayName: CXStateGet
               responses:
                 200:
@@ -1429,7 +1429,7 @@ types:
                        type: Location
         /filesystem:
           post:
-            description: Upload file to Core0
+            description: Upload file to Node
             displayName: CXFileUpload
             queryString:
               properties:
@@ -1447,7 +1447,7 @@ types:
                   application/json:
                     type: Location
           get:
-            description: Download file from Core0
+            description: Download file from Node
             displayName: CXFileDownload
             queryString:
               properties:
@@ -1457,7 +1457,7 @@ types:
                 body:
                   application/octet-stream:
           delete:
-            description: Delete file from Core0
+            description: Delete file from Node
             displayName: CXFileDelete
             body:
               application/json:
