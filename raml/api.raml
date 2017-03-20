@@ -171,6 +171,10 @@ types:
         description: Data that needs to be passed into the stdin of the started process
         type: string
         required: false
+      command:
+        description: Details how to pass the command to the core0/coreX
+        type: Command
+        required: false
 
   CoreKill:
     type: object

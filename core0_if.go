@@ -14,6 +14,29 @@ type Core0Interface interface { // CoresList is the handler for GET /core0
 	CoresList(http.ResponseWriter, *http.Request)
 	// CoreGet is the handler for GET /core0/{id}
 	CoreGet(http.ResponseWriter, *http.Request)
+	// CommandsList is the handler for GET /core0/{id}/command
+	// List running commands
+	CommandsList(http.ResponseWriter, *http.Request)
+	// CommandGet is the handler for GET /core0/{id}/command/{commandid}
+	CommandGet(http.ResponseWriter, *http.Request)
+	// Reboot is the handler for POST /core0/{id}/core/reboot
+	// Immediately reboot the machine.
+	Reboot(http.ResponseWriter, *http.Request)
+	// Ping is the handler for POST /core0/{id}/core/ping
+	// Execute a ping command to this Core0
+	Ping(http.ResponseWriter, *http.Request)
+	// System is the handler for POST /core0/{id}/core/system
+	// Execute a new process  on this Core0
+	System(http.ResponseWriter, *http.Request)
+	// Kill is the handler for POST /core0/{id}/core/kill
+	// Kill a process / command
+	Kill(http.ResponseWriter, *http.Request)
+	// KillAll is the handler for POST /core0/{id}/core/killall
+	// Kills all running commands
+	KillAll(http.ResponseWriter, *http.Request)
+	// StateGet is the handler for GET /core0/{id}/core/state
+	// The aggregated consumption of core0 + all processes (cpu, memory, etc...)
+	StateGet(http.ResponseWriter, *http.Request)
 	// OSInfo is the handler for GET /core0/{id}/info/os
 	OSInfo(http.ResponseWriter, *http.Request)
 	// CPUInfo is the handler for GET /core0/{id}/info/cpu
@@ -24,15 +47,6 @@ type Core0Interface interface { // CoresList is the handler for GET /core0
 	MemInfo(http.ResponseWriter, *http.Request)
 	// NicInfo is the handler for GET /core0/{id}/info/nic
 	NicInfo(http.ResponseWriter, *http.Request)
-	// ProcessList is the handler for GET /core0/{id}/process
-	// Get Processes
-	ProcessList(http.ResponseWriter, *http.Request)
-	// ProcessGet is the handler for GET /core0/{id}/process/{proccessid}
-	// Get process details
-	ProcessGet(http.ResponseWriter, *http.Request)
-	// ProcessKill is the handler for DELETE /core0/{id}/process/{proccessid}
-	// Kill Process
-	ProcessKill(http.ResponseWriter, *http.Request)
 	// BridgeList is the handler for GET /core0/{id}/bridge
 	// List bridges
 	BridgeList(http.ResponseWriter, *http.Request)
@@ -45,6 +59,48 @@ type Core0Interface interface { // CoresList is the handler for GET /core0
 	// BridgeDelete is the handler for DELETE /core0/{id}/bridge/{bridgeid}
 	// Remove bridge
 	BridgeDelete(http.ResponseWriter, *http.Request)
+	// DiskList is the handler for GET /core0/{id}/disk
+	// List blockdevices present in the Core0
+	DiskList(http.ResponseWriter, *http.Request)
+	// DiskGet is the handler for GET /core0/{id}/disk/{devicenameOrdiskserial}
+	// Get disk details
+	DiskGet(http.ResponseWriter, *http.Request)
+	// DiskMakeTable is the handler for POST /core0/{id}/disk/{devicenameOrdiskserial}/mktable
+	// Creates a partition table on a blockdevice
+	DiskMakeTable(http.ResponseWriter, *http.Request)
+	// DiskMount is the handler for POST /core0/{id}/disk/{devicenameOrdiskserial}/mount
+	// Mounts the disk
+	DiskMount(http.ResponseWriter, *http.Request)
+	// DiskUmount is the handler for POST /core0/{id}/disk/{devicenameOrdiskserial}/umount
+	// Unmount the disk
+	DiskUmount(http.ResponseWriter, *http.Request)
+	// DiskPartitionsList is the handler for GET /core0/{id}/disk/{devicenameOrdiskserial}/partitions
+	// Lists partitions
+	DiskPartitionsList(http.ResponseWriter, *http.Request)
+	// DiskPartitionCreate is the handler for POST /core0/{id}/disk/{devicenameOrdiskserial}/partitions
+	// Create a new partition
+	DiskPartitionCreate(http.ResponseWriter, *http.Request)
+	// DiskPartitionGet is the handler for GET /core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}
+	// Gets partition info. (TODO Needs further speccing)
+	DiskPartitionGet(http.ResponseWriter, *http.Request)
+	// DiskPartitionDelete is the handler for DELETE /core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}
+	// Removes a partition
+	DiskPartitionDelete(http.ResponseWriter, *http.Request)
+	// DiskPartitionMount is the handler for POST /core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}/mount
+	// Mounts the partition
+	DiskPartitionMount(http.ResponseWriter, *http.Request)
+	// DiskPartitionUmount is the handler for POST /core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}/umount
+	// Unmount the partition
+	DiskPartitionUmount(http.ResponseWriter, *http.Request)
+	// FileDownload is the handler for GET /core0/{id}/filesystem
+	// Download file from Core0
+	FileDownload(http.ResponseWriter, *http.Request)
+	// FileUpload is the handler for POST /core0/{id}/filesystem
+	// Upload file to Core0
+	FileUpload(http.ResponseWriter, *http.Request)
+	// FileDelete is the handler for DELETE /core0/{id}/filesystem
+	// Delete file from Core0
+	FileDelete(http.ResponseWriter, *http.Request)
 	// BtrfsList is the handler for GET /core0/{id}/btrfs
 	// List btrfs filesystems
 	BtrfsList(http.ResponseWriter, *http.Request)
@@ -69,6 +125,51 @@ type Core0Interface interface { // CoresList is the handler for GET /core0
 	// BtrfsSubvolDelete is the handler for DELETE /core0/{id}/btrfs/{btrfsUuid}/subvolumes/{subvolumepath}
 	// Delete subvolume
 	BtrfsSubvolDelete(http.ResponseWriter, *http.Request)
+	// KVMList is the handler for GET /core0/{id}/kvm
+	// List kvmdomain
+	KVMList(http.ResponseWriter, *http.Request)
+	// KVMCreate is the handler for POST /core0/{id}/kvm
+	// Create a new kvmdomain
+	KVMCreate(http.ResponseWriter, *http.Request)
+	// KVMGet is the handler for GET /core0/{id}/kvm/{domainid}
+	// Get detailed domain object
+	KVMGet(http.ResponseWriter, *http.Request)
+	// KVMDelete is the handler for DELETE /core0/{id}/kvm/{domainid}
+	// Delete Domain
+	KVMDelete(http.ResponseWriter, *http.Request)
+	// KVMStart is the handler for POST /core0/{id}/kvm/{domainid}/start
+	// Start the kvmdomain
+	KVMStart(http.ResponseWriter, *http.Request)
+	// KVMStop is the handler for POST /core0/{id}/kvm/{domainid}/stop
+	// Gracefully stop the kvmdomain
+	KVMStop(http.ResponseWriter, *http.Request)
+	// KVMDestroy is the handler for POST /core0/{id}/kvm/{domainid}/destroy
+	// Destroy the kvm domain
+	KVMDestroy(http.ResponseWriter, *http.Request)
+	// KVMPause is the handler for POST /core0/{id}/kvm/{domainid}/pause
+	// Pause the kvm domain
+	KVMPause(http.ResponseWriter, *http.Request)
+	// ProcessList is the handler for GET /core0/{id}/process
+	// Get Processes
+	ProcessList(http.ResponseWriter, *http.Request)
+	// ProcessGet is the handler for GET /core0/{id}/process/{proccessid}
+	// Get process details
+	ProcessGet(http.ResponseWriter, *http.Request)
+	// ProcessKill is the handler for DELETE /core0/{id}/process/{proccessid}
+	// Kill Process
+	ProcessKill(http.ResponseWriter, *http.Request)
+	// ZerotierList is the handler for GET /core0/{id}/zerotier
+	// List running zerotier networks
+	ZerotierList(http.ResponseWriter, *http.Request)
+	// ZerotierGet is the handler for GET /core0/{id}/zerotier/{zerotierid}
+	// Get zerotier network details
+	ZerotierGet(http.ResponseWriter, *http.Request)
+	// ZerotierJoin is the handler for POST /core0/{id}/zerotier/{zerotierid}
+	// Join zerotier network
+	ZerotierJoin(http.ResponseWriter, *http.Request)
+	// ZerotierUnjoin is the handler for DELETE /core0/{id}/zerotier/{zerotierid}
+	// Delete zerotier network
+	ZerotierUnjoin(http.ResponseWriter, *http.Request)
 	// CoreXList is the handler for GET /core0/{id}/coreX
 	// List running CoreXses
 	CoreXList(http.ResponseWriter, *http.Request)
@@ -104,12 +205,6 @@ type Core0Interface interface { // CoresList is the handler for GET /core0
 	CXCommandsList(http.ResponseWriter, *http.Request)
 	// CXCommandGet is the handler for GET /core0/{id}/coreX/{coreXid}/command/{commandid}
 	CXCommandGet(http.ResponseWriter, *http.Request)
-	// CXStateGet is the handler for GET /core0/{id}/coreX/{coreXid}/core/state
-	// The aggregated consumption of coreX + all processes (cpu, memory, etc...)
-	CXStateGet(http.ResponseWriter, *http.Request)
-	// CXPing is the handler for POST /core0/{id}/coreX/{coreXid}/core/ping
-	// Execute a ping command to this CoreX
-	CXPing(http.ResponseWriter, *http.Request)
 	// CXSystem is the handler for POST /core0/{id}/coreX/{coreXid}/core/system
 	// Execute a new process  on this CoreX
 	CXSystem(http.ResponseWriter, *http.Request)
@@ -119,6 +214,12 @@ type Core0Interface interface { // CoresList is the handler for GET /core0
 	// CXKillAll is the handler for POST /core0/{id}/coreX/{coreXid}/core/killall
 	// Kills all running commands
 	CXKillAll(http.ResponseWriter, *http.Request)
+	// CXStateGet is the handler for GET /core0/{id}/coreX/{coreXid}/core/state
+	// The aggregated consumption of coreX + all processes (cpu, memory, etc...)
+	CXStateGet(http.ResponseWriter, *http.Request)
+	// CXPing is the handler for POST /core0/{id}/coreX/{coreXid}/core/ping
+	// Execute a ping command to this CoreX
+	CXPing(http.ResponseWriter, *http.Request)
 	// CXCPUInfo is the handler for GET /core0/{id}/coreX/{coreXid}/info/cpu
 	CXCPUInfo(http.ResponseWriter, *http.Request)
 	// CXMemInfo is the handler for GET /core0/{id}/coreX/{coreXid}/info/mem
@@ -127,125 +228,43 @@ type Core0Interface interface { // CoresList is the handler for GET /core0
 	CXNicInfo(http.ResponseWriter, *http.Request)
 	// CXOSInfo is the handler for GET /core0/{id}/coreX/{coreXid}/info/os
 	CXOSInfo(http.ResponseWriter, *http.Request)
-	// CommandsList is the handler for GET /core0/{id}/command
-	// List running commands
-	CommandsList(http.ResponseWriter, *http.Request)
-	// CommandGet is the handler for GET /core0/{id}/command/{commandid}
-	CommandGet(http.ResponseWriter, *http.Request)
-	// StateGet is the handler for GET /core0/{id}/core/state
-	// The aggregated consumption of core0 + all processes (cpu, memory, etc...)
-	StateGet(http.ResponseWriter, *http.Request)
-	// Reboot is the handler for POST /core0/{id}/core/reboot
-	// Immediately reboot the machine.
-	Reboot(http.ResponseWriter, *http.Request)
-	// Ping is the handler for POST /core0/{id}/core/ping
-	// Execute a ping command to this Core0
-	Ping(http.ResponseWriter, *http.Request)
-	// System is the handler for POST /core0/{id}/core/system
-	// Execute a new process  on this Core0
-	System(http.ResponseWriter, *http.Request)
-	// Kill is the handler for POST /core0/{id}/core/kill
-	// Kill a process / command
-	Kill(http.ResponseWriter, *http.Request)
-	// KillAll is the handler for POST /core0/{id}/core/killall
-	// Kills all running commands
-	KillAll(http.ResponseWriter, *http.Request)
-	// KVMList is the handler for GET /core0/{id}/kvm
-	// List kvmdomain
-	KVMList(http.ResponseWriter, *http.Request)
-	// KVMCreate is the handler for POST /core0/{id}/kvm
-	// Create a new kvmdomain
-	KVMCreate(http.ResponseWriter, *http.Request)
-	// KVMGet is the handler for GET /core0/{id}/kvm/{domainid}
-	// Get detailed domain object
-	KVMGet(http.ResponseWriter, *http.Request)
-	// KVMDelete is the handler for DELETE /core0/{id}/kvm/{domainid}
-	// Delete Domain
-	KVMDelete(http.ResponseWriter, *http.Request)
-	// KVMDestroy is the handler for POST /core0/{id}/kvm/{domainid}/destroy
-	// Destroy the kvm domain
-	KVMDestroy(http.ResponseWriter, *http.Request)
-	// KVMPause is the handler for POST /core0/{id}/kvm/{domainid}/pause
-	// Pause the kvm domain
-	KVMPause(http.ResponseWriter, *http.Request)
-	// KVMStart is the handler for POST /core0/{id}/kvm/{domainid}/start
-	// Start the kvmdomain
-	KVMStart(http.ResponseWriter, *http.Request)
-	// KVMStop is the handler for POST /core0/{id}/kvm/{domainid}/stop
-	// Gracefully stop the kvmdomain
-	KVMStop(http.ResponseWriter, *http.Request)
-	// DiskList is the handler for GET /core0/{id}/disk
-	// List blockdevices present in the Core0
-	DiskList(http.ResponseWriter, *http.Request)
-	// DiskGet is the handler for GET /core0/{id}/disk/{devicenameOrdiskserial}
-	// Get disk details
-	DiskGet(http.ResponseWriter, *http.Request)
-	// DiskPartitionsList is the handler for GET /core0/{id}/disk/{devicenameOrdiskserial}/partitions
-	// Lists partitions
-	DiskPartitionsList(http.ResponseWriter, *http.Request)
-	// DiskPartitionCreate is the handler for POST /core0/{id}/disk/{devicenameOrdiskserial}/partitions
-	// Create a new partition
-	DiskPartitionCreate(http.ResponseWriter, *http.Request)
-	// DiskPartitionGet is the handler for GET /core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}
-	// Gets partition info. (TODO Needs further speccing)
-	DiskPartitionGet(http.ResponseWriter, *http.Request)
-	// DiskPartitionDelete is the handler for DELETE /core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}
-	// Removes a partition
-	DiskPartitionDelete(http.ResponseWriter, *http.Request)
-	// DiskPartitionMount is the handler for POST /core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}/mount
-	// Mounts the partition
-	DiskPartitionMount(http.ResponseWriter, *http.Request)
-	// DiskPartitionUmount is the handler for POST /core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}/umount
-	// Unmount the partition
-	DiskPartitionUmount(http.ResponseWriter, *http.Request)
-	// DiskMakeTable is the handler for POST /core0/{id}/disk/{devicenameOrdiskserial}/mktable
-	// Creates a partition table on a blockdevice
-	DiskMakeTable(http.ResponseWriter, *http.Request)
-	// DiskMount is the handler for POST /core0/{id}/disk/{devicenameOrdiskserial}/mount
-	// Mounts the disk
-	DiskMount(http.ResponseWriter, *http.Request)
-	// DiskUmount is the handler for POST /core0/{id}/disk/{devicenameOrdiskserial}/umount
-	// Unmount the disk
-	DiskUmount(http.ResponseWriter, *http.Request)
-	// FileDownload is the handler for GET /core0/{id}/filesystem
-	// Download file from Core0
-	FileDownload(http.ResponseWriter, *http.Request)
-	// FileUpload is the handler for POST /core0/{id}/filesystem
-	// Upload file to Core0
-	FileUpload(http.ResponseWriter, *http.Request)
-	// FileDelete is the handler for DELETE /core0/{id}/filesystem
-	// Delete file from Core0
-	FileDelete(http.ResponseWriter, *http.Request)
-	// ZerotierList is the handler for GET /core0/{id}/zerotier
-	// List running zerotier networks
-	ZerotierList(http.ResponseWriter, *http.Request)
-	// ZerotierGet is the handler for GET /core0/{id}/zerotier/{zerotierid}
-	// Get zerotier network details
-	ZerotierGet(http.ResponseWriter, *http.Request)
-	// ZerotierJoin is the handler for POST /core0/{id}/zerotier/{zerotierid}
-	// Join zerotier network
-	ZerotierJoin(http.ResponseWriter, *http.Request)
-	// ZerotierUnjoin is the handler for DELETE /core0/{id}/zerotier/{zerotierid}
-	// Delete zerotier network
-	ZerotierUnjoin(http.ResponseWriter, *http.Request)
 }
 
 // Core0InterfaceRoutes is routing for /core0 root endpoint
 func Core0InterfaceRoutes(r *mux.Router, i Core0Interface) {
 	r.HandleFunc("/core0", i.CoresList).Methods("GET")
 	r.HandleFunc("/core0/{id}", i.CoreGet).Methods("GET")
+	r.HandleFunc("/core0/{id}/command", i.CommandsList).Methods("GET")
+	r.HandleFunc("/core0/{id}/command/{commandid}", i.CommandGet).Methods("GET")
+	r.HandleFunc("/core0/{id}/core/reboot", i.Reboot).Methods("POST")
+	r.HandleFunc("/core0/{id}/core/ping", i.Ping).Methods("POST")
+	r.HandleFunc("/core0/{id}/core/system", i.System).Methods("POST")
+	r.HandleFunc("/core0/{id}/core/kill", i.Kill).Methods("POST")
+	r.HandleFunc("/core0/{id}/core/killall", i.KillAll).Methods("POST")
+	r.HandleFunc("/core0/{id}/core/state", i.StateGet).Methods("GET")
 	r.HandleFunc("/core0/{id}/info/os", i.OSInfo).Methods("GET")
 	r.HandleFunc("/core0/{id}/info/cpu", i.CPUInfo).Methods("GET")
 	r.HandleFunc("/core0/{id}/info/disk", i.DiskInfo).Methods("GET")
 	r.HandleFunc("/core0/{id}/info/mem", i.MemInfo).Methods("GET")
 	r.HandleFunc("/core0/{id}/info/nic", i.NicInfo).Methods("GET")
-	r.HandleFunc("/core0/{id}/process", i.ProcessList).Methods("GET")
-	r.HandleFunc("/core0/{id}/process/{proccessid}", i.ProcessGet).Methods("GET")
-	r.HandleFunc("/core0/{id}/process/{proccessid}", i.ProcessKill).Methods("DELETE")
 	r.HandleFunc("/core0/{id}/bridge", i.BridgeList).Methods("GET")
 	r.HandleFunc("/core0/{id}/bridge", i.BridgeCreate).Methods("POST")
 	r.HandleFunc("/core0/{id}/bridge/{bridgeid}", i.BridgeGet).Methods("GET")
 	r.HandleFunc("/core0/{id}/bridge/{bridgeid}", i.BridgeDelete).Methods("DELETE")
+	r.HandleFunc("/core0/{id}/disk", i.DiskList).Methods("GET")
+	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}", i.DiskGet).Methods("GET")
+	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/mktable", i.DiskMakeTable).Methods("POST")
+	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/mount", i.DiskMount).Methods("POST")
+	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/umount", i.DiskUmount).Methods("POST")
+	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions", i.DiskPartitionsList).Methods("GET")
+	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions", i.DiskPartitionCreate).Methods("POST")
+	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}", i.DiskPartitionGet).Methods("GET")
+	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}", i.DiskPartitionDelete).Methods("DELETE")
+	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}/mount", i.DiskPartitionMount).Methods("POST")
+	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}/umount", i.DiskPartitionUmount).Methods("POST")
+	r.HandleFunc("/core0/{id}/filesystem", i.FileDownload).Methods("GET")
+	r.HandleFunc("/core0/{id}/filesystem", i.FileUpload).Methods("POST")
+	r.HandleFunc("/core0/{id}/filesystem", i.FileDelete).Methods("DELETE")
 	r.HandleFunc("/core0/{id}/btrfs", i.BtrfsList).Methods("GET")
 	r.HandleFunc("/core0/{id}/btrfs", i.BtrfsCreate).Methods("POST")
 	r.HandleFunc("/core0/{id}/btrfs/{btrfsUuid}", i.BtrfsGet).Methods("GET")
@@ -254,6 +273,21 @@ func Core0InterfaceRoutes(r *mux.Router, i Core0Interface) {
 	r.HandleFunc("/core0/{id}/btrfs/{btrfsUuid}/subvolumes/{subvolumepath}", i.BtrfsSubvolGet).Methods("GET")
 	r.HandleFunc("/core0/{id}/btrfs/{btrfsUuid}/subvolumes/{subvolumepath}", i.BtrfsSubvolCreate).Methods("POST")
 	r.HandleFunc("/core0/{id}/btrfs/{btrfsUuid}/subvolumes/{subvolumepath}", i.BtrfsSubvolDelete).Methods("DELETE")
+	r.HandleFunc("/core0/{id}/kvm", i.KVMList).Methods("GET")
+	r.HandleFunc("/core0/{id}/kvm", i.KVMCreate).Methods("POST")
+	r.HandleFunc("/core0/{id}/kvm/{domainid}", i.KVMGet).Methods("GET")
+	r.HandleFunc("/core0/{id}/kvm/{domainid}", i.KVMDelete).Methods("DELETE")
+	r.HandleFunc("/core0/{id}/kvm/{domainid}/start", i.KVMStart).Methods("POST")
+	r.HandleFunc("/core0/{id}/kvm/{domainid}/stop", i.KVMStop).Methods("POST")
+	r.HandleFunc("/core0/{id}/kvm/{domainid}/destroy", i.KVMDestroy).Methods("POST")
+	r.HandleFunc("/core0/{id}/kvm/{domainid}/pause", i.KVMPause).Methods("POST")
+	r.HandleFunc("/core0/{id}/process", i.ProcessList).Methods("GET")
+	r.HandleFunc("/core0/{id}/process/{proccessid}", i.ProcessGet).Methods("GET")
+	r.HandleFunc("/core0/{id}/process/{proccessid}", i.ProcessKill).Methods("DELETE")
+	r.HandleFunc("/core0/{id}/zerotier", i.ZerotierList).Methods("GET")
+	r.HandleFunc("/core0/{id}/zerotier/{zerotierid}", i.ZerotierGet).Methods("GET")
+	r.HandleFunc("/core0/{id}/zerotier/{zerotierid}", i.ZerotierJoin).Methods("POST")
+	r.HandleFunc("/core0/{id}/zerotier/{zerotierid}", i.ZerotierUnjoin).Methods("DELETE")
 	r.HandleFunc("/core0/{id}/coreX", i.CoreXList).Methods("GET")
 	r.HandleFunc("/core0/{id}/coreX", i.CoreXCreate).Methods("POST")
 	r.HandleFunc("/core0/{id}/coreX/{coreXid}", i.CoreXGet).Methods("GET")
@@ -266,47 +300,13 @@ func Core0InterfaceRoutes(r *mux.Router, i Core0Interface) {
 	r.HandleFunc("/core0/{id}/coreX/{coreXid}/filesystem", i.CXFileDelete).Methods("DELETE")
 	r.HandleFunc("/core0/{id}/coreX/{coreXid}/command", i.CXCommandsList).Methods("GET")
 	r.HandleFunc("/core0/{id}/coreX/{coreXid}/command/{commandid}", i.CXCommandGet).Methods("GET")
-	r.HandleFunc("/core0/{id}/coreX/{coreXid}/core/state", i.CXStateGet).Methods("GET")
-	r.HandleFunc("/core0/{id}/coreX/{coreXid}/core/ping", i.CXPing).Methods("POST")
 	r.HandleFunc("/core0/{id}/coreX/{coreXid}/core/system", i.CXSystem).Methods("POST")
 	r.HandleFunc("/core0/{id}/coreX/{coreXid}/core/kill", i.CXKill).Methods("POST")
 	r.HandleFunc("/core0/{id}/coreX/{coreXid}/core/killall", i.CXKillAll).Methods("POST")
+	r.HandleFunc("/core0/{id}/coreX/{coreXid}/core/state", i.CXStateGet).Methods("GET")
+	r.HandleFunc("/core0/{id}/coreX/{coreXid}/core/ping", i.CXPing).Methods("POST")
 	r.HandleFunc("/core0/{id}/coreX/{coreXid}/info/cpu", i.CXCPUInfo).Methods("GET")
 	r.HandleFunc("/core0/{id}/coreX/{coreXid}/info/mem", i.CXMemInfo).Methods("GET")
 	r.HandleFunc("/core0/{id}/coreX/{coreXid}/info/nic", i.CXNicInfo).Methods("GET")
 	r.HandleFunc("/core0/{id}/coreX/{coreXid}/info/os", i.CXOSInfo).Methods("GET")
-	r.HandleFunc("/core0/{id}/command", i.CommandsList).Methods("GET")
-	r.HandleFunc("/core0/{id}/command/{commandid}", i.CommandGet).Methods("GET")
-	r.HandleFunc("/core0/{id}/core/state", i.StateGet).Methods("GET")
-	r.HandleFunc("/core0/{id}/core/reboot", i.Reboot).Methods("POST")
-	r.HandleFunc("/core0/{id}/core/ping", i.Ping).Methods("POST")
-	r.HandleFunc("/core0/{id}/core/system", i.System).Methods("POST")
-	r.HandleFunc("/core0/{id}/core/kill", i.Kill).Methods("POST")
-	r.HandleFunc("/core0/{id}/core/killall", i.KillAll).Methods("POST")
-	r.HandleFunc("/core0/{id}/kvm", i.KVMList).Methods("GET")
-	r.HandleFunc("/core0/{id}/kvm", i.KVMCreate).Methods("POST")
-	r.HandleFunc("/core0/{id}/kvm/{domainid}", i.KVMGet).Methods("GET")
-	r.HandleFunc("/core0/{id}/kvm/{domainid}", i.KVMDelete).Methods("DELETE")
-	r.HandleFunc("/core0/{id}/kvm/{domainid}/destroy", i.KVMDestroy).Methods("POST")
-	r.HandleFunc("/core0/{id}/kvm/{domainid}/pause", i.KVMPause).Methods("POST")
-	r.HandleFunc("/core0/{id}/kvm/{domainid}/start", i.KVMStart).Methods("POST")
-	r.HandleFunc("/core0/{id}/kvm/{domainid}/stop", i.KVMStop).Methods("POST")
-	r.HandleFunc("/core0/{id}/disk", i.DiskList).Methods("GET")
-	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}", i.DiskGet).Methods("GET")
-	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions", i.DiskPartitionsList).Methods("GET")
-	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions", i.DiskPartitionCreate).Methods("POST")
-	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}", i.DiskPartitionGet).Methods("GET")
-	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}", i.DiskPartitionDelete).Methods("DELETE")
-	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}/mount", i.DiskPartitionMount).Methods("POST")
-	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/partitions/{partitionid}/umount", i.DiskPartitionUmount).Methods("POST")
-	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/mktable", i.DiskMakeTable).Methods("POST")
-	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/mount", i.DiskMount).Methods("POST")
-	r.HandleFunc("/core0/{id}/disk/{devicenameOrdiskserial}/umount", i.DiskUmount).Methods("POST")
-	r.HandleFunc("/core0/{id}/filesystem", i.FileDownload).Methods("GET")
-	r.HandleFunc("/core0/{id}/filesystem", i.FileUpload).Methods("POST")
-	r.HandleFunc("/core0/{id}/filesystem", i.FileDelete).Methods("DELETE")
-	r.HandleFunc("/core0/{id}/zerotier", i.ZerotierList).Methods("GET")
-	r.HandleFunc("/core0/{id}/zerotier/{zerotierid}", i.ZerotierGet).Methods("GET")
-	r.HandleFunc("/core0/{id}/zerotier/{zerotierid}", i.ZerotierJoin).Methods("POST")
-	r.HandleFunc("/core0/{id}/zerotier/{zerotierid}", i.ZerotierUnjoin).Methods("DELETE")
 }
