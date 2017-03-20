@@ -1080,9 +1080,16 @@ types:
       post:
         description: Upload file to Core0
         displayName: FileUpload
+        queryString:
+          properties:
+            path: string
         body:
-          application/json:
-            type: WriteFile
+          multipart/form-data:
+            formParameters:
+              file:
+                type: file
+                required: true
+                description: the file to upload
         responses:
           200:
             body:
@@ -1413,9 +1420,16 @@ types:
           post:
             description: Upload file to Core0
             displayName: CXFileUpload
+            queryString:
+              properties:
+                path: string
             body:
-              application/json:
-                type: WriteFile
+              multipart/form-data:
+                formParameters:
+                  file:
+                    type: file
+                    required: true
+                    description: the file to upload
             responses:
               200:
                 body:

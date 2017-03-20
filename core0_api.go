@@ -931,7 +931,23 @@ func (api Core0API) DiskPartitionMount(w http.ResponseWriter, r *http.Request) {
 // Download file from Core0
 func (api Core0API) FileDownload(w http.ResponseWriter, r *http.Request) {
 	// uncomment below line to add header
-	// w.Header().Set("key","value")
+	if err := r.ParseForm(); err != nil {
+		WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+	path := r.Form.Get("path")
+	if path == "" {
+		WriteError(w, http.StatusBadRequest, fmt.Errorf("missing path"))
+		return
+	}
+
+	cl := GetConnection(r)
+	fs := client.Filesystem(cl)
+
+	w.Header().Set("content-type", "application/octet-stream")
+	if err := fs.Download(path, w); err != nil {
+		WriteError(w, http.StatusInternalServerError, err)
+	}
 }
 
 // FileUpload is the handler for POST /core0/{id}/filesystem
@@ -951,6 +967,7 @@ func (api Core0API) FileUpload(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
 		return
 	}
+
 	var respBody Location
 	json.NewEncoder(w).Encode(&respBody)
 	// uncomment below line to add header

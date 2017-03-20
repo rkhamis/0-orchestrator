@@ -11,8 +11,13 @@ import (
 )
 
 func WriteError(w http.ResponseWriter, code int, err error) {
+	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(err.Error())
+	v := struct {
+		Error string `json:"error"`
+	}{Error: err.Error()}
+
+	json.NewEncoder(w).Encode(v)
 
 	return
 }
