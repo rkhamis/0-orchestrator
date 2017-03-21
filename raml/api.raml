@@ -593,6 +593,48 @@ types:
           Epoch timestamp (seconds sinds 01/01/1970) when the snapshot was created
         type: integer
 
+  VMDiskInfo:
+    type: object
+    properties:
+      readIops:
+        description: Average number of io read operations per second over the last 5 minutes
+        type: integer
+      writeIops:
+        description: Average number of io write operations per second over the last 5 minutes
+        type: integer
+      readThroughput:
+        description: Average amount of MiB's read per second over the last 5 minutes
+        type: integer
+      writeThroughput:
+        description: Average amount of MiB's written per second over the last 5 minutes
+        type: integer
+
+  VMNetInfo:
+    type: object
+    properties:
+      receivedPackets:
+        description: Average number of packets received per second over the last 5 minutes
+        type: integer
+      transmittedPackets:
+        description: Average number of packets sent per second over the last 5 minutes
+        type: integer
+      receivedThroughput:
+        description: Average amount of MiB's received per second over the last 5 minutes
+        type: integer
+      transmittedThroughput:
+        description: Average amount of MiB's transmitted per second over the last 5 minutes
+        type: integer
+
+  VMInfo:
+    type: object
+    description: Statistical information about a vm
+    properties:
+      disk: VMDiskInfo[]
+      net: VMNetInfo[]
+      cpu:
+        description: Average number of cpu utilisation in cpu seconds / second over the last 5 minutes per vcpu
+        type: number[]
+
 /node:
   get:
     description: List Nodes
@@ -1079,3 +1121,11 @@ types:
               body:
                 application/json:
                   type: VM
+        /info:
+          get:
+            description: Get statistical information about the virtual machine.
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: VMInfo
