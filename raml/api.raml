@@ -320,12 +320,15 @@ types:
       plist:
         type: string
         description: Url to the root filesystem plist
-      mounts:
+      filesystems:
         description: |
-          List of host directory to container directory mappings (Node to Container)
-          eg: /mnt/volume34:/var
+          List of filesystems that will be exposed to the container
+          format: <<storagepool>>:<<filesystem>>
+          filesystems are mounted in the container filesystem as follows:
+          /fs/<<storagepool>>/<<filesystem>>
+        example: ['pool1:fs1', 'pool2:fs2']
         type: string[]
-      Zerotier:
+      zerotier:
         description: Zerotier network id
         type: string
         required: false
@@ -336,7 +339,7 @@ types:
         type: string[]
         description: |
           List of node to container post mappings.
-          eg: 8080:80
+        example: ['10022:22', '8080:80']
 
   JobListItem:
     type: object
@@ -469,13 +472,126 @@ types:
       environment:
         description: |
           Environment variables for the process.
-          eg: PATH=/usr/bin/local
+        example: ['PATH=/usr/bin/local', 'MYVAR=https://gig.tech']
         type: string[]
         required: false
       stdin:
         description: Data that needs to be passed into the stdin of the started process
         type: string
         required: false
+
+  StoragePoolListItem:
+    type: object
+    description: A combination of block devices forming 1 logical storage unit.
+    properties:
+      name:
+        description: A unique identifier for the storagepool
+        type: string
+      capacity:
+        description: The amount of remaining free capacity left in the storagepool
+
+  StoragePool:
+    type: object
+    description: A combination of block devices forming 1 logical storage unit.
+    properties:
+      name:
+        description: |
+          A unique identifier for the storagepool
+          Permitted characters: a-z,-
+        type: string
+      totalCapacity:
+        description: The amount of storage this storagepool can hold in total in GiB
+        type: integer
+      capacity:
+        description: The amount of remaining free capacity left in the storagepool in GiB
+        type: integer
+      metadataProfile:
+        description: Redundancy level of the storage pool meta data
+        enum: ['raid0', 'raid1', 'raid5', 'raid6', 'raid10', 'dup', 'single']
+      dataProfile:
+        description: Redundancy level of the storage pool data
+        enum: ['raid0', 'raid1', 'raid5', 'raid6', 'raid10', 'dup', 'single']
+      mountpoint:
+        description: |
+          Location where the storage pool is mounted on the node's filesystem
+          The location where the storage pool is mounted cannot be freely chosen.
+          Pools are mounted as follows:
+          /storage/<<pool>>
+        type: string
+
+  StoragePoolCreate:
+    type: object
+    description: Arguments to create a new storage pools
+    properties:
+      name:
+        description: A unique identifier for the storagepool
+        type: string
+      metadataProfile:
+        description: Redundancy level of the storage pool meta data
+        enum: ['raid0', 'raid1', 'raid5', 'raid6', 'raid10', 'dup', 'single']
+      dataProfile:
+        description: Redundancy level of the storage pool data
+        enum: ['raid0', 'raid1', 'raid5', 'raid6', 'raid10', 'dup', 'single']
+      devices:
+        description: List of devices to add to the storage pool
+        example: ['/dev/sda', '/dev/sdb']
+        type: string[]
+
+  Filesystem:
+    type: object
+    description: A filesystem living in a storage pool
+    properties:
+      name:
+        description: |
+          Unique identifier for the filesystem
+        type: string
+      parent:
+        description: Name of the parent filesystem
+        type: string
+      sizeOnDisk:
+        description: Amount of MiB of storage used by the filesystem
+        type: integer
+      readOnly:
+        description: Determines wether changes can be written to the filesystem
+        type: boolean
+      quota:
+        description: Amount of MiB that can be written to the filesystem. 0 means no quota is set.
+        type: integer
+      mountpoint:
+        description: |
+          Location where the filesystem is mounted on the node's filesystem
+          The location where the filesystem is mounted cannot be freely chosen.
+          filesystems are mounted as follows:
+          /filesystems/<<filesystem>>
+
+  FilesystemCreate:
+    type: object
+    description: Arguments to create a new filesystem
+    properties:
+      name:
+        description: |
+          Unique identifier for the filesystem
+          Permitted characters: a-z,-
+          Max length: 50 characters.
+        type: string
+      quota:
+        description: Amount of MiB that can be written to the filesystem. 0 means no quota is set.
+        type: integer
+
+  Snapshot:
+    type: object
+    description: Read only copy of the state of the filesystem at a certain time
+    properties:
+      name:
+        description: Unique name for the snapshot
+        type: string
+      sizeOnDisk:
+        description: The amount of space on disk used by this snapshot in MiB
+        type: integer
+      timestamp:
+        description:
+          Epoch timestamp (seconds sinds 01/01/1970) when the snapshot was created
+        type: integer
 
 /node:
   get:
@@ -639,44 +755,133 @@ types:
           description: Remove bridge
     /storagepool:
       get:
+        displayName: GetStoragePools
         description: List storage pools present in the node
+        responses:
+          200:
+            body:
+              application/json:
+                type: StoragePoolListItem[]
       post:
         description: Create a new storage pool
-      /{storagepoolid}:
+        body:
+          application/json:
+            type: StoragePoolCreate
+        responses:
+          201:
+            headers:
+              Location:
+                description: Url to the newly created storagepool.
+      /{storagepoolname}:
         get:
           description: Get detailed information of this storage pool
-        post:
-          description: Add extra devices to this storage pool
+          responses:
+            200:
+              body:
+                application/json:
+                  type: StoragePool
         delete:
           description: Delete the storage pool
+          responses:
+            204:
+              description: Storage pool deleted successfully
         /device:
           get:
             description: Lists the devices in the storage pool
+            responses:
+              200:
+                body:
+                  application/json:
+                    description: List of devices of the storage pool
+                    example: ['/dev/sda', '/dev/sdb']
+                    type: string[]
+          post:
+            description: Add extra devices to this storage pool
+            body:
+              application/json:
+                description: List of devices to add to the storage pool
+                example: ['/dev/sdc', '/dev/sdd']
+            responses:
+              204:
+                description: Devices added successfully
           /{deviceid}:
-            get:
-              description: Get detailed information on the device
             delete:
               description: Removes the device from the storagepool
-        /volume:
+              responses:
+                202:
+                  headers:
+                    Location:
+                      description: Url to the job object handling this request
+        /filesystem:
           get:
-            description: List volumes
+            description: List filesystems
+            responses:
+              200:
+                body:
+                  application/json:
+                    description: List of filesystems
+                    type: string[]
           post:
-            description: Create a new volume
-          /{volumeid}:
+            description: Create a new filesystem
+            body:
+              application/json:
+                type: FilesystemCreate
+            responses:
+              201:
+                headers:
+                  Location:
+                    description: Url towards the newly created filesystem resource
+          /{filesystemname}:
             get:
-              description: Get detailed volume information
+              description: Get detailed filesystem information
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: Filesystem
             delete:
-              description: Delete volume
+              description: Delete filesystem
+              responses:
+                204:
+                  description: Filesystem deleted successfully
             /snapshot:
-              post:
-                description: Create a new readonly volume of the current state of the volume
-            /clone:
-              post:
-                description: Create a new writable volume that starts with the current state of the volume
-            /children:
               get:
-                description: List child volumes of this volume
-    /Zerotier:
+                description: List snapshots of this filesystem
+                responses:
+                  200:
+                    body:
+                      application/json:
+                        description: List of snapshots
+                        type: string[]
+              post:
+                description: Create a new readonly filesystem of the current state of the volume
+                body:
+                  application/json:
+                    description: |
+                      Unique identifier for the snapshot
+                      Permitted characters: a-z,-
+                      Max length: 50 characters.
+                    type: string
+              /{snapshotname}:
+                get:
+                  description: Get detailed information on the snapshot
+                  responses:
+                    200:
+                      body:
+                        application/json:
+                          type: Snapshot
+                delete:
+                  description: Delete snapshot
+                  responses:
+                    204:
+                      description: Snapshot deleted successfully
+                /rollback:
+                  post:
+                    description: Rollback the filesystem to the state at the moment the snapshot was taken
+                    responses:
+                      204:
+                        description: Snapshot rollbacked successfully
+    /zerotier:
       get:
         displayName: ListZerotier
         description: List running Zerotier networks
