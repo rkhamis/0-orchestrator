@@ -666,6 +666,9 @@ types:
       delete:
         displayName: KillAllNodeJobs
         description: Kills all running jobs
+        responses:
+          204:
+            description: Jobs killed successfully
       /{jobid}:
         get:
           displayName: GetNodeJob
@@ -678,6 +681,9 @@ types:
         delete:
           displayName: KillNodeJob
           description: Kills the job
+          responses:
+            204:
+              description: Jobs killed successfully
     /ping:
       post:
         displayName: PingNode
@@ -702,6 +708,9 @@ types:
       post:
         displayName: RebootNode
         description: Immediately reboot the machine.
+        responses:
+          204:
+            description: Machine reboot signal sent successfully
     /cpu:
       get:
         displayName: GetCPUInfo
@@ -768,6 +777,9 @@ types:
          delete:
            displayName: KillNodeProcess
            description: Kill Process
+           responses:
+             204:
+               description: Job killed successfully
     /bridge:
       post:
         displayName: CreateBridge
@@ -775,6 +787,12 @@ types:
         body:
           application/json:
             type: BridgeCreate
+        responses:
+          201:
+            description: Bridge created successfully
+            headers:
+              Location:
+                description: Url to the created bridge resource
       get:
         displayName: ListBridges
         description: List bridges
@@ -795,6 +813,9 @@ types:
         delete:
           displayName: DeleteBridge
           description: Remove bridge
+          responses:
+            204:
+              description: Bridge removed successfully
     /storagepool:
       get:
         displayName: GetStoragePools
@@ -904,6 +925,12 @@ types:
                       Permitted characters: a-z,-
                       Max length: 50 characters.
                     type: string
+                responses:
+                  201:
+                    description: Snapshot created successfully
+                    headers:
+                      Location:
+                        description: Url to the created snapshot resource
               /{snapshotname}:
                 get:
                   description: Get detailed information on the snapshot
@@ -944,9 +971,18 @@ types:
         post:
           displayName: JoinZerotier
           description: Join Zerotier network
+          responses:
+            201:
+              description: Zerotier network joined successfully
+              headers:
+                Location:
+                  description: Url to the created zerotier network resource
         delete:
           displayName: ExitZerotier
           description: Exit the Zerotier network
+          responses:
+            204:
+              description: Zerotier network exited successfully
     /container:
       get:
         displayName: ListContainers
@@ -962,10 +998,19 @@ types:
         body:
           application/json:
             type: Container
+        responses:
+          201:
+            description: Container created successfully
+            headers:
+              Location:
+                description: Url to the created container resource
       /{containerid}:
         delete:
           displayName: DeleteContainer
           description: Delete Container instance
+          responses:
+            204:
+              description: Container deleted successfully
         get:
           displayName: GetContainer
           description: Get Container
@@ -988,6 +1033,9 @@ types:
                     type: file
                     required: true
                     description: the file to upload
+            responses:
+              204:
+                description: File uploaded successfully
           get:
             description: Download file from container
             displayName: FileDownload
@@ -1004,6 +1052,9 @@ types:
             body:
               application/json:
                 type: DeleteFile
+            responses:
+              204:
+                description: File deleted successfully
         /job:
           get:
             displayName: ListContainerJobs
@@ -1016,6 +1067,9 @@ types:
           delete:
             displayName: KillAllContainerJobs
             description: Kills all running jobs on the container
+            responses:
+              204:
+                description: Jobs killed successfully
           /{jobid}:
             get:
               displayName: GetContainerJob
@@ -1028,6 +1082,9 @@ types:
             delete:
               displayName: KillContainerJob
               description: Kills the job
+              responses:
+                204:
+                  description: Job killed successfully
         /ping:
           post:
             displayName: PingContainer
@@ -1088,6 +1145,9 @@ types:
              delete:
                displayName: KillContainerProcess
                description: Kill Process
+               responses:
+                 204:
+                   description: Process killed successfully
     /vm:
       get:
         description: List running VMs
@@ -1113,6 +1173,9 @@ types:
         delete:
           displayName: StopVM
           description: Stops the VM
+          responses:
+            204:
+              description: VM stopped successfully
         get:
           displayName: GetVM
           description: Get detailed virtual machine object
