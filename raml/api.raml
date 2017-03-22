@@ -678,6 +678,28 @@ types:
             responses:
               204:
                 description: VM Resumed successfully
+        /shutdown:
+          post:
+            (AYSBased):
+            displayName: ShutdownVM
+            description: Gracefully shutdown the VM
+            responses:
+              204:
+                description: VM shutdown request passed successfully
+        /migrate:
+          post:
+            (AYSBased):
+            displayName: MigrateVM
+            description: Migrate the VM to another host
+            body:
+              application/json:
+                properties:
+                  nodeid:
+                    description: Node identifier to which this vm needs to be migrated
+                    type: string
+            responses:
+              204:
+                description: VM migration request passed successfully
 /storagecluster:
   description: Creates and get informations about a storage cluster
   post:
