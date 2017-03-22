@@ -224,6 +224,9 @@ VMListItem:
 VM:
   type: object
   properties:
+    id:
+      description: Unique identifier of the vm
+      type: string
     name: string
     status:
       enum: [running, halted, paused]
@@ -246,6 +249,35 @@ VM:
     disk:
       description: List of virtual disks
       type: VDiskLink[]
+
+VMCreate:
+  type: object
+  properties:
+    name: string
+    memory:
+      description: Amount of memory in MiB
+      type: integer
+    cpu:
+      description: Number of virtual CUPs
+      type: integer
+    nic:
+      description: |
+        List of nic specifications.
+        Possible formats:
+        - "VxLAN:<<VxLAN id>>"
+          eg "VxLAN:200" Attaches the nic to VxLan 200
+        - "Zerotier:<<Zerotier network id>>"
+          eg "Zerotier:fsjyhgu76fsd87ydzf86t7dfygis" Attaches the nic to Zerotier network fsjyhgu76fsd87ydzf86t7dfygis
+      type: string[]
+    disk:
+      description: List of virtual disks
+      type: VDiskLink[]
+    userCloudInit:
+      description: Userlevel cloudinit configuration
+      type: object
+    systemCloudInit:
+      description: Systemlevel cloudinit configuration
+      type: object
 
 Bridge:
   type: object
