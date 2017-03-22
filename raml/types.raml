@@ -6,6 +6,9 @@ Node:
   description: Node node in the g8os grid
   properties:
     id: string
+    status:
+      enum: [running, halted]
+      description: Status of the node
     hostname: string
 
 CPUInfo:
@@ -78,55 +81,12 @@ DiskInfo:
     opts:
       type: string
       description: Mount options
-
-DiskExtInfo:
-  type: object
-  description: Extended disk information. See https://github.com/karelzak/util-linux/blob/master/misc-utils/lsblk.c#L156
-  properties:
-    alignment: integer
-    discAln: integer
-    discGran: integer
-    discMax: integer
-    discZero: integer
-    fstype: string
-    group: string
-    hctl: string
-    hotplug: integer
-    kname: string
-    label: string
-    logSec: integer
-    maj_min: string
-    minIO: integer
-    mode: string
-    model: string
-    mountpoint: string
-    name: string
-    optIO: integer
-    owner: string
-    partflags: string
-    partlabel: string
-    parttype: integer
-    partuuid: string
-    phySec: integer
-    pkname: string
-    ra: integer
-    rand: integer
-    rev: string
-    rm: integer
-    ro: integer
-    rota: integer
-    rqSize: integer
-    sched: string
-    serial: string
-    size: integer
-    state: string
-    subsystems: string
-    tran: string
-    type: string
-    uuid: string
-    vendor: string
-    wsame: integer
-    wwn: string
+    size:
+      type: integer
+      description: Size of the disk in GiB
+    type:
+      enum: [ssd, nvme, hdd, archive]
+      description: Kind of disk
 
 BridgeCreate:
   type: object
@@ -241,20 +201,33 @@ VDiskLink:
     url:
       description: File path to the NBD unix domain socket
       type: string
+    storageclusterid:
+      type: string
+      description: Id of the storage cluster of the volume
+    volumeid:
+      type: string
+      description: Id of the volume
+
 
 VMListItem:
   type: object
   description: Virtual machine list item
   properties:
-    pid:
-      description: Runtime id of the virtual machine (process id)
+    id:
+      description: Unique id of the virtual machine
       type: integer
     name: string
+    status:
+      enum: [running, halted, paused]
+      description: Status of the VM
 
 VM:
   type: object
   properties:
     name: string
+    status:
+      enum: [running, halted, paused]
+      description: Status of the VM
     memory:
       description: Amount of memory in MiB
       type: integer
@@ -268,7 +241,7 @@ VM:
         - "VxLAN:<<VxLAN id>>"
           eg "VxLAN:200" Attaches the nic to VxLan 200
         - "Zerotier:<<Zerotier network id>>"
-          eg "Zerotier:fsjyhgu76fsd87ydzf86t7dfygis" Attaches the noc to Zeroteir network fsjyhgu76fsd87ydzf86t7dfygis
+          eg "Zerotier:fsjyhgu76fsd87ydzf86t7dfygis" Attaches the nic to Zerotier network fsjyhgu76fsd87ydzf86t7dfygis
       type: string[]
     disk:
       description: List of virtual disks
@@ -277,32 +250,38 @@ VM:
 Bridge:
   type: object
   properties:
-     name:
-       description: Name of the bridge
-       type: string
-     config:
-       description: |
-          '' or 'none':
-            no IP is gonna be set on the link
-          'dhcp':
-            Run `udhcpc` on the container link, of course this will
-            only work if the `bridge` is created with `dnsmasq` networking
-          'CIDR':
-            Assign static IP to the link
-       type: string
+    name:
+      description: Name of the bridge
+      type: string
+    config:
+      description: |
+        '' or 'none':
+          no IP is gonna be set on the link
+        'dhcp':
+          Run `udhcpc` on the container link, of course this will
+          only work if the `bridge` is created with `dnsmasq` networking
+        'CIDR':
+          Assign static IP to the link
+      type: string
+    status:
+      enum: [up, down]
+      description: Status of the bridge
 
 ContainerListItem:
   type: object
   properties:
     id:
-      description: identifier
+      description: Unique identifier
       type: string
     hostname:
       description: Hostname for the Container
       type: string
-    plist:
+    flist:
       type: string
-      description: Url to the root filesystem plist
+      description: Url to the root filesystem flist
+    status:
+      enum: [running, halted]
+      description: Status of the container
 
 Container:
   type: object
@@ -310,12 +289,18 @@ Container:
     id:
       description: identifier
       type: string
+    status:
+      enum: [running, halted]
+      description: Status of the container
     hostname:
       description: Hostname for the Container
       type: string
-    plist:
+    flist:
       type: string
-      description: Url to the root filesystem plist
+      description: Url to the root filesystem flist
+    initprocesses:
+      type: CoreSystem[]
+      description: Definition of the processes to start in the container
     filesystems:
       description: |
         List of filesystems that will be exposed to the container
@@ -344,22 +329,12 @@ JobListItem:
     id:
       description: The unique identifier for the job
       type: string
-    name:
-      description: The kind of job to which this result belongs to.
-      enum: ['core.ping', 'core.system', 'core.kill', 'core.killall',
-             'core.state', 'core.reboot', 'info.cpu', 'info.disk',
-             'info.mem', 'info.nic', 'info.os', 'container.create',
-             'container.list', 'container.dispatch', 'container.terminate',
-             'bridge.create', 'bridge.list', 'bridge.delete',
-             'disk.list', 'disk.mktable', 'disk.mkpart', 'disk.rmpart',
-             'disk.mount', 'disk.umount', 'btrfs.create', 'btrfs.list',
-             'btrfs.subvol_create', 'btrfs.subvol_list', 'btrfs.subvol_delete']
     starttime:
       description: Epoch timestamp when the job was started
       type: integer
     state:
       description: Status of the job
-      enum: ['SCHEDULED', 'RUNNING', 'SUCCESS', 'KILLED', 'KILLED_TIMEOUT', 'FAILED']
+      enum: ['scheduled', 'running', 'success', 'killed', 'killed_timeout', 'failed']
 
 JobResult:
   type: object
@@ -392,7 +367,7 @@ JobResult:
       description: Stderr of process/job
     state:
       description: Status of the job
-      enum: ['SCHEDULED', 'RUNNING', 'SUCCESS', 'KILLED', 'KILLED_TIMEOUT', 'FAILED']
+      enum: ['scheduled', 'running', 'success', 'killed', 'killed_timeout', 'failed']
     data:
       description: The result of executing the job
       type: string
@@ -425,7 +400,7 @@ ZerotierListItem:
     nwid: string
     status: string
     type:
-      enum: ['PUBLIC', 'PRIVATE']
+      enum: ['public', 'private']
 
 Zerotier:
   type: object
@@ -448,7 +423,7 @@ Zerotier:
     routes: ZerotierRoute[]
     status: string
     type:
-      enum: ['PUBLIC', 'PRIVATE']
+      enum: ['public', 'private']
 
 CoreSystem:
   type: object
@@ -485,6 +460,9 @@ StoragePoolListItem:
       type: string
     capacity:
       description: The amount of remaining free capacity left in the storagepool
+    status:
+      enum: [healthy, degraded, error]
+      description: Status of the storage pool
 
 StoragePool:
   type: object
@@ -495,6 +473,9 @@ StoragePool:
         A unique identifier for the storagepool
         Permitted characters: a-z,-
       type: string
+    status:
+      enum: [healthy, degraded, error]
+      description: Status of the storage pool
     totalCapacity:
       description: The amount of storage this storagepool can hold in total in GiB
       type: integer
@@ -532,6 +513,18 @@ StoragePoolCreate:
       description: List of devices to add to the storage pool
       example: ['/dev/sda', '/dev/sdb']
       type: string[]
+
+StoragePoolDevice:
+  type: object
+  description:
+  properties:
+    uuid:
+      type: string
+      description: UUID of the device
+    status:
+      enum: [healthy, removing]
+      description: Status of the storage pool device
+
 
 Filesystem:
   type: object
@@ -634,14 +627,19 @@ VMInfo:
 # ObjtStor types
 StorageServer:
   properties:
-    id: integer
+    id:
+      type: integer
+      description: unique id for this storage server
     ip: string
     port: integer
+    container:
+      type: string
+      description: URL to the container resource running this server
     status:
       type: string
-      enum: [READY, ERROR]
+      enum: [ready, error]
 
-ClusterProperties:
+ClusterCreate:
   properties:
     label: string
     numberOfNodes:
@@ -649,9 +647,6 @@ ClusterProperties:
     driveType:
       type: string
       enum: [nvme, ssd, hdd, archive]
-    storage:
-      type: string
-      enum: [ARDB, ScyllaDB, Tarantool, SophiaDB]
     slaveNodes:
       type: boolean
       description: Do we need to have slave backup nodes or no
@@ -659,18 +654,73 @@ ClusterProperties:
     label: cluster1
     numberOfNodes: 256
     driveType: ssd
-    storage: ARDB
     slaveNodes: false
 
-Objstor:
+Cluster:
   properties:
+    label: string
     status:
       type: string
-      enum: [EMPTY, DEPLOYING, READY, ERROR]
-    clusterProperties: ClusterProperties
+      enum: [empty, deploying, ready, error]
+    driveType:
+      type: string
+      enum: [nvme, ssd, hdd, archive]
+    slaveNodes:
+      type: boolean
+      description: Do we need to have slave backup nodes or no
     dataStorage:
       type: StorageServer[]
       description: List of data storage server in the cluster
     metadataStorage:
       type: StorageServer[]
       description: List of metadata storage server in the cluster
+
+# Volumes API
+VolumeCreate:
+  properties:
+    size:
+      type: integer
+      description: Size of the volume in GiB
+    blocksize:
+      type: integer
+      description: blocksize in bytes
+      default: 4096
+    deduped:
+      type: boolean
+      default: true
+    templatevolume:
+      type: string
+      required: false
+    readOnly:
+      type: boolean
+      required: false
+      default: false
+    driver:
+      type: string
+      description: name of the driver of this volume
+      required: false
+
+Volume:
+  properties:
+    id: string
+    status:
+      enum: [running, halted, rollingback]
+      description: Status of the volume
+    size:
+      type: integer
+      description: Size of the volume in GiB
+    blocksize:
+      type: integer
+      description: blocksize in bytes
+      default: 4096
+    deduped:
+      type: boolean
+      description: Indicates if this volume is deduped or not.
+    readOnly:
+      type: boolean
+      default: false
+      required: false
+    driver:
+      type: string
+      description: name of the driver of this volume
+      required: false

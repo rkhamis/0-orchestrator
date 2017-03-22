@@ -1,7 +1,17 @@
 #%RAML 1.0
 title: G8OS Stateless GRID
-version: v0.1.0
+version: v0.2.0
 mediaType:  application/json
+
+annotationTypes:
+  AYSBased:
+    type: nil
+    allowedTargets: [Resource, Method]
+    description: Mark the call as executed by AYS in the backend
+  DirectAccess:
+    type: nil
+    allowedTargets: [Resource, Method]
+    description: Mark the call as going directly to the G8OS node
 
 types:
   !include types.raml
@@ -9,6 +19,7 @@ types:
 
 /node:
   get:
+    (AYSBased):
     description: List Nodes
     displayName: ListNodes
     responses:
@@ -18,6 +29,7 @@ types:
             type: Node[]
   /{nodeid}:
     get:
+      (AYSBased):
       description: Get detailed information of a node
       displayName: GetNode
       responses:
@@ -28,6 +40,7 @@ types:
     /job:
       description: Jobs for this Node
       get:
+        (DirectAccess):
         displayName: ListNodeJobs
         description: List running jobs
         responses:
@@ -36,6 +49,7 @@ types:
               application/json:
                 type: JobListItem[]
       delete:
+        (DirectAccess):
         displayName: KillAllNodeJobs
         description: Kills all running jobs
         responses:
@@ -43,6 +57,7 @@ types:
             description: Jobs killed successfully
       /{jobid}:
         get:
+          (DirectAccess):
           displayName: GetNodeJob
           description: Get the details of a submitted job
           responses:
@@ -51,6 +66,7 @@ types:
                 application/json:
                   type: JobResult
         delete:
+          (DirectAccess):
           displayName: KillNodeJob
           description: Kills the job
           responses:
@@ -58,6 +74,7 @@ types:
               description: Jobs killed successfully
     /ping:
       post:
+        (DirectAccess):
         displayName: PingNode
         description: Ping this node
         responses:
@@ -68,6 +85,7 @@ types:
                 type: boolean
     /state:
       get:
+        (DirectAccess):
         displayName: GetNodeState
         description: The aggregated consumption of node + all processes (cpu, memory, etc...)
         responses:
@@ -78,6 +96,7 @@ types:
                   CoreStateResult
     /reboot:
       post:
+        (AYSBased):
         displayName: RebootNode
         description: Immediately reboot the machine.
         responses:
@@ -85,6 +104,7 @@ types:
             description: Machine reboot signal sent successfully
     /cpu:
       get:
+        (DirectAccess):
         displayName: GetCPUInfo
         description: Get detailed information of all CPUs in the node
         responses:
@@ -94,6 +114,7 @@ types:
                 type: CPUInfo[]
     /disk:
       get:
+        (DirectAccess):
         displayName: GetDiskInfo
         description: Get detailed information of all the disks in the node
         responses:
@@ -103,6 +124,7 @@ types:
                 type: DiskInfo[]
     /mem:
       get:
+        (DirectAccess):
         displayName: GetMemInfo
         description: Get detailed information about the memory in the node
         responses:
@@ -112,6 +134,7 @@ types:
                 type: MemInfo
     /nic:
       get:
+        (DirectAccess):
         displayName: GetNicInfo
         description: Get detailed information about the network interfaces in the node
         responses:
@@ -121,6 +144,7 @@ types:
                 type: NicInfo[]
     /info:
       get:
+        (DirectAccess):
         displayName: GetNodeOSInfo
         description: Get detailed information of the os of the node
         responses:
@@ -130,6 +154,7 @@ types:
                 type: OSInfo
     /process:
        get:
+         (DirectAccess):
          displayName: ListNodeProcesses
          description: Get Processes
          responses:
@@ -139,6 +164,7 @@ types:
                  type: Process[]
        /{proccessid}:
          get:
+           (DirectAccess):
            displayName: GetNodeProcess
            description: Get process details
            responses:
@@ -147,6 +173,7 @@ types:
                  application/json:
                    type: Process
          delete:
+           (DirectAccess):
            displayName: KillNodeProcess
            description: Kill Process
            responses:
@@ -154,6 +181,7 @@ types:
                description: Job killed successfully
     /bridge:
       post:
+        (AYSBased):
         displayName: CreateBridge
         description: Creates a new bridge
         body:
@@ -166,6 +194,7 @@ types:
               Location:
                 description: Url to the created bridge resource
       get:
+        (AYSBased):
         displayName: ListBridges
         description: List bridges
         responses:
@@ -175,6 +204,7 @@ types:
                 type: Bridge[]
       /{bridgeid}:
         get:
+          (AYSBased):
           displayName: GetBridge
           description: Get bridge details
           responses:
@@ -183,6 +213,7 @@ types:
                 application/json:
                   type: Bridge
         delete:
+          (AYSBased):
           displayName: DeleteBridge
           description: Remove bridge
           responses:
@@ -190,6 +221,7 @@ types:
               description: Bridge removed successfully
     /storagepool:
       get:
+        (AYSBased):
         displayName: GetStoragePools
         description: List storage pools present in the node
         responses:
@@ -198,6 +230,7 @@ types:
               application/json:
                 type: StoragePoolListItem[]
       post:
+        (AYSBased):
         description: Create a new storage pool
         body:
           application/json:
@@ -209,6 +242,7 @@ types:
                 description: Url to the newly created storagepool.
       /{storagepoolname}:
         get:
+          (AYSBased):
           description: Get detailed information of this storage pool
           responses:
             200:
@@ -216,21 +250,23 @@ types:
                 application/json:
                   type: StoragePool
         delete:
+          (AYSBased):
           description: Delete the storage pool
           responses:
             204:
               description: Storage pool deleted successfully
         /device:
           get:
+            (AYSBased):
             description: Lists the devices in the storage pool
             responses:
               200:
                 body:
                   application/json:
                     description: List of devices of the storage pool
-                    example: ['/dev/sda', '/dev/sdb']
-                    type: string[]
+                    type: StoragePoolDevice[]
           post:
+            (AYSBased):
             description: Add extra devices to this storage pool
             body:
               application/json:
@@ -239,16 +275,26 @@ types:
             responses:
               204:
                 description: Devices added successfully
-          /{deviceid}:
+          /{deviceuuid}:
+            get:
+              description: Get information of the device
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: StoragePoolDevice
             delete:
+              (AYSBased):
               description: Removes the device from the storagepool
               responses:
-                202:
+                204:
+                  description: Removal started successfully
                   headers:
                     Location:
-                      description: Url to the job object handling this request
+                      description: Url to the storage pool device resource beeing removed
         /filesystem:
           get:
+            (AYSBased):
             description: List filesystems
             responses:
               200:
@@ -257,6 +303,7 @@ types:
                     description: List of filesystems
                     type: string[]
           post:
+            (AYSBased):
             description: Create a new filesystem
             body:
               application/json:
@@ -268,6 +315,7 @@ types:
                     description: Url towards the newly created filesystem resource
           /{filesystemname}:
             get:
+              (AYSBased):
               description: Get detailed filesystem information
               responses:
                 200:
@@ -275,12 +323,14 @@ types:
                     application/json:
                       type: Filesystem
             delete:
+              (AYSBased):
               description: Delete filesystem
               responses:
                 204:
                   description: Filesystem deleted successfully
             /snapshot:
               get:
+                (AYSBased):
                 description: List snapshots of this filesystem
                 responses:
                   200:
@@ -289,6 +339,7 @@ types:
                         description: List of snapshots
                         type: string[]
               post:
+                (AYSBased):
                 description: Create a new readonly filesystem of the current state of the volume
                 body:
                   application/json:
@@ -305,6 +356,7 @@ types:
                         description: Url to the created snapshot resource
               /{snapshotname}:
                 get:
+                  (AYSBased):
                   description: Get detailed information on the snapshot
                   responses:
                     200:
@@ -312,18 +364,21 @@ types:
                         application/json:
                           type: Snapshot
                 delete:
+                  (AYSBased):
                   description: Delete snapshot
                   responses:
                     204:
                       description: Snapshot deleted successfully
                 /rollback:
                   post:
+                    (AYSBased):
                     description: Rollback the filesystem to the state at the moment the snapshot was taken
                     responses:
                       204:
                         description: Snapshot rollbacked successfully
     /zerotier:
       get:
+        (AYSBased):
         displayName: ListZerotier
         description: List running Zerotier networks
         responses:
@@ -333,6 +388,7 @@ types:
                 type: ZerotierListItem[]
       /{zerotierid}:
         get:
+          (AYSBased):
           displayName: GetZerotier
           description: Get Zerotier network details
           responses:
@@ -341,6 +397,7 @@ types:
                 application/json:
                   type: Zerotier
         post:
+          (AYSBased):
           displayName: JoinZerotier
           description: Join Zerotier network
           responses:
@@ -350,6 +407,7 @@ types:
                 Location:
                   description: Url to the created zerotier network resource
         delete:
+          (AYSBased):
           displayName: ExitZerotier
           description: Exit the Zerotier network
           responses:
@@ -357,6 +415,7 @@ types:
               description: Zerotier network exited successfully
     /container:
       get:
+        (AYSBased):
         displayName: ListContainers
         description: List running Containers
         responses:
@@ -365,6 +424,7 @@ types:
               application/json:
                 type: ContainerListItem[]
       post:
+        (AYSBased):
         displayName: CreateContainer
         description: Create a new Container
         body:
@@ -378,12 +438,14 @@ types:
                 description: Url to the created container resource
       /{containerid}:
         delete:
+          (AYSBased):
           displayName: DeleteContainer
           description: Delete Container instance
           responses:
             204:
               description: Container deleted successfully
         get:
+          (AYSBased):
           displayName: GetContainer
           description: Get Container
           responses:
@@ -393,6 +455,7 @@ types:
                   type: Container
         /filesystem:
           post:
+            (DirectAccess):
             description: Upload file to container
             displayName: FileUpload
             queryString:
@@ -409,6 +472,7 @@ types:
               204:
                 description: File uploaded successfully
           get:
+            (DirectAccess):
             description: Download file from container
             displayName: FileDownload
             queryString:
@@ -419,6 +483,7 @@ types:
                 body:
                   application/octet-stream:
           delete:
+            (DirectAccess):
             description: Delete file from container
             displayName: FileDelete
             body:
@@ -429,6 +494,7 @@ types:
                 description: File deleted successfully
         /job:
           get:
+            (DirectAccess):
             displayName: ListContainerJobs
             description: List running jobs on the container
             responses:
@@ -437,6 +503,7 @@ types:
                   application/json:
                     type: JobListItem[]
           delete:
+            (DirectAccess):
             displayName: KillAllContainerJobs
             description: Kills all running jobs on the container
             responses:
@@ -444,6 +511,7 @@ types:
                 description: Jobs killed successfully
           /{jobid}:
             get:
+              (DirectAccess):
               displayName: GetContainerJob
               description: Get details of a submitted job on the container
               responses:
@@ -452,6 +520,7 @@ types:
                     application/json:
                       type: JobResult
             delete:
+              (DirectAccess):
               displayName: KillContainerJob
               description: Kills the job
               responses:
@@ -459,6 +528,7 @@ types:
                   description: Job killed successfully
         /ping:
           post:
+            (DirectAccess):
             displayName: PingContainer
             description: Ping this container
             responses:
@@ -468,6 +538,7 @@ types:
                     type: boolean
         /state:
           get:
+            (DirectAccess):
             displayName: GetContainerState
             description: The aggregated consumption of container + all processes (cpu, memory, etc...)
             responses:
@@ -478,6 +549,7 @@ types:
                       CoreStateResult
         /info:
           get:
+            (DirectAccess):
             displayName: GetContainerOSInfo
             description: Get detailed information of the container os
             responses:
@@ -487,6 +559,7 @@ types:
                     type: OSInfo
         /process:
            get:
+             (DirectAccess):
              displayName: ListContainerProcesses
              description: Get running processes in this container
              responses:
@@ -495,6 +568,7 @@ types:
                    application/json:
                      type: Process[]
            post:
+             (DirectAccess):
              displayName: StartContainerProcess
              description: Start a new process in this container
              body:
@@ -507,6 +581,7 @@ types:
                      description: Url to the job object handling this request
            /{proccessid}:
              get:
+               (DirectAccess):
                displayName: GetContainerProcess
                description: Get process details
                responses:
@@ -515,6 +590,7 @@ types:
                      application/json:
                        type: Process
              delete:
+               (DirectAccess):
                displayName: KillContainerProcess
                description: Kill Process
                responses:
@@ -522,7 +598,8 @@ types:
                    description: Process killed successfully
     /vm:
       get:
-        description: List running VMs
+        (AYSBased):
+        description: List VMs
         displayName: ListVMs
         responses:
           200:
@@ -530,7 +607,8 @@ types:
               application/json:
                 type: VMListItem[]
       post:
-        description: Starts the VM
+        (AYSBased):
+        description: Creates the VM
         displayName: StartVM
         body:
           application/json:
@@ -541,14 +619,16 @@ types:
               application/json:
                 description: Runtime id of the virtual machine (process id)
                 type: integer
-      /{vmpid}:
+      /{vmid}:
         delete:
+          (AYSBased):
           displayName: StopVM
-          description: Stops the VM
+          description: Deletes the VM
           responses:
             204:
               description: VM stopped successfully
         get:
+          (AYSBased):
           displayName: GetVM
           description: Get detailed virtual machine object
           responses:
@@ -558,29 +638,58 @@ types:
                   type: VM
         /info:
           get:
+            (DirectAccess):
             description: Get statistical information about the virtual machine.
             responses:
               200:
                 body:
                   application/json:
                     type: VMInfo
-/objstor:
-  description: Creates and get informations about object stor
+        /start:
+          post:
+            (AYSBased):
+            description: Starts the VM
+            responses:
+              204:
+                description: VM Started successfully
+        /stop:
+          post:
+            (AYSBased):
+            description: Stops the VM
+            responses:
+              204:
+                description: VM Stopped successfully
+        /pause:
+          post:
+            (AYSBased):
+            description: Pauses the VM
+            responses:
+              204:
+                description: VM Paused successfully
+        /resume:
+          post:
+            (AYSBased):
+            description: Resumes the VM
+            responses:
+              204:
+                description: VM Resumed successfully
+/storagecluster:
+  description: Creates and get informations about a storage cluster
   post:
+    (AYSBased):
     displayName: DeployNewCluster
     description: Deploy New Cluster
     body:
       application/json:
-        type: ClusterProperties
+        type: ClusterCreate
     responses:
-      202:
+      201:
         description: Deployment started
-        body:
-          application/json:
-            type: object
-            properties:
-              label: string
+        headers:
+          Location:
+            description: Url to newly created storage cluster resource
   get:
+    (AYSBased):
     displayName: ListAllClusters
     description: List all running clusters
     responses:
@@ -590,38 +699,82 @@ types:
             type: string[]
   /{label}:
     get:
+      (AYSBased):
       displayName: GetClusterInfo
       description: Get full Information about specific cluster
       responses:
         200:
           body:
             application/json:
-              type: Objstor
+              type: Cluster
     delete:
+      (AYSBased):
       displayName: KillCluster
       description: Kill cluster
       responses:
         204:
           description: Cluster destroyed
-/disk:
-  description: Retrieve informations about physical disks attached to the nodes
-  get:
-    displayName: ListAllDisks
-    description: List all physical disks used
-    responses:
-      200:
+    /volumes:
+      post:
+        (AYSBased):
+        displayName: CreateNewVolume
+        description: Create a new volume, can be a copy from an existing volume
         body:
           application/json:
-            type: DiskInfo[]
-  /{diskid}:
-    get:
-      displayName: GetDiskInfo
-      description: Get full Information about a disk
-      responses:
-        200:
-          body:
-            application/json:
-              type: object
-              properties:
-                info: DiskInfo
-                ext: DiskExtInfo
+            type: VolumeCreate
+        responses:
+          201:
+            headers:
+              Location:
+                description: Url to the created volume resource
+          404:
+            description: The template volume or storagecluster do not exist
+      /{volumeid}:
+        get:
+          (AYSBased):
+          displayName: GetVolumeInfo
+          description: Get volume information
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Volume
+            404:
+              description: The volume does not exist
+        delete:
+          (AYSBased):
+          displayName: DeleteVolume
+          description: Delete Volume
+          responses:
+            204:
+              description: Deleted
+            404:
+              description: The volume does not exist
+        /resize:
+          post:
+            (AYSBased):
+            displayName: ResizeVolume
+            description: Resize Volume
+            body:
+              application/json:
+                properties:
+                  newSize:
+                    type: integer
+                    description: New size in Gib, need to be bigger then the current size.
+            responses:
+              204:
+                description: Volume Resized
+        /rollback:
+          post:
+            (AYSBased):
+            displayName: RollbackVolume
+            description: Rollback a volume to a previous state
+            body:
+              application/json:
+                properties:
+                  epoch:
+                    type: integer
+                    description: Epoch to which we want to rollback the volume
+            responses:
+              204:
+                description: Rollback started successfully
