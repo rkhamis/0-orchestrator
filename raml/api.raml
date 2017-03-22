@@ -386,6 +386,19 @@ types:
             body:
               application/json:
                 type: ZerotierListItem[]
+      post:
+        (AYSBased):
+        displayName: JoinZerotier
+        description: Join Zerotier network
+        body:
+          application/json:
+            type: ZerotierJoin
+        responses:
+          201:
+            description: Zerotier network joined successfully
+            headers:
+              Location:
+                description: Url to the created zerotier network resource
       /{zerotierid}:
         get:
           (AYSBased):
@@ -396,16 +409,6 @@ types:
               body:
                 application/json:
                   type: Zerotier
-        post:
-          (AYSBased):
-          displayName: JoinZerotier
-          description: Join Zerotier network
-          responses:
-            201:
-              description: Zerotier network joined successfully
-              headers:
-                Location:
-                  description: Url to the created zerotier network resource
         delete:
           (AYSBased):
           displayName: ExitZerotier
