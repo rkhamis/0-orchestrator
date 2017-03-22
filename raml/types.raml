@@ -348,6 +348,9 @@ Container:
     bridges:
       type: Bridge[]
       description: Bridge mapping
+    hostNetworking:
+      type: boolean
+      description: Make host networking available to the guest. If true means that the container will be able participate in the networks available in the host operating system.
     ports:
       type: string[]
       description: |
