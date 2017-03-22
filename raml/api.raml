@@ -622,7 +622,7 @@ types:
       /{vmid}:
         delete:
           (AYSBased):
-          displayName: StopVM
+          displayName: DeleteVM
           description: Deletes the VM
           responses:
             204:
@@ -639,6 +639,7 @@ types:
         /info:
           get:
             (DirectAccess):
+            displayName: GetVMInfo
             description: Get statistical information about the virtual machine.
             responses:
               200:
@@ -648,6 +649,7 @@ types:
         /start:
           post:
             (AYSBased):
+            displayName: StartVM
             description: Starts the VM
             responses:
               204:
@@ -655,6 +657,7 @@ types:
         /stop:
           post:
             (AYSBased):
+            displayName: StopVM
             description: Stops the VM
             responses:
               204:
@@ -662,6 +665,7 @@ types:
         /pause:
           post:
             (AYSBased):
+            displayName: PauseVM
             description: Pauses the VM
             responses:
               204:
@@ -669,6 +673,7 @@ types:
         /resume:
           post:
             (AYSBased):
+            displayName: ResumeVM
             description: Resumes the VM
             responses:
               204:
