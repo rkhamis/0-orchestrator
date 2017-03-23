@@ -1,5 +1,6 @@
 
 def install(job):
+    # Mount and or create (if it does not exist yet on the g8os) the btrfs filesystem.
     raise NotImplementedError()
 
 def delete(job):
