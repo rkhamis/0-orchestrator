@@ -11,9 +11,3 @@ def addDevice(job):
 
 def removeDevice(job):
     raise NotImplementedError()
-
-def mount(job):
-    raise NotImplementedError()
-
-def umount(job):
-    raise NotImplementedError()
