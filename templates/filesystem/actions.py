@@ -11,12 +11,6 @@ def snaptshot(job):
 def rollback(job):
     raise NotImplementedError()
 
-def mount(job):
-    raise NotImplementedError()
-
-def umount(job):
-    raise NotImplementedError()
-
 def update_sizeOnDisk(job):
     raise NotImplementedError()
     # sync the sizeOnDisk model attribute whith reality
