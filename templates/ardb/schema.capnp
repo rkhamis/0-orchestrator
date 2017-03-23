@@ -1,7 +1,7 @@
 @0x935023b5e21bf041;
 
 struct Schema {
-    homeDir @0 :Text;
+    homeDir @0 :Text; # directory where the ardb db will be stored
     bind @1: Text; # listen bind address.
 
     master @3 :Text;
