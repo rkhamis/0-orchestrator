@@ -1,4 +1,4 @@
-@0x9c644375c5885f00;
+@0x9c644375c5885f01;
 
 struct Schema {
     hwaddr @0 :Text; # Macaddress for the bridge to be created. If none, a random macaddress will be assigned
@@ -6,6 +6,7 @@ struct Schema {
     nat @2 :Bool;  # If true, SNAT will be enabled on this bridge.
     setting @3: Setting;
     status @4: Status;
+    node @5: Text; # pointer to parent service
 
     enum NetworkMode{
         none @0;
