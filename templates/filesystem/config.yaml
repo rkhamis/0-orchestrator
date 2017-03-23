@@ -1,0 +1,6 @@
+links:
+  parent:
+    auto: false
+    role: storagepool
+    optional: false
+    argname: storagePool
