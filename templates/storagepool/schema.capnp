@@ -8,6 +8,7 @@ struct Schema {
     dataProfile @4 :Profile;
     mountpoint @5: Text;
     devices @6: List(Text); # List of devices that are part to the storage pool
+    node @7: Text;
 
     enum Status {
         healthy @0;
