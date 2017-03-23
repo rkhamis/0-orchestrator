@@ -5,11 +5,17 @@ struct Schema {
     networkMode @1 :NetworkMode;
     nat @2 :Bool;  # If true, SNAT will be enabled on this bridge.
     setting @3: Setting;
+    status @4: Status;
 
     enum NetworkMode{
         none @0;
         status @1;
         dnsmasq @2;
+    }
+
+    enum Status {
+        up @0;
+        down @1;
     }
 
     struct Setting {
