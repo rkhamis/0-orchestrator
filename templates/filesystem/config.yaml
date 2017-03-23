@@ -4,3 +4,8 @@ links:
     role: storagepool
     optional: false
     argname: storagePool
+
+recurring:
+  - action: update_sizeOnDisk
+    log: true
+    period: 30m
