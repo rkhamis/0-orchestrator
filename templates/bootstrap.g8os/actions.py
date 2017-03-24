@@ -9,22 +9,18 @@ def bootstrap(job):
     mac = j.sal.nettools.getMacAddressForIp(ip)
 
     # create and install the node.g8os service
-    client_actor = job.service.aysrepo.actorGet('g8os_client')
     node_actor = job.service.aysrepo.actorGet('node.g8os')
     grid_config = job.service.aysrepo.servicesFind(actor='grid_config')[0]
-    client_args = {
-        'redisAddr': ip,
-    }
-
-    job.logger.info("create g8os_client service {}".format(mac))
-    client_actor.serviceCreate(instance=mac, args=client_args)
 
     node_args = {
         'id': mac,
         'status':'running',
 
-        'client': mac,
         'gridConfig': grid_config.name,
+        'redisAddr': ip,
     }
     job.logger.info("create node.g8os service {}".format(mac))
-    node_actor.serviceCreate(instance=mac, args=node_args)
+    node = node_actor.serviceCreate(instance=mac, args=node_args)
+
+    job.logger.info("isntall node.g8os service {}".format(mac))
+    j.tools.async.wrappers.sync(node.executeActionJob('install'))
