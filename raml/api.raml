@@ -388,6 +388,7 @@ types:
                 /rollback:
                   post:
                     (AYSBased):
+                    displayName: RollbackFilesystemSnapshot
                     description: Rollback the filesystem to the state at the moment the snapshot was taken
                     responses:
                       204:
@@ -712,10 +713,7 @@ types:
             description: Migrate the VM to another host
             body:
               application/json:
-                properties:
-                  nodeid:
-                    description: Node identifier to which this vm needs to be migrated
-                    type: string
+                type: VMMigrate
             responses:
               204:
                 description: VM migration request passed successfully
@@ -803,10 +801,7 @@ types:
             description: Resize Volume
             body:
               application/json:
-                properties:
-                  newSize:
-                    type: integer
-                    description: New size in Gib, need to be bigger then the current size.
+                type: VolumeResize
             responses:
               204:
                 description: Volume Resized
@@ -817,10 +812,7 @@ types:
             description: Rollback a volume to a previous state
             body:
               application/json:
-                properties:
-                  epoch:
-                    type: integer
-                    description: Epoch to which we want to rollback the volume
+                type: VolumeRollback
             responses:
               204:
                 description: Rollback started successfully

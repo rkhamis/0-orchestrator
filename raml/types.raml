@@ -665,6 +665,12 @@ VMInfo:
       description: Average number of cpu utilisation in cpu seconds / second over the last 5 minutes per vcpu
       type: number[]
 
+VMMigrate:
+  properties:
+    nodeid:
+      description: Node identifier to which this vm needs to be migrated
+      type: string
+
 # ObjtStor types
 StorageServer:
   properties:
@@ -765,3 +771,15 @@ Volume:
       type: string
       description: name of the driver of this volume
       required: false
+
+VolumeResize:
+  properties:
+    newSize:
+      type: integer
+      description: New size in Gib, need to be bigger then the current size.
+
+VolumeRollback:
+  properties:
+    epoch:
+      type: integer
+      description: Epoch to which we want to rollback the volume
