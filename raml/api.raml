@@ -231,6 +231,7 @@ types:
                 type: StoragePoolListItem[]
       post:
         (AYSBased):
+        displayName: CreateStoragePool
         description: Create a new storage pool
         body:
           application/json:
@@ -243,6 +244,7 @@ types:
       /{storagepoolname}:
         get:
           (AYSBased):
+          displayName: GetStoragePoolInfo
           description: Get detailed information of this storage pool
           responses:
             200:
@@ -251,6 +253,7 @@ types:
                   type: StoragePool
         delete:
           (AYSBased):
+          displayName: DeleteStoragePool
           description: Delete the storage pool
           responses:
             204:
@@ -258,6 +261,7 @@ types:
         /device:
           get:
             (AYSBased):
+            displayName: ListStoragePoolDevices
             description: Lists the devices in the storage pool
             responses:
               200:
@@ -267,6 +271,7 @@ types:
                     type: StoragePoolDevice[]
           post:
             (AYSBased):
+            displayName: CreateStoragePoolDevices
             description: Add extra devices to this storage pool
             body:
               application/json:
@@ -277,6 +282,7 @@ types:
                 description: Devices added successfully
           /{deviceuuid}:
             get:
+              displayName: GetStoragePoolDeviceInfo
               description: Get information of the device
               responses:
                 200:
@@ -285,6 +291,7 @@ types:
                       type: StoragePoolDevice
             delete:
               (AYSBased):
+              displayName: DeleteStoragePoolDevice
               description: Removes the device from the storagepool
               responses:
                 204:
@@ -295,6 +302,7 @@ types:
         /filesystem:
           get:
             (AYSBased):
+            displayName: ListFilesystems
             description: List filesystems
             responses:
               200:
@@ -304,6 +312,7 @@ types:
                     type: string[]
           post:
             (AYSBased):
+            displayName: CreateFilesystem
             description: Create a new filesystem
             body:
               application/json:
@@ -316,6 +325,7 @@ types:
           /{filesystemname}:
             get:
               (AYSBased):
+              displayName: GetFilesystemInfo
               description: Get detailed filesystem information
               responses:
                 200:
@@ -324,6 +334,7 @@ types:
                       type: Filesystem
             delete:
               (AYSBased):
+              displayName: DeleteFilesystem
               description: Delete filesystem
               responses:
                 204:
@@ -331,6 +342,7 @@ types:
             /snapshot:
               get:
                 (AYSBased):
+                displayName: ListFilesystemSnapshots
                 description: List snapshots of this filesystem
                 responses:
                   200:
@@ -340,6 +352,7 @@ types:
                         type: string[]
               post:
                 (AYSBased):
+                displayName: CreateSnapshot
                 description: Create a new readonly filesystem of the current state of the volume
                 body:
                   application/json:
@@ -357,6 +370,7 @@ types:
               /{snapshotname}:
                 get:
                   (AYSBased):
+                  displayName: GetFilesystemSnapshotInfo
                   description: Get detailed information on the snapshot
                   responses:
                     200:
@@ -365,6 +379,7 @@ types:
                           type: Snapshot
                 delete:
                   (AYSBased):
+                  displayName: DeleteFilesystemSnapshot
                   description: Delete snapshot
                   responses:
                     204:
