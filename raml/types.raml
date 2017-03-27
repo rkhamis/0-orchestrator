@@ -367,9 +367,6 @@ JobListItem:
     starttime:
       description: Epoch timestamp when the job was started
       type: integer
-    state:
-      description: Status of the job
-      enum: ['scheduled', 'running', 'success', 'killed', 'killed_timeout', 'failed']
 
 JobResult:
   type: object
@@ -402,7 +399,7 @@ JobResult:
       description: Stderr of process/job
     state:
       description: Status of the job
-      enum: ['scheduled', 'running', 'success', 'killed', 'killed_timeout', 'failed']
+      enum: ['unknown_cmd', 'error', 'success', 'killed', 'timeout', 'duplicate_id', 'running']
     data:
       description: The result of executing the job
       type: string
