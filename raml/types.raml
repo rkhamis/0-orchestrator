@@ -689,19 +689,26 @@ StorageServer:
 ClusterCreate:
   properties:
     label: string
-    numberOfNodes:
+    servers:
       type: integer
+      description: Number of storage server to deploy in this cluster
     driveType:
       type: string
       enum: [nvme, ssd, hdd, archive]
     slaveNodes:
       type: boolean
       description: Do we need to have slave backup nodes or no
+    nodes:
+      type: []string
+      description: List of node ID on which we can deploy storage server
   example:
     label: cluster1
-    numberOfNodes: 256
+    servers: 256
     driveType: ssd
     slaveNodes: false
+    nodes:
+       - node1
+       - node2
 
 Cluster:
   properties:
@@ -715,6 +722,9 @@ Cluster:
     slaveNodes:
       type: boolean
       description: Do we need to have slave backup nodes or no
+    nodes:
+      type: []string
+      description: List of node ID on which storage server are deployed for this cluster
     dataStorage:
       type: StorageServer[]
       description: List of data storage server in the cluster
