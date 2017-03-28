@@ -15,6 +15,11 @@ links:
       max: 9999
       role: bridge
       argname: bridges
+    - auto: false
+      min: 0
+      max: 9999
+      role: filesystem
+      argname: filesystems
 
 recurring:
   - action: monitor

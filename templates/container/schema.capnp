@@ -6,11 +6,7 @@ struct Schema {
     hostname @2 :Text;
     flist @3 :Text; Url to the root filesystem flist
     initProcesses @4 :List(Process);
-    filesystems: @5 :List(Text);
-    # List of filesystems that will be exposed to the container
-    # format: <<storagepool>>:<<filesystem>>
-    # filesystems are mounted in the container filesystem as follows:
-    # /fs/<<storagepool>>/<<filesystem>>
+    filesystems: @5 :List(Text); # pointer to the filesystem to mount into the container
     zerotier @6 :Text; # pointer to the zerotier service to consume
     bridges @7 :List(Text); # pointers to the bridges to consumes
     hostNetworking @8 :Bool;
