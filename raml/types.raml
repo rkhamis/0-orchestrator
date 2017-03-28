@@ -191,6 +191,15 @@ Process:
     swap: number
     vms: number
 
+ProcessSignal:
+  type: object
+  properties:
+    signal:
+      type: integer
+      description: Number of the signal to send to the process.
+      default: 15
+      minimum: 1
+
 VDiskLink:
   type: object
   description: Definition of a virtual disk
