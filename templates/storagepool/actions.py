@@ -46,11 +46,13 @@ def install(job):
 
     # add extra devices
     extradevices = requireddevices - pooldevices
-    pool.device_add(*extradevices)
+    if extradevices:
+        pool.device_add(*extradevices)
 
     # remove devices
     removeddevices = pooldevices - requireddevices
-    pool.device_remove(*removeddevices)
+    if removeddevices:
+        pool.device_remove(*removeddevices)
 
 
 def delete(job):
