@@ -1,0 +1,6 @@
+links:
+  parent:
+    role: storage_cluster
+    argsname: storageCluster
+    auto: false
+    optional: false
