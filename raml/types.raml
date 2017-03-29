@@ -705,7 +705,7 @@ ClusterCreate:
       type: boolean
       description: Do we need to have slave backup nodes or no
     nodes:
-      type: []string
+      type: string[]
       description: List of node ID on which we can deploy storage server
   example:
     label: cluster1
@@ -729,7 +729,7 @@ Cluster:
       type: boolean
       description: Do we need to have slave backup nodes or no
     nodes:
-      type: []string
+      type: string[]
       description: List of node ID on which storage server are deployed for this cluster
     dataStorage:
       type: StorageServer[]
