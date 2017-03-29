@@ -2,8 +2,8 @@
 
 struct Schema {
     status @0 :Status;
-    totalCapacity @1:UInt32;
-    freeCapacity @2:UInt32;
+    totalCapacity @1:UInt64;
+    freeCapacity @2:UInt64;
     metadataProfile @3 :Profile;
     dataProfile @4 :Profile;
     mountpoint @5: Text;

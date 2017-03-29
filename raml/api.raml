@@ -529,6 +529,13 @@ types:
             responses:
               204:
                 description: Jobs killed successfully
+          post:
+            (DirectAccess):
+            displayName: SendSignal
+            description: Send signal to the job
+            body:
+              application/json:
+                type: ProcessSignal
           /{jobid}:
             get:
               (DirectAccess):
@@ -616,6 +623,13 @@ types:
                responses:
                  204:
                    description: Process killed successfully
+             post:
+               (DirectAccess):
+               displayName: SendSignal
+               description: Send signal to the process
+               body:
+                 application/json:
+                   type: ProcessSignal
     /vm:
       get:
         (AYSBased):
