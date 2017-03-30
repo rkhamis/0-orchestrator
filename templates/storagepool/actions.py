@@ -3,7 +3,7 @@ from JumpScaler import j
 
 def input(job):
     service = job.service
-    for notempty in ['mountpoint', 'metadataProfile', 'dataProfile', 'devices']:
+    for notempty in ['metadataProfile', 'dataProfile', 'devices']:
         if job.model.args.get(notempty, "") == "":
             raise j.exceptions.Input("{} argument cannot be empty, cannot continue init of {}".format(notempty, service))
 
@@ -20,7 +20,7 @@ def install(job):
     name = service.name
     dataProfile = str(service.model.data.dataProfile)
     metadataProfile = str(service.model.data.metadataProfile)
-    mountpoint = str(service.model.data.mountpoint)
+    mountpoint = str(service.model.data.mountpoint) or None
     try:
         pool = node.storagepools.get(name)
     except ValueError:
@@ -30,7 +30,7 @@ def install(job):
     # mount device
     if pool.mountpoint:
         if pool.mountpoint != mountpoint:
-            pool.umount(mountpoint)
+            pool.umount()
             pool.mount(mountpoint)
     else:
         pool.mount(mountpoint)

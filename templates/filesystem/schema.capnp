@@ -2,8 +2,9 @@
 
 struct Schema {
     storagePool @0 :Text; # Name of the parent
-    sizeOnDisk @1 :UInt32; # Amount of MiB of storage used by the filesystem
-    readOnly @2: Bool;
-    quota @3: UInt32; # Amount of MiB that can be written to the filesystem. 0 means no quota is set.
-    mountpoint @4:Text;
+    name @1 :Text; # Name of the filesystem
+    sizeOnDisk @2 :UInt32; # Amount of MiB of storage used by the filesystem
+    readOnly @3: Bool;
+    quota @4: UInt32; # Amount of MiB that can be written to the filesystem. 0 means no quota is set.
+    mountpoint @5:Text;
 }
