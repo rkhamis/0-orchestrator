@@ -16,7 +16,7 @@ def input(job):
 def install(job):
     service = job.service
     # Get g8core client
-    cl = service.actions.get_node_client_(service)
+    cl = get_node_client(service)
 
     # create ports config
     ports = {}
@@ -56,38 +56,36 @@ def install(job):
 
 def start(job):
     service = job.service
-    if str(service.model.data.status) == "halted":
-        coro = service.executeAction('install')
-        j.tools.async.wrappers.sync(coro)
+    coro = service.executeAction('install')
+    j.tools.async.wrappers.sync(coro)
 
 
 def stop(job):
     service = job.service
-    if str(service.model.data.status) == "running":
-        # Get g8core client
-        cl = service.actions.get_node_client_(service)
-        cl.container.terminate(service.model.data.id)
-        service.model.data.status = 'halted'
+    # Get g8core client
+    cl = get_node_client(service)
+    cl.container.terminate(service.model.data.id)
+    service.model.data.status = 'halted'
 
 
 def monitor(job):
     service = job.service
     # Get g8core client
-    cl = service.actions.get_node_client_(service)
+    cl = get_node_client(service)
     if str(service.model.data.id) not in cl.container.list():
         coro = service.executeAction('start')
         j.tools.async.wrappers.sync(coro)
 
 
-def get_node_client_(service):
+def get_node_client(service):
     node = service.parent
     return j.clients.g8core.get(host=node.model.data.redisAddr,
                                 port=node.model.data.redisPort,
                                 password=node.model.data.redisPassword)
 
 
-def get_container_client_(service):
+def get_container_client(service):
     if str(service.model.data.status) == "running":
         # Get g8core client
-        cl = service.actions.get_node_client_(service)
+        cl = get_node_client(service)
         return cl.container.client(service.model.data.id)
