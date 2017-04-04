@@ -1,19 +1,18 @@
 package tools
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
+	log "github.com/Sirupsen/logrus"
 	ays "github.com/g8os/grid/api/ays-client"
-	client "github.com/g8os/grid/ays-client"
 )
 
 var (
 	ayscl *ays.AtYourServiceAPI
 )
 
-func SetAYSClient(client ays.AtYourServiceAPI) {
+func SetAYSClient(client *ays.AtYourServiceAPI) {
 	ayscl = client
 }
 
@@ -39,7 +38,7 @@ func ExecuteBlueprint(w http.ResponseWriter, repoName, blueprintName string, blu
 
 func createRepo(w http.ResponseWriter, repoName string) error {
 	// Create ays repo
-	var repo client.AysRepositoryPostReqBody
+	var repo ays.AysRepositoryPostReqBody
 	repo.Name = repoName
 	repo.Git_url = "https://github.com/g8os/test"
 
@@ -57,24 +56,21 @@ func createRepo(w http.ResponseWriter, repoName string) error {
 }
 
 func createBlueprint(w http.ResponseWriter, repoName string, name string, bp map[string]interface{}) error {
-	data, err := json.Marshal(bp)
-	if err != nil {
-		return err
-	}
-
-	blueprint := client.Blueprint{
-		Content: data,
+	blueprint := ays.Blueprint{
+		Content: bp,
 		Name:    name,
 	}
 
 	_, resp, err := ayscl.Ays.CreateBlueprint(repoName, blueprint, nil, nil)
 	if err != nil {
+		log.Errorf("error creating blueprint %s\n", name)
 		WriteError(w, http.StatusInternalServerError, err)
 		return err
 	}
 
 	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusConflict {
 		w.WriteHeader(resp.StatusCode)
+		log.Errorf("bad response code %+v", resp.StatusCode)
 		return fmt.Errorf("bad response code %+v", resp.StatusCode)
 	}
 

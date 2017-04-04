@@ -8,6 +8,8 @@ import (
 
 	"github.com/g8os/grid/api/tools"
 	"github.com/gorilla/mux"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 // CreateStoragePool is the handler for POST /node/{nodeid}/storagepool
@@ -18,28 +20,37 @@ func (api NodeAPI) CreateStoragePool(w http.ResponseWriter, r *http.Request) {
 
 	// decode request
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		log.Errorf("Error decoding request for storagepool creation : %+v", err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	// validate request
 	if err := reqBody.Validate(); err != nil {
+		log.Errorf("Error validating request for storagepool creation : %+v", err)
 		tools.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
 	bpContent := struct {
-		StoragePoolCreate
-		node string
+		DataProfile     EnumStoragePoolCreateDataProfile     `json:"dataProfile"`
+		Devices         []string                             `json:"devices"`
+		MetadataProfile EnumStoragePoolCreateMetadataProfile `json:"metadataProfile"`
+		Node            string                               `json:"node"`
 	}{
-		StoragePoolCreate: reqBody,
-		node:              node,
+		DataProfile:     reqBody.DataProfile,
+		MetadataProfile: reqBody.MetadataProfile,
+		Devices:         reqBody.Devices,
+		Node:            node,
 	}
 
 	blueprint := map[string]interface{}{
-		fmt.Sprintf("storagepool__%s", node): bpContent,
+		fmt.Sprintf("storagepool__%s", reqBody.Name): bpContent,
+		"actions": []map[string]string{{"action": "install"}},
 	}
 
 	blueprintName := fmt.Sprintf("storagepool_%s_create_%d", node, time.Now().Unix())
-	tools.ExecuteBlueprint(w, api.AysRepo, blueprintName, blueprint)
+	if err := tools.ExecuteBlueprint(w, api.AysRepo, blueprintName, blueprint); err != nil {
+		log.Errorf("Error executing blueprint for storagepool creation : %+v", err)
+	}
 }
