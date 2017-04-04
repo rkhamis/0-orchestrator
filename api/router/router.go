@@ -53,8 +53,8 @@ func GetRouter(aysURL, aysRepo string) http.Handler {
 	// apidocs
 	r.PathPrefix("/apidocs/").Handler(http.StripPrefix("/apidocs/", http.FileServer(http.Dir("./apidocs/"))))
 
-	node.NodeInterfaceRoutes(r, node.NewNodeAPI(aysRepo))
-	storagecluster.StorageclusterInterfaceRoutes(r, storagecluster.StorageclusterAPI{})
+	node.NodeInterfaceRoutes(r, node.NewNodeAPI(aysRepo, aysAPI))
+	storagecluster.StorageclusterInterfaceRoutes(r, storagecluster.NewStorageClusterAPI(aysRepo, aysAPI))
 
 	router := NewRouter(r)
 	router.Use(LoggingMiddleware)

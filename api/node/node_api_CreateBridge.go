@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	log "github.com/Sirupsen/logrus"
 	tools "github.com/g8os/grid/api/tools"
 	"github.com/gorilla/mux"
 )
@@ -38,17 +39,25 @@ func (api NodeAPI) CreateBridge(w http.ResponseWriter, r *http.Request) {
 	nodeid := vars["nodeid"]
 
 	// Create blueprint
-	var bp bridgeBlueprint
-
-	bp.Hwaddr = reqBody.Hwaddr
-	bp.Nat = reqBody.Nat
-	bp.NetworkMode = reqBody.NetworkMode
-	bp.Setting = reqBody.Setting
-	bp.Node = nodeid
+	bp := bridgeBlueprint{
+		Hwaddr:      reqBody.Hwaddr,
+		Nat:         reqBody.Nat,
+		NetworkMode: reqBody.NetworkMode,
+		Setting:     reqBody.Setting,
+		Node:        nodeid,
+	}
 
 	obj := make(map[string]interface{})
 	obj[fmt.Sprintf("bridge__%s", reqBody.Name)] = bp
 	obj["actions"] = []map[string]string{map[string]string{"action": "install"}}
 
-	tools.ExecuteBlueprint(w, api.AysRepo, reqBody.Name, obj)
+	if err := tools.ExecuteBlueprint(w, api.AysRepo, reqBody.Name, obj); err != nil {
+		log.Errorf("error executing blueprint for bridge %s creation : %+v", reqBody.Name, err)
+		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	location := r.URL.String() + fmt.Sprintf("/%s", reqBody.Name)
+	w.Header().Set("Location", location)
+	w.WriteHeader(http.StatusCreated)
 }

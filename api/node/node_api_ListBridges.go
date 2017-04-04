@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	client "github.com/g8os/grid/api/ays-client"
 	"github.com/g8os/grid/api/tools"
 )
 
@@ -13,8 +12,8 @@ import (
 func (api NodeAPI) ListBridges(w http.ResponseWriter, r *http.Request) {
 	var respBody []Bridge
 	json.NewEncoder(w).Encode(&respBody)
-	cl := client.NewAtYourServiceAPI()
-	_, resp, err := cl.Ays.ListServicesByRole("bridge", api.AysRepo, nil, nil)
+
+	_, resp, err := api.AysAPI.Ays.ListServicesByRole("bridge", api.AysRepo, nil, nil)
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
