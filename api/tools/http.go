@@ -13,6 +13,4 @@ func WriteError(w http.ResponseWriter, code int, err error) {
 	}{Error: err.Error()}
 
 	json.NewEncoder(w).Encode(v)
-
-	return
 }
