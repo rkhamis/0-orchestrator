@@ -8,15 +8,13 @@ import (
 	log "github.com/Sirupsen/logrus"
 
 	"github.com/codegangsta/cli"
+	ays "github.com/g8os/grid/api/ays-client"
 	"github.com/g8os/grid/api/goraml"
-	"github.com/g8os/grid/api/node"
-	"github.com/g8os/grid/api/storagecluster"
+	"github.com/g8os/grid/api/router"
 	"github.com/g8os/grid/api/tools"
-	ays "github.com/g8os/objstor/backend_api/ays_client"
 
 	"fmt"
 
-	"github.com/gorilla/mux"
 	"gopkg.in/validator.v2"
 )
 
@@ -70,30 +68,13 @@ func main() {
 			log.Fatalln(err.Error())
 		}
 
-		aysAPI := ays.NewAtYourServiceAPI()
-		aysAPI.BaseURI = aysURL
-
-		tools.SetAYSClient(aysAPI)
-
 		return nil
 	}
 
 	app.Action = func(c *cli.Context) {
 		validator.SetValidationFunc("multipleOf", goraml.MultipleOf)
 
-		r := mux.NewRouter()
-
-		// home page
-		r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			http.ServeFile(w, r, "apidocs/index.html")
-		})
-
-		// apidocs
-		r.PathPrefix("/apidocs/").Handler(http.StripPrefix("/apidocs/", http.FileServer(http.Dir("./apidocs/"))))
-
-		node.NodeInterfaceRoutes(r, node.NewNodeAPI(aysRepo))
-
-		storagecluster.StorageclusterInterfaceRoutes(r, storagecluster.StorageclusterAPI{})
+		r := router.GetRouter(aysURL, aysRepo)
 
 		log.Println("starting server")
 		log.Printf("Server is listening on %s\n", bindAddr)
