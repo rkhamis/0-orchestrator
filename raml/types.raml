@@ -296,6 +296,20 @@ VMCreate:
       description: Systemlevel cloudinit configuration
       type: object
 
+VMUpdate:
+  type: object
+  properties:
+    name: string
+    memory:
+      description: Amount of memory in MiB
+      type: integer
+    nic:
+      description: List of nic specifications.
+      type: NicLink[]
+    disk:
+      description: List of virtual disks
+      type: VDiskLink[]
+
 Bridge:
   type: object
   properties:

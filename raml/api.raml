@@ -670,6 +670,18 @@ types:
               body:
                 application/json:
                   type: VM
+        put:
+          displayName: UpdateVm
+          description: updates the VM 
+          body:
+            application/json:
+              type: VMUpdate
+          responses:
+            200:
+              body:
+                application/json:
+                  description: Runtime id of the virtual machine (process id)
+                  type: integer
         /info:
           get:
             (DirectAccess):
