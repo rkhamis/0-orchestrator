@@ -7,7 +7,7 @@ import (
 // Arguments to create a new filesystem
 type FilesystemCreate struct {
 	Name  string `json:"name" validate:"nonzero"`
-	Quota int    `json:"quota" validate:"nonzero"`
+	Quota uint32 `json:"quota" validate:"nonzero"`
 }
 
 func (s FilesystemCreate) Validate() error {
