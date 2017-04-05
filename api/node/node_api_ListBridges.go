@@ -5,6 +5,9 @@ import (
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/gorilla/mux"
+
+	"fmt"
 
 	"github.com/g8os/grid/api/tools"
 )
@@ -14,8 +17,10 @@ import (
 func (api NodeAPI) ListBridges(w http.ResponseWriter, r *http.Request) {
 	var respBody []Bridge
 	json.NewEncoder(w).Encode(&respBody)
+	vars := mux.Vars(r)
+	nodeid := vars["nodeid"]
+	services, resp, err := api.AysAPI.Ays.ListServicesByRole("bridge", api.AysRepo, nil, map[string]interface{}{"parent": fmt.Sprintf("node.g8os!%s", nodeid)})
 
-	services, resp, err := api.AysAPI.Ays.ListServicesByRole("bridge", api.AysRepo, nil, nil)
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
@@ -31,11 +36,13 @@ func (api NodeAPI) ListBridges(w http.ResponseWriter, r *http.Request) {
 			tools.WriteError(w, http.StatusInternalServerError, err)
 			return
 		}
+
 		if resp.StatusCode != http.StatusOK {
 			w.WriteHeader(resp.StatusCode)
 			log.Errorf("Error in listing bridges: %+v\n", err)
 			return
 		}
+
 		var bridge Bridge
 		if err := json.Unmarshal(srv.Data, &bridge); err != nil {
 			tools.WriteError(w, http.StatusInternalServerError, err)
@@ -44,5 +51,8 @@ func (api NodeAPI) ListBridges(w http.ResponseWriter, r *http.Request) {
 		bridge.Name = srv.Name
 		respBody = append(respBody, bridge)
 	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(&respBody)
 }
