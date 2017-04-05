@@ -14,11 +14,11 @@ import (
 // Get bridge details
 func (api NodeAPI) GetBridge(w http.ResponseWriter, r *http.Request) {
 	var respBody Bridge
-	json.NewEncoder(w).Encode(&respBody)
 
 	vars := mux.Vars(r)
 	bridge := vars["bridgeid"]
 	srv, _, err := api.AysAPI.Ays.GetServiceByName(bridge, "bridge", api.AysRepo, nil, nil)
+
 	if err != nil {
 		log.Errorf("Error in getting bridge service %s : %+v", bridge, err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
@@ -34,7 +34,7 @@ func (api NodeAPI) GetBridge(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(&respBody); err != nil {
 		log.Errorf("Error in encoding response: %+v", err)
-		tools.WriteError(w, http.StatusInternalServerError, err)
+		tools.WriteError(w, http.StatusNotFound, err)
 		return
 	}
 }
