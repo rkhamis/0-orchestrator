@@ -16,7 +16,6 @@ import (
 // List bridges
 func (api NodeAPI) ListBridges(w http.ResponseWriter, r *http.Request) {
 	var respBody []Bridge
-	json.NewEncoder(w).Encode(&respBody)
 	vars := mux.Vars(r)
 	nodeid := vars["nodeid"]
 	services, resp, err := api.AysAPI.Ays.ListServicesByRole("bridge", api.AysRepo, nil, map[string]interface{}{"parent": fmt.Sprintf("node.g8os!%s", nodeid)})
@@ -54,5 +53,8 @@ func (api NodeAPI) ListBridges(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	if respBody == nil {
+		respBody = []Bridge{}
+	}
 	json.NewEncoder(w).Encode(&respBody)
 }
