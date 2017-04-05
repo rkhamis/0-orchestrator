@@ -1,6 +1,7 @@
 package node
 
 import (
+	"fmt"
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
@@ -14,10 +15,16 @@ func (api NodeAPI) DeleteStoragePool(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["storagepoolname"]
 
-	_, err := api.AysAPI.Ays.DeleteServiceByName(name, "storagepool", api.AysRepo, nil, nil)
+	resp, err := api.AysAPI.Ays.DeleteServiceByName(name, "storagepool", api.AysRepo, nil, nil)
 	if err != nil {
 		log.Errorf("Error deleting storagepool services : %+v", err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if resp.StatusCode != http.StatusNoContent {
+		log.Errorf("Error deleting storagepool services : %+v", resp.Status)
+		tools.WriteError(w, resp.StatusCode, fmt.Errorf("bad response from AYS: %s", resp.Status))
 		return
 	}
 

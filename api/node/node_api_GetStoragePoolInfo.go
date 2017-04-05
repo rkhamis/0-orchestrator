@@ -16,7 +16,13 @@ func (api NodeAPI) GetStoragePoolInfo(w http.ResponseWriter, r *http.Request) {
 
 	schema, err := api.getStoragepoolDetail(name)
 	if err != nil {
-		log.Errorf("Error get info about storagepool services : %+v", err)
+		log.Errorf("Error get info about storagepool services : %+v", err.Error())
+
+		if httpErr, ok := err.(tools.HTTPError); ok {
+			tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)
+			return
+		}
+
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -49,9 +55,13 @@ type storagePoolSchema struct {
 func (api NodeAPI) getStoragepoolDetail(name string) (*storagePoolSchema, error) {
 	log.Debugf("Get schema detail for storagepool %s\n", name)
 
-	service, _, err := api.AysAPI.Ays.GetServiceByName(name, "storagepool", api.AysRepo, nil, nil)
+	service, resp, err := api.AysAPI.Ays.GetServiceByName(name, "storagepool", api.AysRepo, nil, nil)
 	if err != nil {
-		return nil, err
+		return nil, tools.NewHTTPError(resp, err.Error())
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, tools.NewHTTPError(resp, resp.Status)
 	}
 
 	schema := storagePoolSchema{}
