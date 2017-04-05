@@ -52,12 +52,11 @@ func (api NodeAPI) CreateBridge(w http.ResponseWriter, r *http.Request) {
 	obj["actions"] = []map[string]string{map[string]string{"action": "install"}}
 
 	if err := tools.ExecuteBlueprint(api.AysRepo, reqBody.Name, obj); err != nil {
-		log.Errorf("error executing blueprint for bridge %s creation : %+v", reqBody.Name, err.Error())
+		log.Errorf("error executing blueprint for bridge %s creation : %+v", reqBody.Name, err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	location := r.URL.String() + fmt.Sprintf("/%s", reqBody.Name)
-	w.Header().Set("Location", location)
+	w.Header().Set("Location", fmt.Sprintf("/node/%s/bridge/%s", nodeid, reqBody.Name))
 	w.WriteHeader(http.StatusCreated)
 }

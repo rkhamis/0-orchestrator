@@ -671,6 +671,10 @@ FilesystemCreate:
     quota:
       description: Amount of MiB that can be written to the filesystem. 0 means no quota is set.
       type: integer
+    readOnly:
+      type: bool
+      default: false
+      description: set the filesystem to read only mode
 
 Snapshot:
   type: object
