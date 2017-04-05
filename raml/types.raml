@@ -209,9 +209,9 @@ NicLink:
   properties:
     id:
       type: string
-      description: Vlantag, vxlanid or zerotier id
+      description: Vlantag or vxlanid
     type:
-      enum: [vlan, vxlan, zerotier]
+      enum: [vlan, vxlan, default]
       description: Type of nic
     macaddress:
       type: string
@@ -261,14 +261,8 @@ VM:
       description: Number of virtual CUPs
       type: integer
     nic:
-      description: |
-        List of nic specifications.
-        Possible formats:
-        - "VxLAN:<<VxLAN id>>"
-          eg "VxLAN:200" Attaches the nic to VxLan 200
-        - "Zerotier:<<Zerotier network id>>"
-          eg "Zerotier:fsjyhgu76fsd87ydzf86t7dfygis" Attaches the nic to Zerotier network fsjyhgu76fsd87ydzf86t7dfygis
-      type: string[]
+      description: List of nic specifications.
+      type: NicLink[]
     disk:
       description: List of virtual disks
       type: VDiskLink[]
@@ -316,6 +310,42 @@ Bridge:
       enum: [up, down]
       description: Status of the bridge
 
+ContainerNIC:
+  type: object
+  properties:
+    type:
+      description: Type of the interface
+      enum: [zerotier, vxlan, vlan, default]
+    id:
+      description: Id specific for interface type either vlantag vxlanid or zerotier networkid
+      type: string
+    hwaddr:
+      description: Macaddress for the interface. If none, a random macaddress will be assigned
+      type: string
+      required: false
+    config:
+      required: false
+      properties:
+         dhcp:
+           type: boolean
+           default: false
+           description: If passed true all other config will be ignored
+         cidr:
+           description: IPAddress/Prefix for the interface eg 192.168.103.1/24
+           type: string
+         gateway:
+           type: string
+           description: Gateway for the the container
+           required: false
+         nameservers:
+           type: string[]
+           description: Nameservers to be used
+           required: false
+      description: Optional IPAddress configuration for this interface, only allowed for interfaces of type vxlan and vlan
+    status:
+      enum: [up, down]
+      description: Status of the bridge
+
 ContainerListItem:
   type: object
   properties:
@@ -358,12 +388,8 @@ Container:
         /fs/<<storagepool>>/<<filesystem>>
       example: ['pool1:fs1', 'pool2:fs2']
       type: string[]
-    zerotier:
-      description: Zerotier network id
-      type: string
-      required: false
     bridges:
-      type: Bridge[]
+      type: ContainerNIC[]
       description: Bridge mapping
     hostNetworking:
       type: boolean
