@@ -7,8 +7,6 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
 
-	"fmt"
-
 	"github.com/g8os/grid/api/tools"
 )
 
@@ -32,7 +30,6 @@ func (api NodeAPI) GetBridge(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respBody.Name = srv.Name
-	fmt.Println(respBody)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(&respBody); err != nil {
