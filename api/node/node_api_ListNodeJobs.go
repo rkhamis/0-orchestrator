@@ -8,7 +8,7 @@ import (
 	"github.com/g8os/grid/api/tools"
 )
 
-// ListNodeJobs is the handler for GET /node/{nodeid}/job
+// ListNodeJobs is the handler for GET /nodes/{nodeid}/job
 // List running jobs
 func (api NodeAPI) ListNodeJobs(w http.ResponseWriter, r *http.Request) {
 	cl := tools.GetConnection(r)

@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-// StartVM is the handler for POST /node/{nodeid}/vm/{vmid}/start
+// StartVM is the handler for POST /nodes/{nodeid}/vms/{vmid}/start
 // Starts the VM
 func (api NodeAPI) StartVM(w http.ResponseWriter, r *http.Request) {
 }

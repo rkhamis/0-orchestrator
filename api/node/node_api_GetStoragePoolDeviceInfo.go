@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// GetStoragePoolDeviceInfo is the handler for GET /node/{nodeid}/storagepool/{storagepoolname}/device/{deviceuuid}
+// GetStoragePoolDeviceInfo is the handler for GET /nodes/{nodeid}/storagepools/{storagepoolname}/device/{deviceuuid}
 // Get information of the device
 func (api NodeAPI) GetStoragePoolDeviceInfo(w http.ResponseWriter, r *http.Request) {
 	var respBody StoragePoolDevice

@@ -8,7 +8,7 @@ import (
 	"github.com/g8os/grid/api/tools"
 )
 
-// PingNode is the handler for POST /node/{nodeid}/ping
+// PingNode is the handler for POST /nodes/{nodeid}/ping
 // Ping this node
 func (api NodeAPI) PingNode(w http.ResponseWriter, r *http.Request) {
 	var respBody bool

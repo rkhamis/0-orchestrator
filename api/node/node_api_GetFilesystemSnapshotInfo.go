@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// GetFilesystemSnapshotInfo is the handler for GET /node/{nodeid}/storagepool/{storagepoolname}/filesystem/{filesystemname}/snapshot/{snapshotname}
+// GetFilesystemSnapshotInfo is the handler for GET /nodes/{nodeid}/storagepools/{storagepoolname}/filesystem/{filesystemname}/snapshot/{snapshotname}
 // Get detailed information on the snapshot
 func (api NodeAPI) GetFilesystemSnapshotInfo(w http.ResponseWriter, r *http.Request) {
 	var respBody Snapshot

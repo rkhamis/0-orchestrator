@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// ListFilesystems is the handler for GET /node/{nodeid}/storagepool/{storagepoolname}/filesystem
+// ListFilesystems is the handler for GET /nodes/{nodeid}/storagepools/{storagepoolname}/filesystem
 // List filesystems
 func (api NodeAPI) ListFilesystems(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

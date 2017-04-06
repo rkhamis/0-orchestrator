@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// KillNodeJob is the handler for DELETE /node/{nodeid}/job/{jobid}
+// KillNodeJob is the handler for DELETE /nodes/{nodeid}/job/{jobid}
 // Kills the job
 func (api NodeAPI) KillNodeJob(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

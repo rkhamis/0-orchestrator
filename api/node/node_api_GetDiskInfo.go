@@ -8,7 +8,7 @@ import (
 	"github.com/g8os/grid/api/tools"
 )
 
-// GetDiskInfo is the handler for GET /node/{nodeid}/disk
+// GetDiskInfo is the handler for GET /nodes/{nodeid}/disk
 // Get detailed information of all the disks in the node
 func (api NodeAPI) GetDiskInfo(w http.ResponseWriter, r *http.Request) {
 	cl := tools.GetConnection(r)

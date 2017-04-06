@@ -8,7 +8,7 @@ import (
 	"github.com/g8os/grid/api/tools"
 )
 
-// GetNodeState is the handler for GET /node/{nodeid}/state
+// GetNodeState is the handler for GET /nodes/{nodeid}/state
 // The aggregated consumption of node + all processes (cpu, memory, etc...)
 func (api NodeAPI) GetNodeState(w http.ResponseWriter, r *http.Request) {
 	cl := tools.GetConnection(r)

@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// JoinZerotier is the handler for POST /node/{nodeid}/zerotier
+// JoinZerotier is the handler for POST /nodes/{nodeid}/zerotier
 // Join Zerotier network
 func (api NodeAPI) JoinZerotier(w http.ResponseWriter, r *http.Request) {
 	var reqBody ZerotierJoin

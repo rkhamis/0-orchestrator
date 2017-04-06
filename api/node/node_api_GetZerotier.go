@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// GetZerotier is the handler for GET /node/{nodeid}/zerotier/{zerotierid}
+// GetZerotier is the handler for GET /nodes/{nodeid}/zerotier/{zerotierid}
 // Get Zerotier network details
 func (api NodeAPI) GetZerotier(w http.ResponseWriter, r *http.Request) {
 	var respBody Zerotier

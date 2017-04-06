@@ -7,7 +7,7 @@ import (
 	"github.com/g8os/grid/api/tools"
 )
 
-// KillAllNodeJobs is the handler for DELETE /node/{nodeid}/job
+// KillAllNodeJobs is the handler for DELETE /nodes/{nodeid}/job
 // Kills all running jobs
 func (api NodeAPI) KillAllNodeJobs(w http.ResponseWriter, r *http.Request) {
 	cl := tools.GetConnection(r)

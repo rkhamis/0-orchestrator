@@ -13,7 +13,7 @@ import (
 	"github.com/g8os/grid/api/tools"
 )
 
-// ListBridges is the handler for GET /node/{nodeid}/bridge
+// ListBridges is the handler for GET /nodes/{nodeid}/bridges
 // List bridges
 func (api NodeAPI) ListBridges(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
