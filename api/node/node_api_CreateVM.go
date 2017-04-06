@@ -2,10 +2,15 @@ package node
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+
+	log "github.com/Sirupsen/logrus"
+	tools "github.com/g8os/grid/api/tools"
+	"github.com/gorilla/mux"
 )
 
-// CreateVM is the handler for POST /node/{nodeid}/vm
+// CreateVM is the handler for POST /nodes/{nodeid}/vm
 // Creates the VM
 func (api NodeAPI) CreateVM(w http.ResponseWriter, r *http.Request) {
 	var reqBody VMCreate
@@ -13,6 +18,7 @@ func (api NodeAPI) CreateVM(w http.ResponseWriter, r *http.Request) {
 	// decode request
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		w.WriteHeader(400)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
 		return
 	}
 
@@ -22,6 +28,51 @@ func (api NodeAPI) CreateVM(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
 		return
 	}
-	var respBody int
-	json.NewEncoder(w).Encode(&respBody)
+
+	vars := mux.Vars(r)
+	nodeid := vars["nodeid"]
+
+	// Create blueprint
+	userCloudInit, err := json.Marshal(reqBody.UserCloudInit)
+	if err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		return
+	}
+	systemCloudInit, err := json.Marshal(reqBody.SystemCloudInit)
+	if err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		return
+	}
+	bp := struct {
+		Node            string    `json:"node"`
+		Memory          int       `json:"memory"`
+		Cpu             int       `json:"cpu"`
+		Nic             []NicLink `json:"nic"`
+		Disks           []string  `json:"disks"`
+		UserCloudInit   string    `json:"userCloudInit"`
+		SystemCloudInit string    `json:"systemCloudInit"`
+	}{
+		Node:            nodeid,
+		Memory:          reqBody.Memory,
+		Cpu:             reqBody.Cpu,
+		Nic:             reqBody.Nics,
+		Disks:           reqBody.Disks,
+		UserCloudInit:   string(userCloudInit),
+		SystemCloudInit: string(systemCloudInit),
+	}
+
+	obj := make(map[string]interface{})
+	obj[fmt.Sprintf("vm__%s", reqBody.Id)] = bp
+	obj["actions"] = []map[string]string{map[string]string{"action": "install"}}
+
+	if _, err := tools.ExecuteBlueprint(api.AysRepo, reqBody.Id, obj); err != nil {
+		log.Errorf("error executing blueprint for vm %s creation : %+v", reqBody.Id, err)
+		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	w.Header().Set("Location", fmt.Sprintf("/nodes/%s/vms/%s", nodeid, reqBody.Id))
+	w.WriteHeader(http.StatusCreated)
 }

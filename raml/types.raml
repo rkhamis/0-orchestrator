@@ -270,29 +270,29 @@ VM:
     cpu:
       description: Number of virtual CUPs
       type: integer
-    nic:
+    nics:
       description: List of nic specifications.
       type: NicLink[]
-    disk:
+    disks:
       description: List of virtual disks
       type: VDiskLink[]
 
 VMCreate:
   type: object
   properties:
-    name: string
+    id: string
     memory:
       description: Amount of memory in MiB
       type: integer
     cpu:
       description: Number of virtual CUPs
       type: integer
-    nic:
+    nics:
       description: List of nic specifications.
       type: NicLink[]
-    disk:
+    disks:
       description: List of virtual disks
-      type: VDiskLink[]
+      type: string[]
     userCloudInit:
       description: Userlevel cloudinit configuration
       type: object

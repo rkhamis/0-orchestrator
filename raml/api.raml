@@ -648,11 +648,11 @@ types:
           application/json:
             type: VMCreate
         responses:
-          200:
-            body:
-              application/json:
-                description: Runtime id of the virtual machine (process id)
-                type: integer
+          201:
+            description: VM created successfully
+            headers:
+              Location:
+                description: Url to the created vm resource
       /{vmid}:
         delete:
           (AYSBased):
