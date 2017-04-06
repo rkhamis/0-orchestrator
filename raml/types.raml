@@ -785,9 +785,10 @@ VolumeCreate:
       type: integer
       description: blocksize in bytes
       default: 4096
-    deduped:
-      type: boolean
-      default: true
+    volumetype:
+      enum: [boot, db, cache, tmp]
+      description: The type of volume.
+      required: true
     templatevolume:
       type: string
       required: false
@@ -795,9 +796,13 @@ VolumeCreate:
       type: boolean
       required: false
       default: false
-    driver:
+    storagecluster:
       type: string
-      description: name of the driver of this volume
+      description: the storagecluster used for this volume's main storage.
+      required: false
+    tlogStoragecluster:
+      type: string
+      description: the storagecluster used for this volume's transaction logs
       required: false
 
 Volume:
@@ -813,17 +818,20 @@ Volume:
       type: integer
       description: blocksize in bytes
       default: 4096
-    deduped:
-      type: boolean
-      description: Indicates if this volume is deduped or not.
+    volumetype:
+      enum: [boot, db, cache, tmp]
+      description: The type of volume.
     readOnly:
       type: boolean
       default: false
       required: false
-    driver:
+    storagecluster:
       type: string
-      description: name of the driver of this volume
-      required: false
+      description: the storagecluster used for this volume's main storage.
+    tlogStoragecluster:
+      type: string
+      description: the storagecluster used for this volume's transaction logs
+
 
 VolumeResize:
   properties:
