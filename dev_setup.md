@@ -11,11 +11,7 @@ bash install.sh
 
 ## 2. Install g8core python client
 ```shell
-git clone https://github.com/g8os/core0/
-cd core0
-git checkout 0.12.0
-cd pyclient
-pip install .
+pip3 install g8core
 ```
 
 ## 3. Start jumpscale and create a AYS repository
