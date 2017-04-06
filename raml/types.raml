@@ -48,7 +48,7 @@ OSInfo:
   properties:
     bootTime:
       type: number
-      format: uint64
+      format: int64
     hostname: string
     os: string
     platform: string
@@ -56,10 +56,10 @@ OSInfo:
     platformVersion: string
     procs:
       type: number
-      format: uint64
+      format: int64
     uptime:
       type: number
-      format: uint64
+      format: int64
     virtualizationRole: string
     virtualizationSystem: string
 
@@ -472,13 +472,13 @@ CoreStateResult:
       format: float
     rss:
       type: number
-      format: uint64
+      format: int64
     vms:
       type: number
-      format: uint64
+      format: int64
     swap:
       type: number
-      format: uint64
+      format: int64
 
 ZerotierRoute:
   type: object
@@ -670,7 +670,7 @@ FilesystemCreate:
       description: Amount of MiB that can be written to the filesystem. 0 means no quota is set.
       type: integer
     readOnly:
-      type: bool
+      type: boolean
       default: false
       description: set the filesystem to read only mode
 
