@@ -17,7 +17,7 @@ types:
   !include types.raml
 
 
-/node:
+/nodes:
   get:
     (AYSBased):
     description: List Nodes
@@ -37,7 +37,7 @@ types:
           body:
             application/json:
               type: Node
-    /job:
+    /jobs:
       description: Jobs for this Node
       get:
         (DirectAccess):
@@ -102,7 +102,7 @@ types:
         responses:
           204:
             description: Machine reboot signal sent successfully
-    /cpu:
+    /cpus:
       get:
         (DirectAccess):
         displayName: GetCPUInfo
@@ -112,7 +112,7 @@ types:
             body:
               application/json:
                 type: CPUInfo[]
-    /disk:
+    /disks:
       get:
         (DirectAccess):
         displayName: GetDiskInfo
@@ -132,7 +132,7 @@ types:
             body:
               application/json:
                 type: MemInfo
-    /nic:
+    /nics:
       get:
         (DirectAccess):
         displayName: GetNicInfo
@@ -152,7 +152,7 @@ types:
             body:
               application/json:
                 type: OSInfo
-    /process:
+    /processes:
        get:
          (DirectAccess):
          displayName: ListNodeProcesses
@@ -179,7 +179,7 @@ types:
            responses:
              204:
                description: Job killed successfully
-    /bridge:
+    /bridges:
       post:
         (AYSBased):
         displayName: CreateBridge
@@ -219,7 +219,7 @@ types:
           responses:
             204:
               description: Bridge removed successfully
-    /storagepool:
+    /storagepools:
       get:
         (AYSBased):
         displayName: GetStoragePools
@@ -258,7 +258,7 @@ types:
           responses:
             204:
               description: Storage pool deleted successfully
-        /device:
+        /devices:
           get:
             (AYSBased):
             displayName: ListStoragePoolDevices
@@ -300,7 +300,7 @@ types:
                   headers:
                     Location:
                       description: Url to the storage pool device resource beeing removed
-        /filesystem:
+        /filesystems:
           get:
             (AYSBased):
             displayName: ListFilesystems
@@ -340,7 +340,7 @@ types:
               responses:
                 204:
                   description: Filesystem deleted successfully
-            /snapshot:
+            /snapshots:
               get:
                 (AYSBased):
                 displayName: ListFilesystemSnapshots
@@ -393,7 +393,7 @@ types:
                     responses:
                       204:
                         description: Snapshot rollbacked successfully
-    /zerotier:
+    /zerotiers:
       get:
         (AYSBased):
         displayName: ListZerotier
@@ -433,7 +433,7 @@ types:
           responses:
             204:
               description: Zerotier network exited successfully
-    /container:
+    /containers:
       get:
         (AYSBased):
         displayName: ListContainers
@@ -512,7 +512,7 @@ types:
             responses:
               204:
                 description: File deleted successfully
-        /job:
+        /jobs:
           get:
             (DirectAccess):
             displayName: ListContainerJobs
@@ -531,7 +531,7 @@ types:
                 description: Jobs killed successfully
           post:
             (DirectAccess):
-            displayName: SendSignal
+            displayName: SendSignalToJob
             description: Send signal to the job
             body:
               application/json:
@@ -584,7 +584,7 @@ types:
                 body:
                   application/json:
                     type: OSInfo
-        /process:
+        /processes:
            get:
              (DirectAccess):
              displayName: ListContainerProcesses
@@ -625,12 +625,12 @@ types:
                    description: Process killed successfully
              post:
                (DirectAccess):
-               displayName: SendSignal
+               displayName: SendSignalToProcess
                description: Send signal to the process
                body:
                  application/json:
                    type: ProcessSignal
-    /vm:
+    /vms:
       get:
         (AYSBased):
         description: List VMs
@@ -731,8 +731,8 @@ types:
             responses:
               204:
                 description: VM migration request passed successfully
-/storagecluster:
-  description: Creates and get informations about a storage cluster
+/storageclusters:
+  description: Create and get information about a storage clusters
   post:
     (AYSBased):
     displayName: DeployNewCluster
