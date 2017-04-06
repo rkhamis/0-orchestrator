@@ -13,6 +13,6 @@ func TestHTTPError(t *testing.T) {
 	}
 	err := NewHTTPError(resp, "this is an %s", "error")
 	assert.Equal(t, err.Error(), "this is an error")
-	assert.NotNil(t, err.resp)
-	assert.Equal(t, err.resp.StatusCode, http.StatusInternalServerError)
+	assert.NotNil(t, err.Resp)
+	assert.Equal(t, err.Resp.StatusCode, http.StatusInternalServerError)
 }

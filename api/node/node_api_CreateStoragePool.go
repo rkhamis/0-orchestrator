@@ -50,7 +50,7 @@ func (api NodeAPI) CreateStoragePool(w http.ResponseWriter, r *http.Request) {
 	}
 
 	blueprintName := fmt.Sprintf("storagepool__%s_create_%d", node, time.Now().Unix())
-	if err := tools.ExecuteBlueprint(api.AysRepo, blueprintName, blueprint); err != nil {
+	if _, err := tools.ExecuteBlueprint(api.AysRepo, blueprintName, blueprint); err != nil {
 		httpErr := err.(tools.HTTPError)
 		log.Errorf("Error executing blueprint for storagepool creation : %+v", err.Error())
 		tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)

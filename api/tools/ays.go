@@ -2,6 +2,7 @@ package tools
 
 import (
 	"net/http"
+	"time"
 
 	ays "github.com/g8os/grid/api/ays-client"
 )
@@ -14,24 +15,43 @@ func SetAYSClient(client *ays.AtYourServiceAPI) {
 	ayscl = client
 }
 
-// ExecuteBlueprint runs ays operations needed to run blueprints
-func ExecuteBlueprint(repoName, blueprintName string, blueprint map[string]interface{}) error {
+//ExecuteBlueprint runs ays operations needed to run blueprints, if block is true, the function will block until the run is done
+// create blueprint
+// execute blueprint
+// execute run
+// archive the blueprint
+func ExecuteBlueprint(repoName, blueprintName string, blueprint map[string]interface{}) (*ays.AYSRun, error) {
 
 	if err := createBlueprint(repoName, blueprintName, blueprint); err != nil {
-		return err
+		return nil, err
 	}
 
 	if err := executeBlueprint(blueprintName, repoName); err != nil {
 		archiveBlueprint(blueprintName, repoName)
-		return err
+		return nil, err
 	}
 
-	if err := runRepo(repoName); err != nil {
+	run, err := runRepo(repoName)
+	if err != nil {
 		archiveBlueprint(blueprintName, repoName)
-		return err
+		return nil, err
 	}
 
-	return archiveBlueprint(blueprintName, repoName)
+	return run, archiveBlueprint(blueprintName, repoName)
+}
+
+func WaitRunDone(runid, repoName string) error {
+	run, err := getRun(runid, repoName)
+
+	for run.State == "new" || run.State == "running" {
+		time.Sleep(time.Second)
+
+		run, err = getRun(run.Key, repoName)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func createBlueprint(repoName string, name string, bp map[string]interface{}) error {
@@ -64,16 +84,16 @@ func executeBlueprint(blueprintName string, repoName string) error {
 	return nil
 }
 
-func runRepo(repoName string) error {
+func runRepo(repoName string) (*ays.AYSRun, error) {
 
-	_, resp, err := ayscl.Ays.CreateRun(repoName, nil, nil)
+	run, resp, err := ayscl.Ays.CreateRun(repoName, nil, nil)
 	if err != nil {
-		return NewHTTPError(resp, err.Error())
+		return nil, NewHTTPError(resp, err.Error())
 	}
 	if resp.StatusCode != http.StatusOK {
-		return NewHTTPError(resp, resp.Status)
+		return nil, NewHTTPError(resp, resp.Status)
 	}
-	return nil
+	return &run, nil
 }
 
 func archiveBlueprint(blueprintName string, repoName string) error {
@@ -86,4 +106,17 @@ func archiveBlueprint(blueprintName string, repoName string) error {
 		return NewHTTPError(resp, resp.Status)
 	}
 	return nil
+}
+
+func getRun(runid, repoName string) (*ays.AYSRun, error) {
+	run, resp, err := ayscl.Ays.GetRun(runid, repoName, nil, nil)
+	if err != nil {
+		return nil, NewHTTPError(resp, err.Error())
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, NewHTTPError(resp, resp.Status)
+	}
+
+	return &run, nil
 }

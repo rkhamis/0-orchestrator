@@ -22,7 +22,7 @@ func (api NodeAPI) GetStoragePools(w http.ResponseWriter, r *http.Request) {
 
 	// grab all service details concurently
 	wg := sync.WaitGroup{}
-	var respBody = make([]StoragePoolListItem, len(services), len(services))
+	var respBody = make([]StoragePoolListItem, 0, len(services))
 	wg.Add(len(services))
 
 	for i, service := range services {
@@ -35,11 +35,11 @@ func (api NodeAPI) GetStoragePools(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			respBody[i] = StoragePoolListItem{
+			respBody = append(respBody, StoragePoolListItem{
 				Status:   EnumStoragePoolListItemStatus(schema.Status),
 				Capacity: schema.FreeCapacity,
 				Name:     name,
-			}
+			})
 		}(service.Name, i)
 	}
 

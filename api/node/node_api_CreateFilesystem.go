@@ -45,7 +45,7 @@ func (api NodeAPI) CreateFilesystem(w http.ResponseWriter, r *http.Request) {
 
 	blueprintName := fmt.Sprintf("filesystem__%s_create_%d", storagepool, time.Now().Unix())
 
-	if err := tools.ExecuteBlueprint(api.AysRepo, blueprintName, blueprint); err != nil {
+	if _, err := tools.ExecuteBlueprint(api.AysRepo, blueprintName, blueprint); err != nil {
 		httpErr := err.(tools.HTTPError)
 		log.Errorf("Error executing blueprint for filesystem creation : %+v", err.Error())
 		tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)

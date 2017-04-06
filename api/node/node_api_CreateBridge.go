@@ -10,28 +10,19 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type bridgeBlueprint struct {
-	Hwaddr      string                      `json:"hwaddr"`
-	Nat         bool                        `json:"nat"`
-	NetworkMode EnumBridgeCreateNetworkMode `json:"networkMode"`
-	Setting     BridgeCreateSetting         `json:"setting"`
-	Node        string                      `json:"node"`
-}
-
 // CreateBridge is the handler for POST /node/{nodeid}/bridge
 // Creates a new bridge
 func (api NodeAPI) CreateBridge(w http.ResponseWriter, r *http.Request) {
 	var reqBody BridgeCreate
 
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
-		w.WriteHeader(400)
+		tools.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
 	// validate request
 	if err := reqBody.Validate(); err != nil {
-		w.WriteHeader(400)
-		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		tools.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
@@ -39,7 +30,13 @@ func (api NodeAPI) CreateBridge(w http.ResponseWriter, r *http.Request) {
 	nodeid := vars["nodeid"]
 
 	// Create blueprint
-	bp := bridgeBlueprint{
+	bp := struct {
+		Hwaddr      string                      `json:"hwaddr"`
+		Nat         bool                        `json:"nat"`
+		NetworkMode EnumBridgeCreateNetworkMode `json:"networkMode"`
+		Setting     BridgeCreateSetting         `json:"setting"`
+		Node        string                      `json:"node"`
+	}{
 		Hwaddr:      reqBody.Hwaddr,
 		Nat:         reqBody.Nat,
 		NetworkMode: reqBody.NetworkMode,
@@ -51,7 +48,7 @@ func (api NodeAPI) CreateBridge(w http.ResponseWriter, r *http.Request) {
 	obj[fmt.Sprintf("bridge__%s", reqBody.Name)] = bp
 	obj["actions"] = []map[string]string{map[string]string{"action": "install"}}
 
-	if err := tools.ExecuteBlueprint(api.AysRepo, reqBody.Name, obj); err != nil {
+	if _, err := tools.ExecuteBlueprint(api.AysRepo, reqBody.Name, obj); err != nil {
 		log.Errorf("error executing blueprint for bridge %s creation : %+v", reqBody.Name, err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return

@@ -30,11 +30,10 @@ func (api NodeAPI) GetBridge(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respBody.Name = srv.Name
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(&respBody); err != nil {
 		log.Errorf("Error in encoding response: %+v", err)
-		tools.WriteError(w, http.StatusNotFound, err)
-		return
 	}
 }

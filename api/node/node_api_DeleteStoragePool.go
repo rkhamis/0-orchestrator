@@ -3,6 +3,7 @@ package node
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/g8os/grid/api/tools"
@@ -14,6 +15,35 @@ import (
 func (api NodeAPI) DeleteStoragePool(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["storagepoolname"]
+
+	// execute the delete action of the snapshot
+	blueprint := map[string]interface{}{
+		"actions": []map[string]string{{
+			"action":  "delete",
+			"actor":   "storagepool",
+			"service": name,
+		}},
+	}
+	blueprintName := fmt.Sprintf("storagepool__%s_delete_%d", name, time.Now().Unix())
+
+	run, err := tools.ExecuteBlueprint(api.AysRepo, blueprintName, blueprint)
+	if err != nil {
+		httpErr := err.(tools.HTTPError)
+		log.Errorf("Error executing blueprint for storagepool deletion : %+v", err.Error())
+		tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)
+		return
+	}
+
+	// Wait for the delete job to be finshed before we delete the service
+	if err = tools.WaitRunDone(run.Key, api.AysRepo); err != nil {
+		httpErr, ok := err.(tools.HTTPError)
+		if ok {
+			tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)
+		} else {
+			tools.WriteError(w, http.StatusInternalServerError, err)
+		}
+		return
+	}
 
 	resp, err := api.AysAPI.Ays.DeleteServiceByName(name, "storagepool", api.AysRepo, nil, nil)
 	if err != nil {

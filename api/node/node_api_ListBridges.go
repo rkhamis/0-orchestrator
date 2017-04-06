@@ -18,7 +18,9 @@ import (
 func (api NodeAPI) ListBridges(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	nodeid := vars["nodeid"]
-	services, resp, err := api.AysAPI.Ays.ListServicesByRole("bridge", api.AysRepo, nil, map[string]interface{}{"parent": fmt.Sprintf("node.g8os!%s", nodeid)})
+
+	queryParams := map[string]interface{}{"parent": fmt.Sprintf("node.g8os!%s", nodeid)}
+	services, resp, err := api.AysAPI.Ays.ListServicesByRole("bridge", api.AysRepo, nil, queryParams)
 
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
@@ -30,7 +32,7 @@ func (api NodeAPI) ListBridges(w http.ResponseWriter, r *http.Request) {
 	}
 
 	wg := sync.WaitGroup{}
-	var respBody = make([]Bridge, len(services), len(services))
+	var respBody = make([]Bridge, 0, len(services))
 	wg.Add(len(services))
 
 	for _, service := range services {
@@ -39,22 +41,22 @@ func (api NodeAPI) ListBridges(w http.ResponseWriter, r *http.Request) {
 
 			srv, resp, err := api.AysAPI.Ays.GetServiceByName(name, role, api.AysRepo, nil, nil)
 			if err != nil {
-				tools.WriteError(w, http.StatusInternalServerError, err)
+				log.Errorf("Error in listing bridges: %+v\n", err)
 				return
 			}
-			fmt.Println(resp)
+
 			if resp.StatusCode != http.StatusOK {
-				w.WriteHeader(resp.StatusCode)
 				log.Errorf("Error in listing bridges: %+v\n", err)
 				return
 			}
 
 			var bridge Bridge
 			if err := json.Unmarshal(srv.Data, &bridge); err != nil {
-				tools.WriteError(w, http.StatusInternalServerError, err)
+				log.Errorf("Error in listing bridges: %+v\n", err)
 				return
 			}
 			bridge.Name = srv.Name
+
 			respBody = append(respBody, bridge)
 		}(service.Name, service.Role)
 	}
