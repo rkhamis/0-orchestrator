@@ -18,7 +18,7 @@ type NodesInterface interface { // ListNodes is the handler for GET /node
 	GetNode(http.ResponseWriter, *http.Request)
 	// GetStoragePools is the handler for GET /node/{nodeid}/storagepool
 	// List storage pools present in the node
-	GetStoragePools(http.ResponseWriter, *http.Request)
+	ListStoragePools(http.ResponseWriter, *http.Request)
 	// CreateStoragePool is the handler for POST /node/{nodeid}/storagepool
 	// Create a new storage pool
 	CreateStoragePool(http.ResponseWriter, *http.Request)
@@ -235,7 +235,7 @@ type NodesInterface interface { // ListNodes is the handler for GET /node
 func NodesInterfaceRoutes(r *mux.Router, i NodesInterface) {
 	r.HandleFunc("/nodes", i.ListNodes).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}", i.GetNode).Methods("GET")
-	r.HandleFunc("/nodes/{nodeid}/storagepools", i.GetStoragePools).Methods("GET")
+	r.HandleFunc("/nodes/{nodeid}/storagepools", i.ListStoragePools).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/storagepools", i.CreateStoragePool).Methods("POST")
 	r.HandleFunc("/nodes/{nodeid}/storagepools/{storagepoolname}", i.GetStoragePoolInfo).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/storagepools/{storagepoolname}", i.DeleteStoragePool).Methods("DELETE")
