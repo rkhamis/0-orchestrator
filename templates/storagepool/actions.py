@@ -41,18 +41,7 @@ def install(job):
     if pool.fsinfo['metadata']['profile'].lower() != metadataProfile:
         raise RuntimeError("Metadata profile of storagepool {} does not match".format(name))
 
-    pooldevices = set(pool.devices)
-    requireddevices = set(devices)
-
-    # add extra devices
-    extradevices = requireddevices - pooldevices
-    if extradevices:
-        pool.device_add(*extradevices)
-
-    # remove devices
-    removeddevices = pooldevices - requireddevices
-    if removeddevices:
-        pool.device_remove(*removeddevices)
+    updateDevices(pool, devices)
 
 
 def delete(job):
@@ -71,3 +60,35 @@ def delete(job):
     except ValueError:
         # pool does not exists, nothing to do
         pass
+
+def updateDevices(pool, devices):
+    pooldevices = set(pool.devices)
+    requireddevices = set(devices)
+
+    # add extra devices
+    extradevices = requireddevices - pooldevices
+    if extradevices:
+        pool.device_add(*extradevices)
+
+    # remove devices
+    removeddevices = pooldevices - requireddevices
+    if removeddevices:
+        pool.device_remove(*removeddevices)
+
+def processChange(job):
+    service = job.service
+    pservice = service.parent
+    node = j.sal.g8os.get_node(
+        addr=pservice.model.data.redisAddr,
+        port=pservice.model.data.redisPort,
+        password=pservice.model.data.redisPassword or None,
+    )
+
+    args = job.model.args
+    category = args.pop('changeCategory')
+    if category == "dataschema" and service.model.actionsState['install'] == 'ok':
+        try:
+            pool = node.storagepools.get(service.name)
+            updateDevices(pool, args['devices'])
+        except ValueError:
+            job.logger.error("pool {} doesn't exist, cant update devices", service.name)

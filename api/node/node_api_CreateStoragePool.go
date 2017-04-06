@@ -12,7 +12,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-// CreateStoragePool is the handler for POST /node/{nodeid}/storagepools
+// CreateStoragePool is the handler for POST /nodes/{nodeid}/storagepools
 // Create a new storage pool
 func (api NodeAPI) CreateStoragePool(w http.ResponseWriter, r *http.Request) {
 	var reqBody StoragePoolCreate
@@ -55,4 +55,8 @@ func (api NodeAPI) CreateStoragePool(w http.ResponseWriter, r *http.Request) {
 		log.Errorf("Error executing blueprint for storagepool creation : %+v", err.Error())
 		tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)
 	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Location", fmt.Sprintf("/nodes/%s/storagepools/%s", node, reqBody.Name))
+	w.WriteHeader(http.StatusCreated)
 }

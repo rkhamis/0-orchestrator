@@ -22,7 +22,7 @@ func (api NodeAPI) ListNodes(w http.ResponseWriter, r *http.Request) {
 	var respBody = make([]Node, len(services))
 	for i, service := range services {
 		node := Node{
-			Name: service.Name,
+			Id: service.Name,
 		}
 		if err := json.Unmarshal(service.Data, &node); err != nil {
 			tools.WriteError(w, http.StatusInternalServerError, err)

@@ -28,29 +28,22 @@ func (api NodeAPI) ListStoragePoolDevices(w http.ResponseWriter, r *http.Request
 	storagepoolname := vars["storagepoolname"]
 	nodeid := vars["nodeid"]
 
-	queryParams := map[string]interface{}{"parent": fmt.Sprintf("node.g8os!%s", nodeid)}
-	service, _, err := api.AysAPI.Ays.GetServiceByName(storagepoolname, "storagepool", api.AysRepo, nil, queryParams)
-
+	devices, err := api.getStoragePoolDevices(nodeid, storagepoolname)
 	if err != nil {
-		tools.WriteError(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	// Get storagepool devices
-	type StoragepoolDevicesNames struct {
-		Devices []string `json:"devices"`
-	}
-	var device StoragepoolDevicesNames
-	if err := json.Unmarshal(service.Data, &device); err != nil {
-		log.Errorf("Error Unmarshal storagepool service '%s' data: %+v", storagepoolname, err)
+		log.Errorf("Error Listing storage pool devices: %+v", err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	cl, err := tools.GetConnection(r, api)
-	core := client.Core(cl)
-	res, err := core.ListStoragePoolDevices(device.Devices)
+	if err != nil {
+		log.Errorf("Error Listing storage pool devices: %+v", err)
+		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
 
+	core := client.Core(cl)
+	res, err := core.ListStoragePoolDevices(devices)
 	if err != nil {
 		log.Errorf("Error Listing storage pool devices: %+v", err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
@@ -60,7 +53,7 @@ func (api NodeAPI) ListStoragePoolDevices(w http.ResponseWriter, r *http.Request
 	for _, dev := range res {
 		for _, info := range dev.Devices {
 			if str, ok := info["path"].(string); ok {
-				if containsStrings(device.Devices, str) {
+				if containsStrings(devices, str) {
 					respBody = append(respBody, StoragePoolDevice{Uuid: dev.UUID})
 				}
 			}
@@ -69,6 +62,26 @@ func (api NodeAPI) ListStoragePoolDevices(w http.ResponseWriter, r *http.Request
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(&respBody)
+}
+
+// Get storagepool devices
+func (api NodeAPI) getStoragePoolDevices(node, storagepool string) ([]string, error) {
+	queryParams := map[string]interface{}{"parent": fmt.Sprintf("node.g8os!%s", node)}
+
+	service, _, err := api.AysAPI.Ays.GetServiceByName(storagepool, "storagepool", api.AysRepo, nil, queryParams)
+	if err != nil {
+		return nil, err
+	}
+
+	var data struct {
+		Devices []string `json:"devices"`
+	}
+	if err := json.Unmarshal(service.Data, &data); err != nil {
+		log.Errorf("Error Unmarshal storagepool service '%s' data: %+v", storagepool, err)
+		return nil, err
+	}
+
+	return data.Devices, nil
 }
 
 func containsStrings(slice []string, target string) bool {
