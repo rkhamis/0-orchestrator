@@ -3,18 +3,24 @@
 struct Schema {
     size @0 :UInt64;
     blocksize @1 :UInt32;
-    deduped @2 :Bool;
+    type @2 :VolumeType;
     templateVolume @3 :Text; # in case it's a copy of another volume
     readOnly @4 :Bool;
-    driver @5 :Text;
-    status @6 :Status;
-    gridApiUrl @7:Text;
+    status @5 :Status;
 
-    storageCluster @8 :Text; # parent
+    storageCluster @6 :Text; # consume
+    tlogStoragecluster @7 :Text; # consume
 
     enum Status {
         running @0;
         halted @1;
         rollingback @2;
+    }
+
+    enum VolumeType {
+        boot @0;
+        db @1;
+        cache @2;
+        tmp @3;
     }
 }
