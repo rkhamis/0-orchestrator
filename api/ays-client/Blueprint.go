@@ -5,7 +5,7 @@ import (
 )
 
 type Blueprint struct {
-	Archived bool        `json:"archived" validate:"nonzero"`
+	Archived bool        `json:"archived"`
 	Content  interface{} `json:"content" validate:"nonzero"`
 	Hash     string      `json:"hash" validate:"nonzero"`
 	Name     string      `json:"name" validate:"nonzero"`

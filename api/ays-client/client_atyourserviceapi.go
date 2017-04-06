@@ -14,8 +14,7 @@ type AtYourServiceAPI struct {
 	BaseURI    string
 	common     service // Reuse a single struct instead of allocating one for each service on the heap.
 
-	Ays      *AysService
-	Webhooks *WebhooksService
+	Ays *AysService
 }
 
 type service struct {
@@ -30,7 +29,6 @@ func NewAtYourServiceAPI() *AtYourServiceAPI {
 	c.common.client = c
 
 	c.Ays = (*AysService)(&c.common)
-	c.Webhooks = (*WebhooksService)(&c.common)
 
 	return c
 }
