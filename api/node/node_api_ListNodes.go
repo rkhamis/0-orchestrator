@@ -3,6 +3,7 @@ package node
 import (
 	"encoding/json"
 	"net/http"
+	"fmt"
 
 	"github.com/g8os/grid/api/tools"
 )
@@ -11,28 +12,12 @@ import (
 // List Nodes
 func (api NodeAPI) ListNodes(w http.ResponseWriter, r *http.Request) {
 	services, res, err := api.AysAPI.Ays.ListServicesByRole("node", api.AysRepo, nil, nil)
-	if err != nil {
-		tools.WriteError(w, http.StatusInternalServerError, err)
-		return
-	}
-	if res.StatusCode != http.StatusOK {
-		w.WriteHeader(res.StatusCode)
-		return
-	}
+	if ! tools.HandleAYSResponse(err, res, w, "listing nodes") { return }
 
 	var respBody []Node
 	for _, service := range services {
 		srv, res, err := api.AysAPI.Ays.GetServiceByName(service.Name, "node", api.AysRepo, nil, nil)
-
-		if err != nil {
-			tools.WriteError(w, http.StatusInternalServerError, err)
-			return
-		}
-
-		if res.StatusCode != http.StatusOK {
-			w.WriteHeader(res.StatusCode)
-			return
-		}
+		if ! tools.HandleAYSResponse(err, res, w, fmt.Sprintf("getting node %s details", service.Name)) { return }
 
 		var node Node
 		if err := json.Unmarshal(srv.Data, &node); err != nil {
