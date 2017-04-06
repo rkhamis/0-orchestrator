@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// CreateVM is the handler for POST /nodes/{nodeid}/vm
+// CreateVM is the handler for POST /nodes/{nodeid}/vms
 // Creates the VM
 func (api NodeAPI) CreateVM(w http.ResponseWriter, r *http.Request) {
 	var reqBody VMCreate

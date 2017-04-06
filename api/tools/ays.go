@@ -120,3 +120,14 @@ func getRun(runid, repoName string) (*ays.AYSRun, error) {
 
 	return &run, nil
 }
+
+func DeleteServiceByName(name, role, repository string) error {
+	resp, err := ayscl.Ays.DeleteServiceByName(name, role, repository, nil, nil)
+	if err != nil {
+		return NewHTTPError(resp, err.Error())
+	}
+	if resp.StatusCode != http.StatusOK {
+		return NewHTTPError(resp, resp.Status)
+	}
+	return nil
+}
