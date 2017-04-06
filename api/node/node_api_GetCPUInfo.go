@@ -11,7 +11,12 @@ import (
 // GetCPUInfo is the handler for GET /node/{nodeid}/cpu
 // Get detailed information of all CPUs in the node
 func (api NodeAPI) GetCPUInfo(w http.ResponseWriter, r *http.Request) {
-	cl := tools.GetConnection(r)
+	cl, err := tools.GetConnection(r,api)
+	if err != nil {
+		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
 	info := client.Info(cl)
 	result, err := info.CPU()
 	if err != nil {

@@ -11,6 +11,8 @@ import (
 	"github.com/g8os/grid/api/volume"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/patrickmn/go-cache"
+	"time"
 )
 
 func LoggingMiddleware(h http.Handler) http.Handler {
@@ -54,7 +56,7 @@ func GetRouter(aysURL, aysRepo string) http.Handler {
 	// apidocs
 	r.PathPrefix("/apidocs/").Handler(http.StripPrefix("/apidocs/", http.FileServer(http.Dir("./apidocs/"))))
 
-	node.NodesInterfaceRoutes(r, node.NewNodeAPI(aysRepo, aysAPI))
+	node.NodesInterfaceRoutes(r, node.NewNodeAPI(aysRepo, aysAPI, cache.New(5*time.Minute, 1*time.Minute)))
 	storagecluster.StorageclustersInterfaceRoutes(r, storagecluster.NewStorageClusterAPI(aysRepo, aysAPI))
 	volume.VolumesInterfaceRoutes(r, volume.NewVolumeAPI(aysRepo, aysAPI))
 

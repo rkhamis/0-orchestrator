@@ -11,7 +11,12 @@ import (
 // ListNodeJobs is the handler for GET /nodes/{nodeid}/job
 // List running jobs
 func (api NodeAPI) ListNodeJobs(w http.ResponseWriter, r *http.Request) {
-	cl := tools.GetConnection(r)
+	cl, err := tools.GetConnection(r,api)
+	if err != nil {
+		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
 	core := client.Core(cl)
 	processes, err := core.Processes()
 
