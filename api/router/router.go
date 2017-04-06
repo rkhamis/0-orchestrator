@@ -8,6 +8,7 @@ import (
 	"github.com/g8os/grid/api/node"
 	"github.com/g8os/grid/api/storagecluster"
 	"github.com/g8os/grid/api/tools"
+	"github.com/g8os/grid/api/volume"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
@@ -53,8 +54,9 @@ func GetRouter(aysURL, aysRepo string) http.Handler {
 	// apidocs
 	r.PathPrefix("/apidocs/").Handler(http.StripPrefix("/apidocs/", http.FileServer(http.Dir("./apidocs/"))))
 
-	node.NodeInterfaceRoutes(r, node.NewNodeAPI(aysRepo, aysAPI))
-	storagecluster.StorageclusterInterfaceRoutes(r, storagecluster.NewStorageClusterAPI(aysRepo, aysAPI))
+	node.NodesInterfaceRoutes(r, node.NewNodeAPI(aysRepo, aysAPI))
+	storagecluster.StorageclustersInterfaceRoutes(r, storagecluster.NewStorageClusterAPI(aysRepo, aysAPI))
+	volume.VolumesInterfaceRoutes(r, volume.NewVolumeAPI(aysRepo, aysAPI))
 
 	router := NewRouter(r)
 	router.Use(LoggingMiddleware)
