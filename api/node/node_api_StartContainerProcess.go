@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// StartContainerProcess is the handler for POST /node/{nodeid}/container/{containerid}/process
+// StartContainerProcess is the handler for POST /nodes/{nodeid}/containers/{containerid}/processes
 // Start a new process in this container
 func (api NodeAPI) StartContainerProcess(w http.ResponseWriter, r *http.Request) {
 	var reqBody CoreSystem

@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// SendSignalJob is the handler for POST /node/{nodeid}/container/{containerid}/job
+// SendSignalJob is the handler for POST /nodes/{nodeid}/containers/{containerid}/job
 // Send signal to the job
 func (api NodeAPI) SendSignalJob(w http.ResponseWriter, r *http.Request) {
 	var reqBody ProcessSignal

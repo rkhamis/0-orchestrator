@@ -12,7 +12,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-// CreateSnapshot is the handler for POST /node/{nodeid}/storagepool/{storagepoolname}/filesystem/{filesystemname}/snapshot
+// CreateSnapshot is the handler for POST /nodes/{nodeid}/storagepools/{storagepoolname}/filesystem/{filesystemname}/snapshot
 // Create a new readonly filesystem of the current state of the volume
 func (api NodeAPI) CreateSnapshot(w http.ResponseWriter, r *http.Request) {
 	filessytem := mux.Vars(r)["filesystemname"]

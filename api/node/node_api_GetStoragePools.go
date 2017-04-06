@@ -9,7 +9,7 @@ import (
 	"github.com/g8os/grid/api/tools"
 )
 
-// GetStoragePools is the handler for GET /node/{nodeid}/storagepool
+// GetStoragePools is the handler for GET /nodes/{nodeid}/storagepools
 // List storage pools present in the node
 func (api NodeAPI) GetStoragePools(w http.ResponseWriter, r *http.Request) {
 

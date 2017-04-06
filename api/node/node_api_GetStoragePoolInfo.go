@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// GetStoragePoolInfo is the handler for GET /node/{nodeid}/storagepool/{storagepoolname}
+// GetStoragePoolInfo is the handler for GET /nodes/{nodeid}/storagepools/{storagepoolname}
 // Get detailed information of this storage pool
 func (api NodeAPI) GetStoragePoolInfo(w http.ResponseWriter, r *http.Request) {
 	name := mux.Vars(r)["storagepoolname"]

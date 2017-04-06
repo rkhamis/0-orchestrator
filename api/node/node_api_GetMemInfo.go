@@ -8,7 +8,7 @@ import (
 	"github.com/g8os/grid/api/tools"
 )
 
-// GetMemInfo is the handler for GET /node/{nodeid}/mem
+// GetMemInfo is the handler for GET /nodes/{nodeid}/mem
 // Get detailed information about the memory in the node
 func (api NodeAPI) GetMemInfo(w http.ResponseWriter, r *http.Request) {
 	cl, err := tools.GetConnection(r,api)

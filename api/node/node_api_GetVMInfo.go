@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// GetVMInfo is the handler for GET /node/{nodeid}/vm/{vmid}/info
+// GetVMInfo is the handler for GET /nodes/{nodeid}/vm/{vmid}/info
 // Get statistical information about the virtual machine.
 func (api NodeAPI) GetVMInfo(w http.ResponseWriter, r *http.Request) {
 	var respBody VMInfo

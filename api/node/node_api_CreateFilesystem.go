@@ -11,7 +11,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// CreateFilesystem is the handler for POST /node/{nodeid}/storagepool/{storagepoolname}/filesystem
+// CreateFilesystem is the handler for POST /nodes/{nodeid}/storagepools/{storagepoolname}/filesystem
 // Create a new filesystem
 func (api NodeAPI) CreateFilesystem(w http.ResponseWriter, r *http.Request) {
 	var reqBody FilesystemCreate

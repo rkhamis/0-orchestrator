@@ -10,7 +10,7 @@ import (
 	"github.com/g8os/grid/api/tools"
 )
 
-// GetBridge is the handler for GET /node/{nodeid}/bridge/{bridgeid}
+// GetBridge is the handler for GET /nodes/{nodeid}/bridges/{bridgeid}
 // Get bridge details
 func (api NodeAPI) GetBridge(w http.ResponseWriter, r *http.Request) {
 	var respBody Bridge

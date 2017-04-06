@@ -8,7 +8,7 @@ import (
 	"github.com/g8os/grid/api/tools"
 )
 
-// GetNicInfo is the handler for GET /node/{nodeid}/nic
+// GetNicInfo is the handler for GET /nodes/{nodeid}/nic
 // Get detailed information about the network interfaces in the node
 func (api NodeAPI) GetNicInfo(w http.ResponseWriter, r *http.Request) {
 	cl, err := tools.GetConnection(r,api)

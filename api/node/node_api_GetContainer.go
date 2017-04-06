@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// GetContainer is the handler for GET /node/{nodeid}/container/{containerid}
+// GetContainer is the handler for GET /nodes/{nodeid}/container/{containerid}
 // Get Container
 func (api NodeAPI) GetContainer(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
