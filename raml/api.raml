@@ -677,11 +677,8 @@ types:
             application/json:
               type: VMUpdate
           responses:
-            200:
-              body:
-                application/json:
-                  description: Runtime id of the virtual machine (process id)
-                  type: integer
+            204:
+              description: VM updated successfully
         /info:
           get:
             (DirectAccess):
