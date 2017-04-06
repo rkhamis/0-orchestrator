@@ -9,7 +9,6 @@ type VM struct {
 	Disk   []VDiskLink  `json:"disk" validate:"nonzero"`
 	Id     string       `json:"id" validate:"nonzero"`
 	Memory int          `json:"memory" validate:"nonzero"`
-	Name   string       `json:"name" validate:"nonzero"`
 	Nic    []string     `json:"nic" validate:"nonzero"`
 	Status EnumVMStatus `json:"status" validate:"nonzero"`
 }

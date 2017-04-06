@@ -250,8 +250,7 @@ VMListItem:
   properties:
     id:
       description: Unique id of the virtual machine
-      type: integer
-    name: string
+      type: string
     status:
       enum: [running, halted, paused]
       description: Status of the VM
@@ -262,7 +261,6 @@ VM:
     id:
       description: Unique identifier of the vm
       type: string
-    name: string
     status:
       enum: [running, halted, paused, halting, migrating]
       description: Status of the VM
