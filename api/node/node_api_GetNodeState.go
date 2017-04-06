@@ -11,7 +11,12 @@ import (
 // GetNodeState is the handler for GET /node/{nodeid}/state
 // The aggregated consumption of node + all processes (cpu, memory, etc...)
 func (api NodeAPI) GetNodeState(w http.ResponseWriter, r *http.Request) {
-	cl := tools.GetConnection(r)
+	cl, err := tools.GetConnection(r,api)
+	if err != nil {
+		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
 	core := client.Core(cl)
 	stats, err := core.State()
 

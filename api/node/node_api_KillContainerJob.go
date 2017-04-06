@@ -14,7 +14,7 @@ func (api NodeAPI) KillContainerJob(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	jobID := client.Job(vars["jobid"])
 
-	container, err := tools.GetContainerConnection(r)
+	container, err := tools.GetContainerConnection(r,api)
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return

@@ -11,7 +11,12 @@ import (
 // GetMemInfo is the handler for GET /node/{nodeid}/mem
 // Get detailed information about the memory in the node
 func (api NodeAPI) GetMemInfo(w http.ResponseWriter, r *http.Request) {
-	cl := tools.GetConnection(r)
+	cl, err := tools.GetConnection(r,api)
+	if err != nil {
+		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
 	info := client.Info(cl)
 	result, err := info.Mem()
 

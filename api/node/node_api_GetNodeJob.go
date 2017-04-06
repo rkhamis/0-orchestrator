@@ -15,7 +15,12 @@ func (api NodeAPI) GetNodeJob(w http.ResponseWriter, r *http.Request) {
 	var respBody JobResult
 	vars := mux.Vars(r)
 	jobID := client.Job(vars["jobid"])
-	cl := tools.GetConnection(r)
+	cl, err := tools.GetConnection(r,api)
+	if err != nil {
+		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
 	core := client.Core(cl)
 
 	// Check first if the job is running and return

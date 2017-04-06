@@ -11,7 +11,12 @@ import (
 // GetNodeOSInfo is the handler for GET /node/{nodeid}/info
 // Get detailed information of the os of the node
 func (api NodeAPI) GetNodeOSInfo(w http.ResponseWriter, r *http.Request) {
-	cl := tools.GetConnection(r)
+	cl, err := tools.GetConnection(r,api)
+	if err != nil {
+		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
 	info := client.Info(cl)
 	os, err := info.OS()
 
