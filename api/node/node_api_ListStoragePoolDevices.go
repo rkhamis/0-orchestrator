@@ -7,8 +7,7 @@ import (
 	"sort"
 
 	log "github.com/Sirupsen/logrus"
-
-	client "github.com/g8os/go-client"
+	g8client "github.com/g8os/go-client"
 	"github.com/g8os/grid/api/tools"
 	"github.com/gorilla/mux"
 )
@@ -42,23 +41,21 @@ func (api NodeAPI) ListStoragePoolDevices(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	core := client.Core(cl)
-	res, err := core.ListStoragePoolDevices(devices)
+	btrfsMgr := g8client.Btrfs(cl)
+	fss, err := btrfsMgr.List()
 	if err != nil {
 		log.Errorf("Error Listing storage pool devices: %+v", err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
-
-	for _, dev := range res {
-		for _, info := range dev.Devices {
-			if str, ok := info["path"].(string); ok {
-				if containsStrings(devices, str) {
-					respBody = append(respBody, StoragePoolDevice{Uuid: dev.UUID})
-				}
+	for _, fs := range fss {
+		for _, device := range fs.Devices {
+			if containsStrings(devices, device.Path) {
+				respBody = append(respBody, StoragePoolDevice{Uuid: fs.UUID})
 			}
 		}
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(&respBody)
@@ -76,6 +73,7 @@ func (api NodeAPI) getStoragePoolDevices(node, storagepool string) ([]string, er
 	var data struct {
 		Devices []string `json:"devices"`
 	}
+
 	if err := json.Unmarshal(service.Data, &data); err != nil {
 		log.Errorf("Error Unmarshal storagepool service '%s' data: %+v", storagepool, err)
 		return nil, err
