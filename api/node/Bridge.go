@@ -5,7 +5,7 @@ import (
 )
 
 type Bridge struct {
-	Setting string           `json:"config" validate:"nonzero"`
+	Setting string           `json:"setting" validate:"nonzero"`
 	Name    string           `json:"name" validate:"nonzero"`
 	Status  EnumBridgeStatus `json:"status" validate:"nonzero"`
 }

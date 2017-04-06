@@ -375,9 +375,9 @@ ContainerListItem:
 Container:
   type: object
   properties:
-    id:
-      description: identifier
-      type: string
+    containerId:
+      description: The container id given to the container by g8os
+      type: integer
     status:
       enum: [running, halted]
       description: Status of the container
