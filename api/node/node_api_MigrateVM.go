@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// MigrateVM is the handler for POST /node/{nodeid}/vm/{vmid}/migrate
+// MigrateVM is the handler for POST /nodes/{nodeid}/vms/{vmid}/migrate
 // Migrate the VM to another host
 func (api NodeAPI) MigrateVM(w http.ResponseWriter, r *http.Request) {
 	var reqBody VMMigrate

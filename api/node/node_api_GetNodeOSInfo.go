@@ -8,7 +8,7 @@ import (
 	"github.com/g8os/grid/api/tools"
 )
 
-// GetNodeOSInfo is the handler for GET /node/{nodeid}/info
+// GetNodeOSInfo is the handler for GET /nodes/{nodeid}/info
 // Get detailed information of the os of the node
 func (api NodeAPI) GetNodeOSInfo(w http.ResponseWriter, r *http.Request) {
 	cl, err := tools.GetConnection(r,api)

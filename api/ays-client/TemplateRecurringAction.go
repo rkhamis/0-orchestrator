@@ -6,7 +6,7 @@ import (
 
 type TemplateRecurringAction struct {
 	Action string `json:"action" validate:"nonzero"`
-	Log    bool   `json:"log" validate:"nonzero"`
+	Log    bool   `json:"log"`
 	Period string `json:"period" validate:"nonzero"`
 }
 

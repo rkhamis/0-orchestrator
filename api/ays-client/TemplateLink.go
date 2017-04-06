@@ -6,7 +6,7 @@ import (
 
 type TemplateLink struct {
 	Argname string `json:"argname" validate:"nonzero"`
-	Auto    bool   `json:"auto" validate:"nonzero"`
+	Auto    bool   `json:"auto"`
 	Max     int    `json:"max" validate:"nonzero"`
 	Min     int    `json:"min" validate:"nonzero"`
 	Role    string `json:"role" validate:"nonzero"`

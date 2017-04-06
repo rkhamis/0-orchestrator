@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// CreateContainer is the handler for POST /node/{nodeid}/container
+// CreateContainer is the handler for POST /nodes/{nodeid}/container
 // Create a new Container
 func (api NodeAPI) CreateContainer(w http.ResponseWriter, r *http.Request) {
 	var reqBody Container

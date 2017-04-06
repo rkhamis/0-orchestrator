@@ -3,7 +3,6 @@ package node
 import (
 	"encoding/json"
 	"net/http"
-	"fmt"
 
 	"github.com/g8os/grid/api/tools"
 )
@@ -11,22 +10,26 @@ import (
 // ListNodes is the handler for GET /nodes
 // List Nodes
 func (api NodeAPI) ListNodes(w http.ResponseWriter, r *http.Request) {
-	services, res, err := api.AysAPI.Ays.ListServicesByRole("node", api.AysRepo, nil, nil)
-	if ! tools.HandleAYSResponse(err, res, w, "listing nodes") { return }
 
-	var respBody []Node
-	for _, service := range services {
-		srv, res, err := api.AysAPI.Ays.GetServiceByName(service.Name, "node", api.AysRepo, nil, nil)
-		if ! tools.HandleAYSResponse(err, res, w, fmt.Sprintf("getting node %s details", service.Name)) { return }
+	queryParams := map[string]interface{}{
+		"fields": "hostname,status,id",
+	}
+	services, res, err := api.AysAPI.Ays.ListServicesByRole("node", api.AysRepo, nil, queryParams)
+	if !tools.HandleAYSResponse(err, res, w, "listing nodes") {
+		return
+	}
 
-		var node Node
-		if err := json.Unmarshal(srv.Data, &node); err != nil {
+	var respBody = make([]Node, len(services))
+	for i, service := range services {
+		node := Node{
+			Name: service.Name,
+		}
+		if err := json.Unmarshal(service.Data, &node); err != nil {
 			tools.WriteError(w, http.StatusInternalServerError, err)
 			return
 		}
 
-		node.Id = service.Name
-		respBody = append(respBody, node)
+		respBody[i] = node
 	}
 
 	w.Header().Set("Content-Type", "application/json")

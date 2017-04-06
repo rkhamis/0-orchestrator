@@ -8,7 +8,7 @@ type VolumeCreate struct {
 	Blocksize          int                        `json:"blocksize" validate:"nonzero"`
 	ReadOnly           bool                       `json:"readOnly,omitempty"`
 	Size               int                        `json:"size" validate:"nonzero"`
-	Storagecluster     string                     `json:"storagecluster,omitempty"`
+	Storagecluster     string                     `json:"storagecluster" validate:"nonzero"`
 	Templatevolume     string                     `json:"templatevolume,omitempty"`
 	TlogStoragecluster string                     `json:"tlogStoragecluster,omitempty"`
 	Volumetype         EnumVolumeCreateVolumetype `json:"volumetype" validate:"nonzero"`

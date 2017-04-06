@@ -2,8 +2,8 @@ package node
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/g8os/grid/api/tools"
 	"github.com/gorilla/mux"
@@ -15,9 +15,10 @@ func (api NodeAPI) ListContainers(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	nodeID := vars["nodeid"]
 
-	query := make(map[string]interface{})
-	query["parent"] = strings.Join([]string{"node.g8os", nodeID}, "!")
-
+	query := map[string]interface{}{
+		"parent": fmt.Sprintf("node.g8os!%s", nodeID),
+		"fields": "flist,hostname,status",
+	}
 	services, res, err := api.AysAPI.Ays.ListServicesByRole("container", api.AysRepo, nil, query)
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
@@ -34,33 +35,21 @@ func (api NodeAPI) ListContainers(w http.ResponseWriter, r *http.Request) {
 		Status   EnumContainerListItemStatus `json:"status" validate:"nonzero"`
 	}
 
-	var respBody []ContainerListItem
-	for _, service := range services {
-		srv, res, err := api.AysAPI.Ays.GetServiceByName(service.Name, "container", api.AysRepo, nil, nil)
-
-		if err != nil {
-			tools.WriteError(w, http.StatusInternalServerError, err)
-			return
-		}
-
-		if res.StatusCode != http.StatusOK {
-			w.WriteHeader(res.StatusCode)
-			return
-		}
-
-		var containerItem containerItem
-		if err := json.Unmarshal(srv.Data, &containerItem); err != nil {
+	var respBody = make([]ContainerListItem, len(services))
+	for i, service := range services {
+		var data containerItem
+		if err := json.Unmarshal(service.Data, &data); err != nil {
 			tools.WriteError(w, http.StatusInternalServerError, err)
 			return
 		}
 
 		container := ContainerListItem{
 			Id:       service.Name,
-			Flist:    containerItem.Flist,
-			Hostname: containerItem.Hostname,
-			Status:   containerItem.Status,
+			Flist:    data.Flist,
+			Hostname: data.Hostname,
+			Status:   data.Status,
 		}
-		respBody = append(respBody, container)
+		respBody[i] = container
 	}
 
 	w.Header().Set("Content-Type", "application/json")

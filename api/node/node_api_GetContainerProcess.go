@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// GetContainerProcess is the handler for GET /node/{nodeid}/container/{containerid}/process/{proccessid}
+// GetContainerProcess is the handler for GET /nodes/{nodeid}/container/{containerid}/process/{proccessid}
 // Get process details
 func (api NodeAPI) GetContainerProcess(w http.ResponseWriter, r *http.Request) {
 	var respBody Process

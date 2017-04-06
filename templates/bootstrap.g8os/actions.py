@@ -8,6 +8,7 @@ def bootstrap(job):
     ip, _ = job.model.request.ip
     job.logger.info("reverse ardb loopup on IP: {}".format(ip))
     mac = j.sal.nettools.getMacAddressForIp(ip)
+    mac = mac.replace(":", "")
 
     service = job.service
 

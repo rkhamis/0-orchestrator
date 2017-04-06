@@ -6,7 +6,7 @@ import (
 
 type Job struct {
 	Action_name  string `json:"action_name" validate:"nonzero"`
-	Actor_name   string `json:"actor_name" validate:"nonzero"`
+	Actor        string `json:"actor" validate:"nonzero"`
 	Key          string `json:"key" validate:"nonzero"`
 	Logs         []Log  `json:"logs" validate:"nonzero"`
 	Service_key  string `json:"service_key" validate:"nonzero"`

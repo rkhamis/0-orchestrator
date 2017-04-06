@@ -12,7 +12,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-// CreateStoragePool is the handler for POST /node/{nodeid}/storagepool
+// CreateStoragePool is the handler for POST /node/{nodeid}/storagepools
 // Create a new storage pool
 func (api NodeAPI) CreateStoragePool(w http.ResponseWriter, r *http.Request) {
 	var reqBody StoragePoolCreate

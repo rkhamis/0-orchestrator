@@ -10,7 +10,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-// GetFilesystemInfo is the handler for GET /node/{nodeid}/storagepool/{storagepoolname}/filesystem/{filesystemname}
+// GetFilesystemInfo is the handler for GET /nodes/{nodeid}/storagepools/{storagepoolname}/filesystem/{filesystemname}
 // Get detailed filesystem information
 func (api NodeAPI) GetFilesystemInfo(w http.ResponseWriter, r *http.Request) {
 	storagepool := mux.Vars(r)["storagepoolname"]
