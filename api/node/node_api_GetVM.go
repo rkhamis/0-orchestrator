@@ -25,6 +25,7 @@ func (api NodeAPI) GetVM(w http.ResponseWriter, r *http.Request) {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
+	vm.Id = srv.Name
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
