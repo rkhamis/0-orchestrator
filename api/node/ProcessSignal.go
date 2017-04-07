@@ -5,7 +5,7 @@ import (
 )
 
 type ProcessSignal struct {
-	Signal int `json:"signal" validate:"min=1,nonzero"`
+	Signal int8 `json:"signal" validate:"min=1,nonzero"`
 }
 
 func (s ProcessSignal) Validate() error {

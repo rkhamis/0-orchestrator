@@ -3,6 +3,10 @@ package node
 import (
 	"encoding/json"
 	"net/http"
+
+	client "github.com/g8os/go-client"
+	"github.com/g8os/grid/api/tools"
+	"github.com/gorilla/mux"
 )
 
 // SendSignalJob is the handler for POST /nodes/{nodeid}/containers/{containerid}/job
@@ -22,4 +26,21 @@ func (api NodeAPI) SendSignalJob(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
 		return
 	}
+
+	containerId := mux.Vars(r)["containerid"]
+
+	// Get a connection
+	cl, err := tools.GetConnection(r, api)
+	if err != nil {
+		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Send signal to the container
+	if err := client.Core(cl).Kill(client.Job(containerId), reqBody.Signal); err != nil {
+		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
