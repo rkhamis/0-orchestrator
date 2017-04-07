@@ -2,6 +2,7 @@ package node
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -16,7 +17,7 @@ func (api NodeAPI) ListVMs(w http.ResponseWriter, r *http.Request) {
 
 	queryParams := map[string]interface{}{
 		"fields": "status,id",
-		"parent": vars["nodeid"],
+		"parent": fmt.Sprintf("node.g8os!%s", vars["nodeid"]),
 	}
 	services, res, err := api.AysAPI.Ays.ListServicesByRole("vm", api.AysRepo, nil, queryParams)
 	if !tools.HandleAYSResponse(err, res, w, "listing vms") {
@@ -25,13 +26,12 @@ func (api NodeAPI) ListVMs(w http.ResponseWriter, r *http.Request) {
 
 	var respBody = make([]VMListItem, len(services))
 	for i, service := range services {
-		vm := VMListItem{
-			Id: service.Name,
-		}
+		var vm VMListItem
 		if err := json.Unmarshal(service.Data, &vm); err != nil {
 			tools.WriteError(w, http.StatusInternalServerError, err)
 			return
 		}
+		vm.Id = service.Name
 
 		respBody[i] = vm
 	}
