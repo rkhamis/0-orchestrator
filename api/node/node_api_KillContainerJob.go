@@ -21,7 +21,7 @@ func (api NodeAPI) KillContainerJob(w http.ResponseWriter, r *http.Request) {
 	}
 	core := client.Core(container)
 
-	if err := core.Kill(jobID); err != nil {
+	if err := core.Kill(jobID, 9); err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
