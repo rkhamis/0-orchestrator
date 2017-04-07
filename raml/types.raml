@@ -398,9 +398,9 @@ Container:
         /fs/<<storagepool>>/<<filesystem>>
       example: ['pool1:fs1', 'pool2:fs2']
       type: string[]
-    bridges:
+    nics:
       type: ContainerNIC[]
-      description: Bridge mapping
+      description: List of container nics
     hostNetworking:
       type: boolean
       description: Make host networking available to the guest. If true means that the container will be able participate in the networks available in the host operating system.
