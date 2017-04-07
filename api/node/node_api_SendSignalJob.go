@@ -3,6 +3,7 @@ package node
 import (
 	"encoding/json"
 	"net/http"
+	"syscall"
 
 	client "github.com/g8os/go-client"
 	"github.com/g8os/grid/api/tools"
@@ -37,7 +38,7 @@ func (api NodeAPI) SendSignalJob(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send signal to the container
-	if err := client.Core(cl).Kill(client.Job(containerId), reqBody.Signal); err != nil {
+	if err := client.Core(cl).Kill(client.Job(containerId), syscall.Signal(reqBody.Signal)); err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
