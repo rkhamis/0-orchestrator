@@ -11,7 +11,7 @@ import (
 // GetNicInfo is the handler for GET /nodes/{nodeid}/nic
 // Get detailed information about the network interfaces in the node
 func (api NodeAPI) GetNicInfo(w http.ResponseWriter, r *http.Request) {
-	cl, err := tools.GetConnection(r,api)
+	cl, err := tools.GetConnection(r, api)
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return

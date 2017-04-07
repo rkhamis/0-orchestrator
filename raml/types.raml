@@ -394,9 +394,51 @@ Container:
         /fs/<<storagepool>>/<<filesystem>>
       example: ['pool1:fs1', 'pool2:fs2']
       type: string[]
-    bridges:
+    nics:
       type: ContainerNIC[]
-      description: Bridge mapping
+      description: List of container nics
+    hostNetworking:
+      type: boolean
+      description: Make host networking available to the guest. If true means that the container will be able participate in the networks available in the host operating system.
+    ports:
+      type: string[]
+      description: |
+        List of node to container post mappings.
+      example: ['10022:22', '8080:80']
+    storage:
+      type: string
+      description: A Url to the ardb storage to use to mount the root plist
+
+
+CreateContainer:
+  type: object
+  properties:
+    id:
+      description: unique identifier
+      type: string
+    status:
+      enum: [running, halted]
+      description: Status of the container
+    hostname:
+      description: Hostname for the Container
+      type: string
+    flist:
+      type: string
+      description: Url to the root filesystem flist
+    initProcesses:
+      type: CoreSystem[]
+      description: Definition of the processes to start in the container
+    filesystems:
+      description: |
+        List of filesystems that will be exposed to the container
+        format: <<storagepool>>:<<filesystem>>
+        filesystems are mounted in the container filesystem as follows:
+        /fs/<<storagepool>>/<<filesystem>>
+      example: ['pool1:fs1', 'pool2:fs2']
+      type: string[]
+    nics:
+      type: ContainerNIC[]
+      description: List of container nics
     hostNetworking:
       type: boolean
       description: Make host networking available to the guest. If true means that the container will be able participate in the networks available in the host operating system.

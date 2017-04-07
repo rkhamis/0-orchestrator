@@ -13,7 +13,7 @@ import (
 func (api NodeAPI) KillNodeJob(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	jobID := vars["jobid"]
-	cl, err := tools.GetConnection(r,api)
+	cl, err := tools.GetConnection(r, api)
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return

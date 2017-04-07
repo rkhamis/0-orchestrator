@@ -5,7 +5,7 @@ import (
 )
 
 type Container struct {
-	Bridges        []Bridge            `json:"bridges" validate:"nonzero"`
+	Nics           []ContainerNIC      `json:"nics" validate:"nonzero"`
 	Filesystems    []string            `json:"filesystems" validate:"nonzero"`
 	Flist          string              `json:"flist" validate:"nonzero"`
 	HostNetworking bool                `json:"hostNetworking" validate:"nonzero"`

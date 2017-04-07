@@ -10,7 +10,7 @@ import (
 // KillAllContainerJobs is the handler for DELETE /nodes/{nodeid}/container/{containerid}/job
 // Kills all running jobs on the container
 func (api NodeAPI) KillAllContainerJobs(w http.ResponseWriter, r *http.Request) {
-	container, err := tools.GetContainerConnection(r,api)
+	container, err := tools.GetContainerConnection(r, api)
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return

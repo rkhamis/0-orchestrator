@@ -37,7 +37,7 @@ func (api NodeAPI) FileUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	container, err := tools.GetContainerConnection(r,api)
+	container, err := tools.GetContainerConnection(r, api)
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 	}
