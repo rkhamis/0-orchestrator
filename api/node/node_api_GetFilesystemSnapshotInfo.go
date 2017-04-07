@@ -2,8 +2,8 @@ package node
 
 import (
 	"encoding/json"
-	"net/http"
 	"fmt"
+	"net/http"
 
 	"github.com/gorilla/mux"
 
@@ -16,7 +16,7 @@ func (api NodeAPI) GetFilesystemSnapshotInfo(w http.ResponseWriter, r *http.Requ
 	snapshotname := mux.Vars(r)["snapshotname"]
 
 	service, resp, err := api.AysAPI.Ays.GetServiceByName(snapshotname, "fssnapshot", api.AysRepo, nil, nil)
-	if ! tools.HandleAYSResponse(err, resp, w, fmt.Sprintf("getting snapshot %s details", snapshotname)) {
+	if !tools.HandleAYSResponse(err, resp, w, fmt.Sprintf("getting snapshot %s details", snapshotname)) {
 		return
 	}
 

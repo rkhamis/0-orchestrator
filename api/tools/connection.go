@@ -186,7 +186,7 @@ func GetContainerConnection(r *http.Request, api API) (client.Client, error) {
 			return nil, fmt.Errorf("Error getting service %v", id)
 		}
 
-		var cID  struct {
+		var cID struct {
 			Id int
 		}
 

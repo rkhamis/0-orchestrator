@@ -32,16 +32,16 @@ func (api NodeAPI) CreateContainer(w http.ResponseWriter, r *http.Request) {
 	nodeId := vars["nodeid"]
 
 	container := struct {
-		Nics           []ContainerNIC      `json:"nics"`
-		Filesystems    []string            `json:"filesystems"`
-		Flist          string              `json:"flist"`
-		HostNetworking bool                `json:"hostNetworking"`
-		Hostname       string              `json:"hostname"`
-		Node           string              `json:"node"`
-		InitProcesses  []CoreSystem        `json:"initProcesses"`
-		Ports          []string            `json:"ports"`
+		Nics           []ContainerNIC            `json:"nics"`
+		Filesystems    []string                  `json:"filesystems"`
+		Flist          string                    `json:"flist"`
+		HostNetworking bool                      `json:"hostNetworking"`
+		Hostname       string                    `json:"hostname"`
+		Node           string                    `json:"node"`
+		InitProcesses  []CoreSystem              `json:"initProcesses"`
+		Ports          []string                  `json:"ports"`
 		Status         EnumCreateContainerStatus `json:"status"`
-		Storage        string              `json:"storage"`
+		Storage        string                    `json:"storage"`
 	}{
 		Nics:           reqBody.Nics,
 		Filesystems:    reqBody.Filesystems,

@@ -2,8 +2,8 @@ package node
 
 import (
 	"encoding/json"
-	"net/http"
 	"fmt"
+	"net/http"
 
 	"github.com/g8os/grid/api/tools"
 	"github.com/gorilla/mux"
@@ -16,7 +16,9 @@ func (api NodeAPI) GetVM(w http.ResponseWriter, r *http.Request) {
 	vmID := vars["vmid"]
 
 	srv, res, err := api.AysAPI.Ays.GetServiceByName(vmID, "vm", api.AysRepo, nil, nil)
-	if !tools.HandleAYSResponse(err, res, w, fmt.Sprintf("getting vm %s details", vmID)) { return }
+	if !tools.HandleAYSResponse(err, res, w, fmt.Sprintf("getting vm %s details", vmID)) {
+		return
+	}
 
 	var vm VM
 	if err := json.Unmarshal(srv.Data, &vm); err != nil {

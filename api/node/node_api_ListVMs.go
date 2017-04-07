@@ -25,7 +25,7 @@ func (api NodeAPI) ListVMs(w http.ResponseWriter, r *http.Request) {
 
 	var respBody = make([]VMListItem, len(services))
 	for i, service := range services {
-		vm := VMListItem {
+		vm := VMListItem{
 			Id: service.Name,
 		}
 		if err := json.Unmarshal(service.Data, &vm); err != nil {

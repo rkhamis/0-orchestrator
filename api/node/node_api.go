@@ -9,26 +9,25 @@ import (
 type NodeAPI struct {
 	AysRepo string
 	AysAPI  *ays.AtYourServiceAPI
-	Cache *cache.Cache
+	Cache   *cache.Cache
 }
 
 func NewNodeAPI(repo string, client *ays.AtYourServiceAPI, c *cache.Cache) NodeAPI {
 	return NodeAPI{
 		AysRepo: repo,
 		AysAPI:  client,
-		Cache: c,
+		Cache:   c,
 	}
 }
 
-func(api NodeAPI) AysAPIClient() *ays.AtYourServiceAPI {
+func (api NodeAPI) AysAPIClient() *ays.AtYourServiceAPI {
 	return api.AysAPI
 }
 
-func(api NodeAPI) AysRepoName() string {
+func (api NodeAPI) AysRepoName() string {
 	return api.AysRepo
 }
 
-func(api NodeAPI) ContainerCache() *cache.Cache {
+func (api NodeAPI) ContainerCache() *cache.Cache {
 	return api.Cache
 }
-
