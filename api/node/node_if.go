@@ -76,6 +76,9 @@ type NodesInterface interface { // ListNodes is the handler for GET /node
 	// GetVM is the handler for GET /node/{nodeid}/vms/{vmid}
 	// Get detailed virtual machine object
 	GetVM(http.ResponseWriter, *http.Request)
+	// UpdateVM is the handler for PUT /node/{nodeid}/vms/{vmid}
+	// Updates virtual machine object
+	UpdateVM(http.ResponseWriter, *http.Request)
 	// DeleteVM is the handler for DELETE /node/{nodeid}/vms/{vmid}
 	// Deletes the VM
 	DeleteVM(http.ResponseWriter, *http.Request)
@@ -255,6 +258,7 @@ func NodesInterfaceRoutes(r *mux.Router, i NodesInterface) {
 	r.HandleFunc("/nodes/{nodeid}/vms", i.ListVMs).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/vms", i.CreateVM).Methods("POST")
 	r.HandleFunc("/nodes/{nodeid}/vms/{vmid}", i.GetVM).Methods("GET")
+	r.HandleFunc("/nodes/{nodeid}/vms/{vmid}", i.UpdateVM).Methods("PUT")
 	r.HandleFunc("/nodes/{nodeid}/vms/{vmid}", i.DeleteVM).Methods("DELETE")
 	r.HandleFunc("/nodes/{nodeid}/vms/{vmid}/migrate", i.MigrateVM).Methods("POST")
 	r.HandleFunc("/nodes/{nodeid}/vms/{vmid}/info", i.GetVMInfo).Methods("GET")
