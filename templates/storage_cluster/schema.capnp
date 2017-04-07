@@ -1,9 +1,9 @@
-@0x80eab0d1fa3f13a3;
+@0x80eab0d1fa3f13a4;
 
 struct Schema {
     label @0 :Text;
     status @1 :Status = empty;
-    nbrServer @2 :UInt32 = 256;
+    nrServer @2 :UInt32 = 256;
     hasSlave @3 :Bool = false;
     diskType @4:DiskClass = ssd;
     filesystems @5:List(Text);

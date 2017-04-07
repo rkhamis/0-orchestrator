@@ -28,12 +28,13 @@ def install(job):
         pool = node.storagepools.create(name, devices, metadataProfile, dataProfile, overwrite=True)
 
     # mount device
-    if pool.mountpoint:
-        if pool.mountpoint != mountpoint:
-            pool.umount()
+    if mountpoint:
+        if pool.mountpoint:
+            if pool.mountpoint != mountpoint:
+                pool.umount()
+                pool.mount(mountpoint)
+        else:
             pool.mount(mountpoint)
-    else:
-        pool.mount(mountpoint)
 
     # lets check if devices need to be added removed and the profile still matches
     if pool.fsinfo['data']['profile'].lower() != dataProfile:
