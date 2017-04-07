@@ -1,20 +1,29 @@
+def input(job):
+    if job.model.args.get("status", "") != "":
+        raise j.exceptions.Input("status should not be set as input")
+
+
 def install(job):
     service = job.service
     service.model.data.status = 'halted'
+
 
 def start(job):
     service = job.service
     service.model.data.status = 'running'
 
+
 def pause(job):
     service = job.service
     service.model.data.status = 'halted'
+
 
 def rollback(job):
     service = job.service
     service.model.data.status = 'rollingback'
     # TODO: rollback disk
     service.model.data.status = 'running'
+
 
 def resize(job):
     service = job.service
@@ -28,6 +37,7 @@ def resize(job):
         raise j.exceptions.Input("size is smaller then current size, disks can grown")
 
     service.model.data.size = size
+
 
 def processChange(job):
     service = job.service

@@ -670,6 +670,15 @@ types:
               body:
                 application/json:
                   type: VM
+        put:
+          displayName: UpdateVm
+          description: updates the VM 
+          body:
+            application/json:
+              type: VMUpdate
+          responses:
+            204:
+              description: VM updated successfully
         /info:
           get:
             (DirectAccess):
