@@ -1,6 +1,7 @@
 package node
 
 import (
+	"fmt"
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
@@ -12,6 +13,7 @@ import (
 // Exit the Zerotier network
 func (api NodeAPI) ExitZerotier(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	nodeID := mux.Vars(r)["nodeid"]
 	zerotierID := vars["zerotierid"]
 
 	// execute the exit action of the zerotier
