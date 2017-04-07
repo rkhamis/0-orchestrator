@@ -233,16 +233,12 @@ VDiskLink:
   type: object
   description: Definition of a virtual disk
   properties:
-    maxIOps:
-      description: Maximum amount of iops the virtual disk should deliver
-      type: integer
-    storageclusterid:
-      type: string
-      description: Id of the storage cluster of the volume
     volumeid:
       type: string
       description: Id of the volume
-
+    maxIOps:
+      description: Maximum amount of iops the virtual disk should deliver
+      type: integer
 
 VMListItem:
   type: object

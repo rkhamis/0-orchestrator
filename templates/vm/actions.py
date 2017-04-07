@@ -1,3 +1,14 @@
+def input(job):
+    # Check the blueprint input for errors
+    args = job.model.args
+    if args.get('volumes'):
+        raise j.exceptions.Input('volumes property should not be set in the blueprint. Instead use disks property.')
+    disks = args.get("disks", [])
+    if disks:
+        args['volumes'] = [disk['volumeid'] for disk in disks]
+    return args
+
+
 def get_node_client(service):
     node = service.parent
     return j.clients.g8core.get(host=node.model.data.redisAddr,
@@ -99,14 +110,13 @@ def install(job):
         service.name,
         media=medias,
         cpu=service.model.data.cpu,
-        memory=service.model.data.memory,
+        memory=service.model.data.memory
         # port=None, #TODO
         # bridge=None #TODO
     )
 
     # TODO: test vm actually exists
     service.model.data.status = 'running'
-
 
 def start(job):
     service = job.service
