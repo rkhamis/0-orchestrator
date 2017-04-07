@@ -3,7 +3,6 @@ package node
 import (
 	"fmt"
 	"net/http"
-	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/g8os/grid/api/tools"
@@ -25,9 +24,7 @@ func (api NodeAPI) DeleteFilesystemSnapshot(w http.ResponseWriter, r *http.Reque
 		}},
 	}
 
-	blueprintName := fmt.Sprintf("fssnaptshot__%s_delete_%d", name, time.Now().Unix())
-
-	run, err := tools.ExecuteBlueprint(api.AysRepo, blueprintName, blueprint)
+	run, err := tools.ExecuteBlueprint(api.AysRepo, "fssnapshot", name, "delete", blueprint)
 	if err != nil {
 		httpErr := err.(tools.HTTPError)
 		log.Errorf("Error executing blueprint for fssnapshot deletion : %+v", err.Error())

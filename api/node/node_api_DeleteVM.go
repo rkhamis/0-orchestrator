@@ -19,7 +19,7 @@ func (api NodeAPI) DeleteVM(w http.ResponseWriter, r *http.Request) {
 	obj := make(map[string]interface{})
 	obj["actions"] = []map[string]string{map[string]string{"action": "delete", "actor": "vm", "service": vmid}}
 
-	run, err := tools.ExecuteBlueprint(api.AysRepo, vmid, obj)
+	run, err := tools.ExecuteBlueprint(api.AysRepo, "vm", vmid, "delete", obj)
 	if err != nil {
 		log.Errorf("Error executing blueprint for vm %s deletion : %+v", vmid, err)
 		tools.WriteError(w, http.StatusInternalServerError, err)

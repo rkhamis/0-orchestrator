@@ -1,11 +1,9 @@
 package node
 
 import (
-	"fmt"
 	"github.com/g8os/grid/api/tools"
 	"github.com/gorilla/mux"
 	"net/http"
-	"time"
 )
 
 // RebootNode is the handler for POST /nodes/{nodeid}/reboot
@@ -21,9 +19,8 @@ func (api NodeAPI) RebootNode(w http.ResponseWriter, r *http.Request) {
 			"service": nodeId,
 		}},
 	}
-	blueprintName := fmt.Sprintf("node__%s_reboot_%d", nodeId, time.Now().Unix())
 
-	run, err := tools.ExecuteBlueprint(api.AysRepo, blueprintName, blueprint)
+	run, err := tools.ExecuteBlueprint(api.AysRepo, "node", nodeId, "reboot", blueprint)
 	if err != nil {
 		httpErr := err.(tools.HTTPError)
 		tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)

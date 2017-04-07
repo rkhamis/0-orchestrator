@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/g8os/grid/api/tools"
 	"github.com/gorilla/mux"
@@ -39,9 +38,7 @@ func (api NodeAPI) CreateSnapshot(w http.ResponseWriter, r *http.Request) {
 		"actions":                           []map[string]string{{"action": "install"}},
 	}
 
-	blueprintName := fmt.Sprintf("fssnaptshot__%s_create_%d", name, time.Now().Unix())
-
-	if _, err := tools.ExecuteBlueprint(api.AysRepo, blueprintName, blueprint); err != nil {
+	if _, err := tools.ExecuteBlueprint(api.AysRepo, "fssnapshot", name, "install", blueprint); err != nil {
 		httpErr := err.(tools.HTTPError)
 		log.Errorf("Error executing blueprint for fssnapshot creation : %+v", err.Error())
 		tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)

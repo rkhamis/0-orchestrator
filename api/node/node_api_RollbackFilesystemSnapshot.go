@@ -1,9 +1,7 @@
 package node
 
 import (
-	"fmt"
 	"net/http"
-	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/g8os/grid/api/tools"
@@ -25,9 +23,7 @@ func (api NodeAPI) RollbackFilesystemSnapshot(w http.ResponseWriter, r *http.Req
 		}},
 	}
 
-	bpName := fmt.Sprintf("%s_rollback_%d", name, time.Now().Unix())
-
-	if _, err := tools.ExecuteBlueprint(api.AysRepo, bpName, blueprint); err != nil {
+	if _, err := tools.ExecuteBlueprint(api.AysRepo, "snapshot", name, "rollback", blueprint); err != nil {
 		httpErr := err.(tools.HTTPError)
 		log.Errorf("Error executing blueprint for fssnapshot rollback : %+v", err)
 		tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)

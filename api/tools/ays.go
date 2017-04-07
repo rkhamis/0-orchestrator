@@ -3,6 +3,7 @@ package tools
 import (
 	"net/http"
 	"time"
+	"fmt"
 
 	ays "github.com/g8os/grid/api/ays-client"
 )
@@ -20,7 +21,8 @@ func SetAYSClient(client *ays.AtYourServiceAPI) {
 // execute blueprint
 // execute run
 // archive the blueprint
-func ExecuteBlueprint(repoName, blueprintName string, blueprint map[string]interface{}) (*ays.AYSRun, error) {
+func ExecuteBlueprint(repoName, role, name, action string, blueprint map[string]interface{}) (*ays.AYSRun, error) {
+	blueprintName := fmt.Sprintf("%s_%s_%s_%+v", role, name, action, time.Now().Unix())
 
 	if err := createBlueprint(repoName, blueprintName, blueprint); err != nil {
 		return nil, err

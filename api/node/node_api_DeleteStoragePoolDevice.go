@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/g8os/grid/api/tools"
@@ -48,8 +47,7 @@ func (api NodeAPI) DeleteStoragePoolDevice(w http.ResponseWriter, r *http.Reques
 		fmt.Sprintf("storagepool__%s", storagepool): bpContent,
 	}
 
-	blueprintName := fmt.Sprintf("storagepooldevice__%s_delete_%d", node, time.Now().Unix())
-	if _, err := tools.ExecuteBlueprint(api.AysRepo, blueprintName, blueprint); err != nil {
+	if _, err := tools.ExecuteBlueprint(api.AysRepo, "storagepool", storagepool, "removeDevices", blueprint); err != nil {
 		httpErr := err.(tools.HTTPError)
 		log.Errorf("Error executing blueprint for storagepool device deletion : %+v", err.Error())
 		tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)

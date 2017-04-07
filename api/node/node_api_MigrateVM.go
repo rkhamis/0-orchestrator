@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/g8os/grid/api/tools"
@@ -38,7 +37,6 @@ func (api NodeAPI) MigrateVM(w http.ResponseWriter, r *http.Request) {
 		Node: reqBody.Nodeid,
 	}
 
-	bpName := fmt.Sprintf("vmmigrate%sto%vat%v", vmID, reqBody.Nodeid, time.Now().Unix())
 	decl := fmt.Sprintf("vm__%v", vmID)
 
 	obj := make(map[string]interface{})
@@ -46,7 +44,7 @@ func (api NodeAPI) MigrateVM(w http.ResponseWriter, r *http.Request) {
 	obj["actions"] = []map[string]string{map[string]string{"action": "migrate"}}
 
 	// And execute
-	if _, err := tools.ExecuteBlueprint(api.AysRepo, bpName, obj); err != nil {
+	if _, err := tools.ExecuteBlueprint(api.AysRepo, "vm", vmID, "migrate", obj); err != nil {
 		log.Errorf("error executing blueprint for vm %s migrate : %+v", vmID, err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return

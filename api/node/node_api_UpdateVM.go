@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	log "github.com/Sirupsen/logrus"
 	tools "github.com/g8os/grid/api/tools"
@@ -48,7 +47,7 @@ func (api NodeAPI) UpdateVM(w http.ResponseWriter, r *http.Request) {
 	obj := make(map[string]interface{})
 	obj[fmt.Sprintf("vm__%s", vmid)] = bp
 
-	if _, err := tools.ExecuteBlueprint(api.AysRepo, fmt.Sprintf("vm_%s_%+v", vmid, time.Now().Unix()), obj); err != nil {
+	if _, err := tools.ExecuteBlueprint(api.AysRepo, "vm", vmid, "update", obj); err != nil {
 		log.Errorf("error executing blueprint for vm %s creation : %+v", vmid, err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return

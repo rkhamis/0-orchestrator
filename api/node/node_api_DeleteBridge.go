@@ -1,9 +1,7 @@
 package node
 
 import (
-	"fmt"
 	"net/http"
-	"time"
 
 	log "github.com/Sirupsen/logrus"
 
@@ -25,9 +23,8 @@ func (api NodeAPI) DeleteBridge(w http.ResponseWriter, r *http.Request) {
 			"service": bridge,
 		}},
 	}
-	blueprintName := fmt.Sprintf("bridge__%s_delete_%d", bridge, time.Now().Unix())
 
-	run, err := tools.ExecuteBlueprint(api.AysRepo, blueprintName, blueprint)
+	run, err := tools.ExecuteBlueprint(api.AysRepo, "bridge", bridge, "delete", blueprint)
 	if err != nil {
 		httpErr := err.(tools.HTTPError)
 		log.Errorf("Error executing blueprint for bridge deletion : %+v", err.Error())

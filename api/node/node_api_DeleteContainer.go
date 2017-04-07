@@ -1,9 +1,7 @@
 package node
 
 import (
-	"fmt"
 	"net/http"
-	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/g8os/grid/api/tools"
@@ -24,9 +22,8 @@ func (api NodeAPI) DeleteContainer(w http.ResponseWriter, r *http.Request) {
 			"service": containerID,
 		}},
 	}
-	bpName := fmt.Sprintf("container__%s_delete_%d", containerID, time.Now().Unix())
 
-	run, err := tools.ExecuteBlueprint(api.AysRepo, bpName, bp)
+	run, err := tools.ExecuteBlueprint(api.AysRepo, "container", containerID, "delete", bp)
 	if err != nil {
 		httpErr := err.(tools.HTTPError)
 		log.Errorf("Error executing blueprint for container deletion : %+v", err.Error())

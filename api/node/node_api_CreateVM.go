@@ -67,7 +67,7 @@ func (api NodeAPI) CreateVM(w http.ResponseWriter, r *http.Request) {
 	obj[fmt.Sprintf("vm__%s", reqBody.Id)] = bp
 	obj["actions"] = []map[string]string{map[string]string{"action": "install"}}
 
-	if _, err := tools.ExecuteBlueprint(api.AysRepo, reqBody.Id, obj); err != nil {
+	if _, err := tools.ExecuteBlueprint(api.AysRepo, "vm", reqBody.Id, "install", obj); err != nil {
 		log.Errorf("error executing blueprint for vm %s creation : %+v", reqBody.Id, err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return

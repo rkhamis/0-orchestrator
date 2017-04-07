@@ -3,7 +3,6 @@ package node
 import (
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/g8os/grid/api/tools"
 	"github.com/gorilla/mux"
@@ -25,9 +24,8 @@ func (api NodeAPI) DeleteFilesystem(w http.ResponseWriter, r *http.Request) {
 			"service": name,
 		}},
 	}
-	blueprintName := fmt.Sprintf("filesystem__%s_delete_%d", name, time.Now().Unix())
 
-	run, err := tools.ExecuteBlueprint(api.AysRepo, blueprintName, blueprint)
+	run, err := tools.ExecuteBlueprint(api.AysRepo, "filesystem", name, "delete", blueprint)
 	if err != nil {
 		httpErr := err.(tools.HTTPError)
 		log.Errorf("Error executing blueprint for filesystem deletion : %+v", err.Error())

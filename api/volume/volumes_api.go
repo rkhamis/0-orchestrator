@@ -68,7 +68,7 @@ func (api VolumesAPI) CreateNewVolume(w http.ResponseWriter, r *http.Request) {
 	obj["actions"] = []map[string]string{map[string]string{"action": "install"}}
 
 	// And Execute
-	if _, err := tools.ExecuteBlueprint(api.AysRepo, vName, obj); err != nil {
+	if _, err := tools.ExecuteBlueprint(api.AysRepo, "volume", vName, "install", obj); err != nil {
 		log.Errorf("error executing blueprint for volume %v creation : %+v", vName, err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
@@ -116,9 +116,7 @@ func (api VolumesAPI) DeleteVolume(w http.ResponseWriter, r *http.Request) {
 		}},
 	}
 
-	blueprintName := fmt.Sprintf("%s_delete_%d", volumeId, time.Now().Unix())
-
-	run, err := tools.ExecuteBlueprint(api.AysRepo, blueprintName, blueprint)
+	run, err := tools.ExecuteBlueprint(api.AysRepo, "volume", volumeId, "delete", blueprint)
 	if err != nil {
 		httpErr := err.(tools.HTTPError)
 		log.Errorf("Error executing blueprint for volume deletion : %+v", err.Error())
@@ -174,7 +172,6 @@ func (api VolumesAPI) ResizeVolume(w http.ResponseWriter, r *http.Request) {
 		Size: reqBody.NewSize,
 	}
 
-	bpName := fmt.Sprintf("volumeresize%sto%vat%v", volumeId, reqBody.NewSize, time.Now().Unix())
 	decl := fmt.Sprintf("volume__%v", volumeId)
 
 	obj := make(map[string]interface{})
@@ -182,7 +179,7 @@ func (api VolumesAPI) ResizeVolume(w http.ResponseWriter, r *http.Request) {
 	obj["actions"] = []map[string]string{map[string]string{"action": "resize"}}
 
 	// And execute
-	if _, err := tools.ExecuteBlueprint(api.AysRepo, bpName, obj); err != nil {
+	if _, err := tools.ExecuteBlueprint(api.AysRepo, "volume", volumeId, "resize", obj); err != nil {
 		log.Errorf("error executing blueprint for volume %s resize : %+v", volumeId, err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return

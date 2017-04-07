@@ -1,9 +1,7 @@
 package node
 
 import (
-	"fmt"
 	"net/http"
-	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/g8os/grid/api/tools"
@@ -14,7 +12,6 @@ import (
 // Exit the Zerotier network
 func (api NodeAPI) ExitZerotier(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	nodeID := vars["nodeid"]
 	zerotierID := vars["zerotierid"]
 
 	// execute the exit action of the zerotier
@@ -26,10 +23,8 @@ func (api NodeAPI) ExitZerotier(w http.ResponseWriter, r *http.Request) {
 		}},
 	}
 
-	bpName := fmt.Sprintf("zerotierexit%sof%vat%v", zerotierID, nodeID, time.Now().Unix())
-
 	// And execute
-	if _, err := tools.ExecuteBlueprint(api.AysRepo, bpName, bp); err != nil {
+	if _, err := tools.ExecuteBlueprint(api.AysRepo, "zerotier", zerotierID, "exit", bp); err != nil {
 		log.Errorf("error executing blueprint for zerotier %s exit : %+v", zerotierID, err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
