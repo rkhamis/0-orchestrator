@@ -19,7 +19,7 @@ func (api NodeAPI) ExitZerotier(w http.ResponseWriter, r *http.Request) {
 		"actions": []map[string]string{{
 			"action":  "leave",
 			"actor":   "zerotier",
-			"service": zerotierID,
+			"service": fmt.Sprintf("%s_%s", nodeID, zerotierID),
 		}},
 	}
 

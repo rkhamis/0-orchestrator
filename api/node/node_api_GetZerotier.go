@@ -15,9 +15,10 @@ func (api NodeAPI) GetZerotier(w http.ResponseWriter, r *http.Request) {
 	var respBody Zerotier
 
 	vars := mux.Vars(r)
+	nodeID := vars["nodeid"]
 	zerotierID := vars["zerotierid"]
 
-	srv, res, err := api.AysAPI.Ays.GetServiceByName(zerotierID, "zerotier", api.AysRepo, nil, nil)
+	srv, res, err := api.AysAPI.Ays.GetServiceByName(fmt.Sprintf("%s_%s", nodeID, zerotierID), "zerotier", api.AysRepo, nil, nil)
 	if !tools.HandleAYSResponse(err, res, w, fmt.Sprintf("getting zerotier %s details", zerotierID)) {
 		return
 	}
