@@ -9,6 +9,8 @@ import (
 // Start a new process in this container
 func (api NodeAPI) StartContainerProcess(w http.ResponseWriter, r *http.Request) {
 	var reqBody CoreSystem
+	// nodeid := mux.Vars(r)["nodeid"]
+	// containerid := mux.Vars(r)["containerid"]
 
 	// decode request
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
@@ -22,4 +24,7 @@ func (api NodeAPI) StartContainerProcess(w http.ResponseWriter, r *http.Request)
 		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
 		return
 	}
+	// TODO: implement
+	// w.Header().Set("Location", fmt.Sprintf("/nodes/%s/containers/%s/processes/%s", nodeid, containerid, reqBody.))
+	w.WriteHeader(http.StatusAccepted)
 }

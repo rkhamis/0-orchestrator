@@ -33,15 +33,15 @@ func (api NodeAPI) UpdateVM(w http.ResponseWriter, r *http.Request) {
 	vmid := vars["vmid"]
 
 	bp := struct {
-		Memory          int         `json:"memory"`
-		Cpu             int         `json:"cpu"`
-		Nic             []NicLink   `json:"nic"`
-		Disks           []VDiskLink `json:"disks"`
+		Memory int         `json:"memory"`
+		Cpu    int         `json:"cpu"`
+		Nics   []NicLink   `json:"nics"`
+		Disks  []VDiskLink `json:"disks"`
 	}{
-		Memory:          reqBody.Memory,
-		Cpu:             reqBody.Cpu,
-		Nic:             reqBody.Nics,
-		Disks:           reqBody.Disks,
+		Memory: reqBody.Memory,
+		Cpu:    reqBody.Cpu,
+		Nics:   reqBody.Nics,
+		Disks:  reqBody.Disks,
 	}
 
 	obj := make(map[string]interface{})

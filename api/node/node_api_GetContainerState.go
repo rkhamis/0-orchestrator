@@ -30,5 +30,7 @@ func (api NodeAPI) GetContainerState(w http.ResponseWriter, r *http.Request) {
 		Vms:  stats.VMS,
 		Swap: stats.Swap,
 	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(&respBody)
 }

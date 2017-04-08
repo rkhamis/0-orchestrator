@@ -37,6 +37,7 @@ func (api NodeAPI) GetMemInfo(w http.ResponseWriter, r *http.Request) {
 	respBody.UsedPercent = result.UsedPercent
 	respBody.Wired = int(result.Wired)
 
-	w.Header().Set("content-type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(&respBody)
 }

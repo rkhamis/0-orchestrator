@@ -31,7 +31,7 @@ func (api NodeAPI) GetNodeJob(w http.ResponseWriter, r *http.Request) {
 			StartTime: process.StartTime,
 			State:     EnumJobResultStaterunning,
 		}
-		w.Header().Set("content-type", "application/json")
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(&respBody)
 		return
 	}
@@ -48,7 +48,7 @@ func (api NodeAPI) GetNodeJob(w http.ResponseWriter, r *http.Request) {
 			Stdout:    process.Streams.Stdout(),
 			State:     EnumJobResultState(process.State),
 		}
-		w.Header().Set("content-type", "application/json")
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(&respBody)
 		return
 	}

@@ -36,6 +36,7 @@ func (api NodeAPI) FileUpload(w http.ResponseWriter, r *http.Request) {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
+	defer fd.Close()
 
 	container, err := tools.GetContainerConnection(r, api)
 	if err != nil {
@@ -48,4 +49,5 @@ func (api NodeAPI) FileUpload(w http.ResponseWriter, r *http.Request) {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
+	w.WriteHeader(http.StatusNoContent)
 }

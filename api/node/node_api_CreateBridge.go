@@ -54,6 +54,6 @@ func (api NodeAPI) CreateBridge(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Location", fmt.Sprintf("/node/%s/bridge/%s", nodeid, reqBody.Name))
+	w.Header().Set("Location", fmt.Sprintf("/nodes/%s/bridge/%s", nodeid, reqBody.Name))
 	w.WriteHeader(http.StatusCreated)
 }

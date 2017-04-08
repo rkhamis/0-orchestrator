@@ -22,4 +22,5 @@ func (api NodeAPI) SendSignalProcess(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
 		return
 	}
+	w.WriteHeader(http.StatusNoContent)
 }

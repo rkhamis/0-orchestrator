@@ -25,7 +25,8 @@ func (api NodeAPI) FileDownload(w http.ResponseWriter, r *http.Request) {
 
 	fs := client.Filesystem(container)
 
-	w.Header().Set("content-type", "application/octet-stream")
+	w.Header().Set("Content-Type", "application/octet-stream")
+	w.WriteHeader(http.StatusOK)
 	if err := fs.Download(path, w); err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 	}

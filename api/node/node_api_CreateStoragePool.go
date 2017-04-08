@@ -54,7 +54,6 @@ func (api NodeAPI) CreateStoragePool(w http.ResponseWriter, r *http.Request) {
 		tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Location", fmt.Sprintf("/nodes/%s/storagepools/%s", node, reqBody.Name))
 	w.WriteHeader(http.StatusCreated)
 }

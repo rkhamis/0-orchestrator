@@ -62,7 +62,8 @@ func (api NodeAPI) GetContainerJob(w http.ResponseWriter, r *http.Request) {
 			State:     EnumJobResultState(process.State),
 		}
 
-		w.Header().Set("content-type", "application/json")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(&respBody)
 		return
 	}

@@ -15,6 +15,8 @@ import (
 // Create a new readonly filesystem of the current state of the volume
 func (api NodeAPI) CreateSnapshot(w http.ResponseWriter, r *http.Request) {
 	filessytem := mux.Vars(r)["filesystemname"]
+	nodeid := mux.Vars(r)["nodeid"]
+	storagepool := mux.Vars(r)["storagepoolname"]
 
 	var name string
 
@@ -43,4 +45,6 @@ func (api NodeAPI) CreateSnapshot(w http.ResponseWriter, r *http.Request) {
 		log.Errorf("Error executing blueprint for fssnapshot creation : %+v", err.Error())
 		tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)
 	}
+	w.Header().Set("Location", fmt.Sprintf("/nodes/%s/storagepools/%s/filesystems/%s/snapshots/%s", nodeid, storagepool, filessytem, name))
+	w.WriteHeader(http.StatusCreated)
 }

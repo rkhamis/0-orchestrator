@@ -48,6 +48,6 @@ func (api NodeAPI) CreateFilesystem(w http.ResponseWriter, r *http.Request) {
 		tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)
 	}
 
-	w.Header().Set("Location", fmt.Sprintf("/node/%s/storagepool/%s/filesystem/%s", nodeid, storagepool, reqBody.Name))
+	w.Header().Set("Location", fmt.Sprintf("/nodes/%s/storagepools/%s/filesystems/%s", nodeid, storagepool, reqBody.Name))
 	w.WriteHeader(http.StatusCreated)
 }
