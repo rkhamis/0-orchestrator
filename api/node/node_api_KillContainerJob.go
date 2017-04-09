@@ -22,7 +22,7 @@ func (api NodeAPI) KillContainerJob(w http.ResponseWriter, r *http.Request) {
 	}
 	core := client.Core(container)
 
-	if err := core.Kill(jobID, syscall.SIGKILL); err != nil {
+	if err := core.KillJob(jobID, syscall.SIGKILL); err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}

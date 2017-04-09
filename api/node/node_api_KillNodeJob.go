@@ -22,7 +22,7 @@ func (api NodeAPI) KillNodeJob(w http.ResponseWriter, r *http.Request) {
 
 	core := client.Core(cl)
 
-	if err := core.Kill(client.JobId(jobID), syscall.SIGKILL); err != nil {
+	if err := core.KillJob(client.JobId(jobID), syscall.SIGKILL); err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}

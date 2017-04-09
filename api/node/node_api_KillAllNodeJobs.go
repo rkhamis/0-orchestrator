@@ -18,7 +18,7 @@ func (api NodeAPI) KillAllNodeJobs(w http.ResponseWriter, r *http.Request) {
 
 	core := client.Core(cl)
 
-	if err := core.KillAll(); err != nil {
+	if err := core.KillAllJobs(); err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
