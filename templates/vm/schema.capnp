@@ -6,7 +6,7 @@ struct Schema {
     id @2: Text;
     memory @3: UInt16; # Amount of memory in MiB
     cpu @4: UInt16; # Number of virtual CUPs
-    nic @5: List(NicLink);
+    nics @5: List(NicLink);
     disks @6: List(DiskLink);
     volumes @7: List(Text); # consume volume services, should not be set via blueprint, will be calculated from disks
     userCloudInit @7: Text;
