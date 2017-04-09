@@ -12,15 +12,10 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Get storage pool service data, of the same node
-// Get the devices list from their data
-// if empty make it empty slice
-// From the text get data u needed for
-//  Handle errors from all
-
 // ListStoragePoolDevices is the handler for GET /nodes/{nodeid}/storagepools/{storagepoolname}/devices
 // Lists the devices in the storage pool
 func (api NodeAPI) ListStoragePoolDevices(w http.ResponseWriter, r *http.Request) {
+	// TODO: Device Status is missing
 	var respBody []StoragePoolDevice
 
 	vars := mux.Vars(r)

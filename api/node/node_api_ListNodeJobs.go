@@ -18,7 +18,7 @@ func (api NodeAPI) ListNodeJobs(w http.ResponseWriter, r *http.Request) {
 	}
 
 	core := client.Core(cl)
-	processes, err := core.Processes()
+	processes, err := core.Jobs()
 
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)

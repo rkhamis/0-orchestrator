@@ -13,7 +13,7 @@ import (
 // Kills the job
 func (api NodeAPI) KillContainerJob(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	jobID := client.Job(vars["jobid"])
+	jobID := client.JobId(vars["jobid"])
 
 	container, err := tools.GetContainerConnection(r, api)
 	if err != nil {

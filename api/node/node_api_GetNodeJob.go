@@ -14,7 +14,7 @@ import (
 func (api NodeAPI) GetNodeJob(w http.ResponseWriter, r *http.Request) {
 	var respBody JobResult
 	vars := mux.Vars(r)
-	jobID := client.Job(vars["jobid"])
+	jobID := client.JobId(vars["jobid"])
 	cl, err := tools.GetConnection(r, api)
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
@@ -24,7 +24,7 @@ func (api NodeAPI) GetNodeJob(w http.ResponseWriter, r *http.Request) {
 	core := client.Core(cl)
 
 	// Check first if the job is running and return
-	if process, _ := core.Process(jobID); process != nil {
+	if process, _ := core.Job(jobID); process != nil {
 		respBody = JobResult{
 			Id:        process.Command.ID,
 			Name:      EnumJobResultName(process.Command.Command),

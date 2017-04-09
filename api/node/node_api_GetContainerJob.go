@@ -16,7 +16,7 @@ func (api NodeAPI) GetContainerJob(w http.ResponseWriter, r *http.Request) {
 	var respBody JobResult
 
 	vars := mux.Vars(r)
-	jobID := client.Job(vars["jobid"])
+	jobID := client.JobId(vars["jobid"])
 
 	container, err := tools.GetContainerConnection(r, api)
 	if err != nil {
@@ -27,7 +27,7 @@ func (api NodeAPI) GetContainerJob(w http.ResponseWriter, r *http.Request) {
 	core := client.Core(container)
 
 	// Check first if the job is running and return
-	if process, _ := core.Process(jobID); process != nil {
+	if process, _ := core.Job(jobID); process != nil {
 		respBody = JobResult{
 			Id:        process.Command.ID,
 			Name:      EnumJobResultName(process.Command.Command),
