@@ -21,13 +21,12 @@ func (api NodeAPI) ListNodes(w http.ResponseWriter, r *http.Request) {
 
 	var respBody = make([]Node, len(services))
 	for i, service := range services {
-		node := Node{
-			Id: service.Name,
-		}
+		var node Node
 		if err := json.Unmarshal(service.Data, &node); err != nil {
 			tools.WriteError(w, http.StatusInternalServerError, err)
 			return
 		}
+		node.Id = service.Name
 
 		respBody[i] = node
 	}
