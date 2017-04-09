@@ -49,7 +49,7 @@ func (api NodeAPI) CreateVM(w http.ResponseWriter, r *http.Request) {
 		Node            string      `json:"node"`
 		Memory          int         `json:"memory"`
 		Cpu             int         `json:"cpu"`
-		Nic             []NicLink   `json:"nic"`
+		Nics            []NicLink   `json:"nics"`
 		Disks           []VDiskLink `json:"disks"`
 		UserCloudInit   string      `json:"userCloudInit"`
 		SystemCloudInit string      `json:"systemCloudInit"`
@@ -57,7 +57,7 @@ func (api NodeAPI) CreateVM(w http.ResponseWriter, r *http.Request) {
 		Node:            nodeid,
 		Memory:          reqBody.Memory,
 		Cpu:             reqBody.Cpu,
-		Nic:             reqBody.Nics,
+		Nics:            reqBody.Nics,
 		Disks:           reqBody.Disks,
 		UserCloudInit:   string(userCloudInit),
 		SystemCloudInit: string(systemCloudInit),
