@@ -13,7 +13,6 @@ import (
 // GetContainerProcess is the handler for GET /nodes/{nodeid}/container/{containerid}/process/{proccessid}
 // Get process details
 func (api NodeAPI) GetContainerProcess(w http.ResponseWriter, r *http.Request) {
-	var respBody Process
 	vars := mux.Vars(r)
 	conn, err := tools.GetContainerConnection(r, api)
 	if err != nil {
@@ -21,26 +20,42 @@ func (api NodeAPI) GetContainerProcess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmp, err := strconv.ParseUint(vars["processid"], 10, 64)
+	pId, err := strconv.ParseUint(vars["proccessid"], 10, 64)
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	processID := client.ProcessId(tmp)
+	processID := client.ProcessId(pId)
 	core := client.Core(conn)
-	clprocess, err := core.Process(processID)
+	process, err := core.Process(processID)
 
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
-	respBody.Cmd = clprocess.Command
-	// respBody.Cpu = #TODO:
-	respBody.Pid = uint64(clprocess.PID)
-	respBody.Rss = clprocess.RSS
-	respBody.Swap = clprocess.Swap
-	respBody.Vms = clprocess.VMS
+
+	cpu := CPUStats{
+		GuestNice: process.Cpu.GuestNice,
+		Idle:      process.Cpu.Idle,
+		IoWait:    process.Cpu.IoWait,
+		Irq:       process.Cpu.Irq,
+		Nice:      process.Cpu.Nice,
+		SoftIrq:   process.Cpu.SoftIrq,
+		Steal:     process.Cpu.Steal,
+		Stolen:    process.Cpu.Stolen,
+		System:    process.Cpu.System,
+		User:      process.Cpu.User,
+	}
+
+	respBody := Process{
+		Cmdline: process.Command,
+		Cpu:     cpu,
+		Pid:     pId,
+		Rss:     process.RSS,
+		Swap:    process.Swap,
+		Vms:     process.VMS,
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

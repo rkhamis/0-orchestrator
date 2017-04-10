@@ -194,11 +194,53 @@ DeleteFile:
       displayName: Path on the target system where the file should be written
       type: string
 
+CPUStats:
+  description: cpu time stats of all cpus combined
+  type: object
+  properties:
+    user:
+      description: The time the process spent running in user space
+      type: number
+      format: float
+    system:
+      description: The time the process spent running in kernel
+      type: number
+      format: float
+    idle:
+      description: The time the process spent idle
+      type: number
+      format: float
+    nice:
+      description: The time the niced process spent running in user space
+      type: number
+      format: float
+    ioWait:
+      description: The time the process spent idle waiting for I/O operation to complete
+      type: number
+      format: float
+    irq:
+      description: The time the process spent servicing hardware interrupts
+      type: number
+      format: float
+    softIrq:
+      description: The time the process spent servicing software interrupts
+      type: number
+      format: float
+    steal:
+      type: number
+      format: float
+    guestNice:
+      type: number
+      format: float
+    stolen:
+      type: number
+      format: float
+
 Process:
   type: object
   properties:
-    cmd: string
-    cpu: number
+    cmdline: string
+    cpu: CPUStats
     pid: 
       type: number
       format: int64

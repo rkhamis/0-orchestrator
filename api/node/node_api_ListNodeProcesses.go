@@ -20,20 +20,33 @@ func (api NodeAPI) ListNodeProcesses(w http.ResponseWriter, r *http.Request) {
 	}
 
 	core := client.Core(conn)
-	clprocesses, err := core.Processes()
+	processes, err := core.Processes()
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	for _, clprocess := range clprocesses {
+	for _, process := range processes {
+
+		cpu := CPUStats{
+			GuestNice: process.Cpu.GuestNice,
+			Idle:      process.Cpu.Idle,
+			IoWait:    process.Cpu.IoWait,
+			Irq:       process.Cpu.Irq,
+			Nice:      process.Cpu.Nice,
+			SoftIrq:   process.Cpu.SoftIrq,
+			Steal:     process.Cpu.Steal,
+			Stolen:    process.Cpu.Stolen,
+			System:    process.Cpu.System,
+			User:      process.Cpu.User,
+		}
 		pr := Process{
-			Cmd: clprocess.Command,
-			// Cpu : # TODO:,
-			Pid:  uint64(clprocess.PID),
-			Rss:  clprocess.RSS,
-			Swap: clprocess.Swap,
-			Vms:  clprocess.VMS,
+			Cmdline: process.Command,
+			Cpu:     cpu,
+			Pid:     uint64(process.PID),
+			Rss:     process.RSS,
+			Swap:    process.Swap,
+			Vms:     process.VMS,
 		}
 		respBody = append(respBody, pr)
 	}
