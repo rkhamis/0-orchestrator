@@ -3,8 +3,9 @@ package node
 import (
 	"encoding/json"
 	"fmt"
-	log "github.com/Sirupsen/logrus"
 	"net/http"
+
+	log "github.com/Sirupsen/logrus"
 
 	"github.com/g8os/grid/api/tools"
 	"github.com/gorilla/mux"
@@ -31,16 +32,15 @@ func (api NodeAPI) CreateContainer(w http.ResponseWriter, r *http.Request) {
 	nodeId := vars["nodeid"]
 
 	container := struct {
-		Nics           []ContainerNIC            `json:"nics"`
-		Filesystems    []string                  `json:"filesystems"`
-		Flist          string                    `json:"flist"`
-		HostNetworking bool                      `json:"hostNetworking"`
-		Hostname       string                    `json:"hostname"`
-		Node           string                    `json:"node"`
-		InitProcesses  []CoreSystem              `json:"initProcesses"`
-		Ports          []string                  `json:"ports"`
-		Status         EnumCreateContainerStatus `json:"status"`
-		Storage        string                    `json:"storage"`
+		Nics           []ContainerNIC `json:"nics"`
+		Filesystems    []string       `json:"filesystems"`
+		Flist          string         `json:"flist"`
+		HostNetworking bool           `json:"hostNetworking"`
+		Hostname       string         `json:"hostname"`
+		Node           string         `json:"node"`
+		InitProcesses  []CoreSystem   `json:"initProcesses"`
+		Ports          []string       `json:"ports"`
+		Storage        string         `json:"storage"`
 	}{
 		Nics:           reqBody.Nics,
 		Filesystems:    reqBody.Filesystems,
@@ -50,7 +50,6 @@ func (api NodeAPI) CreateContainer(w http.ResponseWriter, r *http.Request) {
 		InitProcesses:  reqBody.InitProcesses,
 		Node:           nodeId,
 		Ports:          reqBody.Ports,
-		Status:         reqBody.Status,
 		Storage:        reqBody.Storage,
 	}
 

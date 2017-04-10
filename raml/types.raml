@@ -439,9 +439,6 @@ CreateContainer:
     id:
       description: unique identifier
       type: string
-    status:
-      enum: [running, halted]
-      description: Status of the container
     hostname:
       description: Hostname for the Container
       type: string
@@ -451,6 +448,7 @@ CreateContainer:
     initProcesses:
       type: CoreSystem[]
       description: Definition of the processes to start in the container
+      required: false
     filesystems:
       description: |
         List of filesystems that will be exposed to the container
@@ -462,6 +460,7 @@ CreateContainer:
     nics:
       type: ContainerNIC[]
       description: List of container nics
+      required: false
     hostNetworking:
       type: boolean
       description: Make host networking available to the guest. If true means that the container will be able participate in the networks available in the host operating system.
@@ -470,8 +469,11 @@ CreateContainer:
       description: |
         List of node to container post mappings.
       example: ['10022:22', '8080:80']
+      required: false
+      default: []
     storage:
       type: string
+      required: false
       description: A Url to the ardb storage to use to mount the root plist
 
 JobListItem:

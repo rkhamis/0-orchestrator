@@ -7,16 +7,6 @@ links:
   consume:
     - auto: false
       min: 0
-      max: 1
-      role: zerotier
-      argname: zerotier
-    - auto: false
-      min: 0
-      max: 9999
-      role: bridge
-      argname: bridges
-    - auto: false
-      min: 0
       max: 9999
       role: filesystem
       argname: filesystems
