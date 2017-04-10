@@ -9,8 +9,8 @@ struct Schema {
     nics @5: List(NicLink);
     disks @6: List(DiskLink);
     volumes @7: List(Text); # consume volume services, should not be set via blueprint, will be calculated from disks
-    userCloudInit @7: Text;
-    systemCloudInit @8: Text;
+    userCloudInit @8: Text;
+    systemCloudInit @9: Text;
 
     enum Status{
         running @0;
