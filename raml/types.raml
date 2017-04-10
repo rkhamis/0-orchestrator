@@ -197,14 +197,20 @@ DeleteFile:
 Process:
   type: object
   properties:
-    cmd: Job
-    pid: integer
-    name: string
+    cmd: string
     cpu: number
-    debug: string
-    rss: number
-    swap: number
-    vms: number
+    pid: 
+      type: number
+      format: int64
+    rss: 
+      type: number
+      format: int64
+    swap: 
+      type: number
+      format: int64
+    vms: 
+      type: number
+      format: int64
 
 ProcessSignal:
   type: object
