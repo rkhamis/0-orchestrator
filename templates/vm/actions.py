@@ -1,3 +1,14 @@
+def input(job):
+    # Check the blueprint input for errors
+    args = job.model.args
+    if args.get('volumes'):
+        raise j.exceptions.Input('volumes property should not be set in the blueprint. Instead use disks property.')
+    disks = args.get("disks", [])
+    if disks:
+        args['volumes'] = [disk['volumeid'] for disk in disks]
+    return args
+
+
 def get_node_client(service):
     node = service.parent
     return j.clients.g8core.get(host=node.model.data.redisAddr,
@@ -99,14 +110,13 @@ def install(job):
         service.name,
         media=medias,
         cpu=service.model.data.cpu,
-        memory=service.model.data.memory,
+        memory=service.model.data.memory
         # port=None, #TODO
         # bridge=None #TODO
     )
 
     # TODO: test vm actually exists
     service.model.data.status = 'running'
-
 
 def start(job):
     service = job.service
@@ -180,6 +190,37 @@ def migrate(job):
     j.tools.async.wrappers.sync(old_volume_container.delete())
 
 
+def updatedevices(service, client, args):
+    # mean we want to migrate vm from a node to another
+    if 'node' in args and args['node'] != service.model.data.node:
+        j.tools.async.wrappers.sync(service.executeAction('migrate', args={'node': args['node']}))
+    if 'disks' in args['disks'] != service.model.data.disks:
+            new_disks = set(args['disks'])-set(service.model.data.disks)
+            if new_disks:
+                new_disks = list(new_disks)
+                for new_disk in new_disks:
+                    client.experimental.kvm.attachDisk(service.name, new_disk)
+            old_disks = set(service.model.data.disks)-set(args['disks'])
+            if old_disks:
+                old_disks = list(old_disks)
+                for old_disk in old_disks:
+                    client.experimental.kvm.detachDisk(service.name, old_disk)
+
+# TODO removeNic and addNic not implmented as required code will be added when they are done.
+    # if 'nics' in args['nics'] != service.model.data.nics:
+    #     bp_nics = [(nic.id, nic.type) for nic in args['nics']]
+    #     loaded_nics = [(nic.id, nic.type) for nic in service.model.data.nics]
+    #     nics = set(bp_nics) - set(loaded_nics)
+    #     if nics:
+    #         nics = list(nics)
+    #         for nic in nics:
+    #             client.experimental.kvm.addNic(service.name, nic)
+    #     nics = set(loaded_nics) - set(bp_nics)
+    #     if nics:
+    #         nics = list(nics)
+    #         for nic in nics:
+    #             client.experimental.kvm.removeNic(service.name, nic)
+
 
 def monitor(job):
     pass
@@ -191,6 +232,9 @@ def processChange(job):
     args = job.model.args
     category = args.pop('changeCategory')
     if category == "dataschema" and service.model.actionsState['install'] == 'ok':
-        # mean we want to migrate vm from a node to another
-        if 'node' in args and args['node'] != service.model.data.node:
-            j.tools.async.wrappers.sync(service.executeAction('migrate', args={'node': args['node']}))
+        try:
+            client = get_node_client(service)
+            updatedevices(service, client, args)
+        except ValueError:
+            job.logger.error("vm {} doesn't exist, cant update devices", service.name)
+

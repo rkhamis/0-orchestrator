@@ -1,21 +1,16 @@
 @0x9e3b2bd4c67f73e9;
 
 struct Schema {
-    node @0 :Text; # pointer to the parent service
-    status @1 :Status;
-    id @2 :Text;
-    memory @3 :UInt16; # Amount of memory in MiB
-    cpu @4 :UInt16; # Number of virtual CUPs
-    nic @5 :List(Text);
-    # # List of nic specifications.
-    # # Possible formats:
-    # # - "VxLAN:<<VxLAN id>>"
-    # # eg "VxLAN:200" Attaches the nic to VxLan 200
-    # # - "Zerotier:<<Zerotier network id>>"
-    # # eg "Zerotier:fsjyhgu76fsd87ydzf86t7dfygis" Attaches the nic to Zerotier network fsjyhgu76fsd87ydzf86t7dfygis
-    disks @6 :List(Text); # consume volume services
-    userCloudInit @7 :Text;
-    systemCloudInit @8:Text;
+    node @0: Text; # pointer to the parent service
+    status @1: Status;
+    id @2: Text;
+    memory @3: UInt16; # Amount of memory in MiB
+    cpu @4: UInt16; # Number of virtual CUPs
+    nics @5: List(NicLink);
+    disks @6: List(DiskLink);
+    volumes @7: List(Text); # consume volume services, should not be set via blueprint, will be calculated from disks
+    userCloudInit @8: Text;
+    systemCloudInit @9: Text;
 
     enum Status{
         running @0;
@@ -23,6 +18,23 @@ struct Schema {
         paused @2;
         halting @3;
         migrating @4;
+    }
+
+    struct NicLink {
+      id @0: Text; # VxLan or VLan id
+      type @1: NicType;
+      macaddress @2: Text;
+    }
+
+    struct DiskLink {
+      volumeid @0: Text;
+      maxIOps @2: UInt32;
+    }
+
+    enum NicType {
+      default @0;
+      vlan @1;
+      vxlan @2;
     }
 
 }

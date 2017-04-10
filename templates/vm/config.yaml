@@ -9,7 +9,7 @@ links:
       min: 0
       max: 9999
       role: volume
-      argname: disks
+      argname: volumes
 
 recurring:
   - action: monitor

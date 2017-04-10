@@ -1,6 +1,20 @@
 from JumpScale import j
 
 
+def init(job):
+    service = job.service
+    node = j.sal.g8os.get_node(
+        addr=service.model.data.redisAddr,
+        port=service.model.data.redisPort,
+        password=service.model.data.redisPassword or None,
+    )
+
+    job.logger.info("create storage pool for fuse cache")
+    poolname = "{}_fscache".format(service.name)
+
+    storagepool = node.ensure_persistance(poolname)
+    storagepool.ays.create(service.aysrepo)
+
 def install(job):
     import asyncio
 
@@ -12,24 +26,16 @@ def install(job):
         password=service.model.data.redisPassword or None,
     )
 
-    job.logger.info("create storage pool for fuse cache")
-    poolname = "{}_fsache".format(service.name)
-    storagepool = node.ensure_persistance(poolname)
-    actor_storagepool = service.aysrepo.actorGet('storagepool')
-    sp_args = {
-        'status': 'healthy',
-        'totalCapacity': storagepool.size,
-        'freeCapacity': storagepool.size - storagepool.used,
-        'metadataProfile': storagepool.fsinfo['metadata']['profile'],
-        'dataProfile': storagepool.fsinfo['data']['profile'],
-        'mountpoint': storagepool.mountpoint,
-        'devices': storagepool.devices,
-        'node': service.name,
-    }
-    actor_storagepool.serviceCreate(instance=poolname, args=sp_args)
+    job.logger.info("mout storage pool for fuse cache")
+    poolname = "{}_fscache".format(service.name)
+    node.ensure_persistance(poolname)
 
     job.logger.info("configure networks")
-    loop = asyncio.get_event_loop()
+    try:
+        loop = asyncio.get_event_loop()
+    except:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
     futures = []
     for network in service.producers.get('network', []):
         job = network.getJob('configure', args={'node_name': service.name})

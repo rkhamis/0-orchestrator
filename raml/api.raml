@@ -222,7 +222,7 @@ types:
     /storagepools:
       get:
         (AYSBased):
-        displayName: GetStoragePools
+        displayName: ListStoragePools
         description: List storage pools present in the node
         responses:
           200:
@@ -449,7 +449,7 @@ types:
         description: Create a new Container
         body:
           application/json:
-            type: Container
+            type: CreateContainer
         responses:
           201:
             description: Container created successfully
@@ -648,11 +648,11 @@ types:
           application/json:
             type: VMCreate
         responses:
-          200:
-            body:
-              application/json:
-                description: Runtime id of the virtual machine (process id)
-                type: integer
+          201:
+            description: VM created successfully
+            headers:
+              Location:
+                description: Url to the created vm resource
       /{vmid}:
         delete:
           (AYSBased):
@@ -670,6 +670,15 @@ types:
               body:
                 application/json:
                   type: VM
+        put:
+          displayName: UpdateVM
+          description: updates the VM
+          body:
+            application/json:
+              type: VMUpdate
+          responses:
+            204:
+              description: VM updated successfully
         /info:
           get:
             (DirectAccess):

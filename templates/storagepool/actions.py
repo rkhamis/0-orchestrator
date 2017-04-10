@@ -28,12 +28,13 @@ def install(job):
         pool = node.storagepools.create(name, devices, metadataProfile, dataProfile, overwrite=True)
 
     # mount device
-    if pool.mountpoint:
-        if pool.mountpoint != mountpoint:
-            pool.umount()
+    if mountpoint:
+        if pool.mountpoint:
+            if pool.mountpoint != mountpoint:
+                pool.umount()
+                pool.mount(mountpoint)
+        else:
             pool.mount(mountpoint)
-    else:
-        pool.mount(mountpoint)
 
     # lets check if devices need to be added removed and the profile still matches
     if pool.fsinfo['data']['profile'].lower() != dataProfile:
@@ -41,6 +42,27 @@ def install(job):
     if pool.fsinfo['metadata']['profile'].lower() != metadataProfile:
         raise RuntimeError("Metadata profile of storagepool {} does not match".format(name))
 
+    updateDevices(pool, devices)
+
+
+def delete(job):
+    service = job.service
+    pservice = service.parent
+    node = j.sal.g8os.get_node(
+        addr=pservice.model.data.redisAddr,
+        port=pservice.model.data.redisPort,
+        password=pservice.model.data.redisPassword or None,
+    )
+    name = service.name
+
+    try:
+        pool = node.storagepools.get(name)
+        pool.delete()
+    except ValueError:
+        # pool does not exists, nothing to do
+        pass
+
+def updateDevices(pool, devices):
     pooldevices = set(pool.devices)
     requireddevices = set(devices)
 
@@ -54,8 +76,7 @@ def install(job):
     if removeddevices:
         pool.device_remove(*removeddevices)
 
-
-def delete(job):
+def processChange(job):
     service = job.service
     pservice = service.parent
     node = j.sal.g8os.get_node(
@@ -63,5 +84,12 @@ def delete(job):
         port=pservice.model.data.redisPort,
         password=pservice.model.data.redisPassword or None,
     )
-    name = service.name
-    node.storagepools.destroy(name)
+
+    args = job.model.args
+    category = args.pop('changeCategory')
+    if category == "dataschema" and service.model.actionsState['install'] == 'ok':
+        try:
+            pool = node.storagepools.get(service.name)
+            updateDevices(pool, args['devices'])
+        except ValueError:
+            job.logger.error("pool {} doesn't exist, cant update devices", service.name)

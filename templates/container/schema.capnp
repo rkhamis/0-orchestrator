@@ -7,19 +7,14 @@ struct Schema {
     flist @3 :Text; # Url to the root filesystem flist
     initProcesses @4 :List(Process);
     filesystems @5 :List(Text); # pointer to the filesystem to mount into the container
-    zerotier @6 :Text; # pointer to the zerotier service to consume
-    bridges @7 :List(Text); # pointers to the bridges to consumes
-    hostNetworking @8 :Bool;
+    nics @6 :List(Nic); # Configuration of the attached nics to the container
+    hostNetworking @7 :Bool;
     # Make host networking available to the guest.
     # If true means that the container will be able participate in the networks available in the host operating system.
-    ports @9:List(Text); # List of node to container post mappings. e.g: 8080:80
-    storage @10 :Text;
-    id @11: UInt32;
-    mounts @12: List(Mount); # List mount points mapping to the container
-    enum Status{
-        running @0;
-        halted @1;
-    }
+    ports @8:List(Text); # List of node to container post mappings. e.g: 8080:80
+    storage @9 :Text;
+    id @10: UInt32;
+    mounts @11: List(Mount); # List mount points mapping to the container
 
     struct Mount {
         filesystem @0 :Text; # Instance name of a filesystem service
@@ -34,5 +29,30 @@ struct Schema {
         # Environment variables for the process.
         # e.g:  'PATH=/usr/bin/local'
         stdin @4 :Text; # Data that needs to be passed into the stdin of the started process
+    }
+
+    struct Nic {
+        type @0: NicType;
+        id @1: Text;
+        config @2: NicConfig
+    }
+
+    struct NicConfig {
+        dhcp @0: Bool;
+        cidr @0: Text;
+        gateway @1: Text;
+        dns @2: List(Text);
+    }
+
+    enum Status{
+        running @0;
+        halted @1;
+    }
+
+    enum NicType {
+        default @0;
+        zerotier @1;
+        vlan @2;
+        vxlan @3;
     }
 }
