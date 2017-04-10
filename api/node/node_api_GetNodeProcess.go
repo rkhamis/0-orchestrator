@@ -4,8 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-
-	"fmt"
+	
 	client "github.com/g8os/go-client"
 	"github.com/g8os/grid/api/tools"
 	"github.com/gorilla/mux"
