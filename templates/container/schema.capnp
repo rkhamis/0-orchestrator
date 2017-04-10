@@ -34,7 +34,7 @@ struct Schema {
     struct Nic {
         type @0: Text;
         id @1: Text;
-        nics @2: NicConfig
+        config @2: NicConfig
     }
 
     struct NicConfig {
