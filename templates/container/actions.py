@@ -26,8 +26,8 @@ def start(job):
     container = Container.from_ays(job.service)
     container.start()
 
-    running = container.is_running()
-    if running:
+    if container.is_running():
+        job.service.model.data.id = container.id
         job.service.model.data.status = "running"
     else:
         raise j.exceptions.RuntimeError("container didn't started")
@@ -39,8 +39,8 @@ def stop(job):
     container = Container.from_ays(job.service)
     container.stop()
 
-    running, _ = container.is_running()
-    if not running:
+    if not container.is_running():
+        job.service.model.data.id = 0
         job.service.model.data.status = "halted"
     else:
         raise j.exceptions.RuntimeError("container didn't stopped")
@@ -58,12 +58,16 @@ def monitor(job):
             try:
                 job.logger.warning("container {} not running, trying to restart".format(service.name))
                 service.model.dbobj.state = 'error'
+                job.service.model.data.id = 0
+
                 container.start()
-                running, _ = container.is_running()
-                if running:
+
+                if container.is_running():
+                    job.service.model.data.id = container.id
                     service.model.dbobj.state = 'ok'
             except:
                 job.logger.error("can't restart container {} not running".format(service.name))
+                service.model.dbobj.id = 0
                 service.model.dbobj.state = 'error'
         elif running and service.model.data.status == 'halted':
             try:
@@ -72,6 +76,7 @@ def monitor(job):
                 container.stop()
                 running, _ = container.is_running()
                 if not running:
+                    job.service.model.data.id = 0
                     service.model.dbobj.state = 'ok'
             except:
                 job.logger.error("can't stop container {} is running".format(service.name))
