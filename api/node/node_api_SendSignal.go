@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// SendSignal is the handler for POST /nodes/{nodeid}/containers/{containerid}/processes/{proccessid}
+// SendSignal is the handler for POST /nodes/{nodeid}/containers/{containerid}/processes/{processid}
 // Send signal to the process
 func (api NodeAPI) SendSignal(w http.ResponseWriter, r *http.Request) {
 	var reqBody ProcessSignal

@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// GetNodeProcess is the handler for GET /nodes/{nodeid}/process/{proccessid}
+// GetNodeProcess is the handler for GET /nodes/{nodeid}/processes/{processid}
 // Get process details
 func (api NodeAPI) GetNodeProcess(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -20,7 +20,7 @@ func (api NodeAPI) GetNodeProcess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pId, err := strconv.ParseUint(vars["proccessid"], 10, 64)
+	pId, err := strconv.ParseUint(vars["processid"], 10, 64)
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return

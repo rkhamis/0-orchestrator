@@ -162,7 +162,7 @@ types:
              body:
                application/json:
                  type: Process[]
-       /{proccessid}:
+       /{processid}:
          get:
            (DirectAccess):
            displayName: GetNodeProcess
@@ -606,7 +606,7 @@ types:
                  headers:
                    Location:
                      description: Url to the job object handling this request
-           /{proccessid}:
+           /{processid}:
              get:
                (DirectAccess):
                displayName: GetContainerProcess

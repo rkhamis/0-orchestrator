@@ -190,13 +190,13 @@ type NodesInterface interface { // ListNodes is the handler for GET /node
 	// StartContainerProcess is the handler for POST /node/{nodeid}/containers/{containerid}/processes
 	// Start a new process in this container
 	StartContainerProcess(http.ResponseWriter, *http.Request)
-	// GetContainerProcess is the handler for GET /node/{nodeid}/containers/{containerid}/processes/{proccessid}
+	// GetContainerProcess is the handler for GET /node/{nodeid}/containers/{containerid}/processes/{processid}
 	// Get process details
 	GetContainerProcess(http.ResponseWriter, *http.Request)
-	// SendSignalProcess is the handler for POST /node/{nodeid}/containers/{containerid}/processes/{proccessid}
+	// SendSignalProcess is the handler for POST /node/{nodeid}/containers/{containerid}/processes/{processid}
 	// Send signal to the process
 	SendSignalProcess(http.ResponseWriter, *http.Request)
-	// KillContainerProcess is the handler for DELETE /node/{nodeid}/containers/{containerid}/processes/{proccessid}
+	// KillContainerProcess is the handler for DELETE /node/{nodeid}/containers/{containerid}/processes/{processid}
 	// Kill Process
 	KillContainerProcess(http.ResponseWriter, *http.Request)
 	// FileDownload is the handler for GET /node/{nodeid}/containers/{containerid}/filesystems
@@ -211,10 +211,10 @@ type NodesInterface interface { // ListNodes is the handler for GET /node
 	// ListNodeProcesses is the handler for GET /node/{nodeid}/processes
 	// Get Processes
 	ListNodeProcesses(http.ResponseWriter, *http.Request)
-	// GetNodeProcess is the handler for GET /node/{nodeid}/processes/{proccessid}
+	// GetNodeProcess is the handler for GET /node/{nodeid}/processes/{processid}
 	// Get process details
 	GetNodeProcess(http.ResponseWriter, *http.Request)
-	// KillNodeProcess is the handler for DELETE /node/{nodeid}/processes/{proccessid}
+	// KillNodeProcess is the handler for DELETE /node/{nodeid}/processes/{processid}
 	// Kill Process
 	KillNodeProcess(http.ResponseWriter, *http.Request)
 	// PingNode is the handler for POST /node/{nodeid}/ping
@@ -296,15 +296,15 @@ func NodesInterfaceRoutes(r *mux.Router, i NodesInterface) {
 	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}/info", i.GetContainerOSInfo).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}/processes", i.ListContainerProcesses).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}/processes", i.StartContainerProcess).Methods("POST")
-	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}/processes/{proccessid}", i.GetContainerProcess).Methods("GET")
-	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}/processes/{proccessid}", i.SendSignalProcess).Methods("POST")
-	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}/processes/{proccessid}", i.KillContainerProcess).Methods("DELETE")
+	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}/processes/{processid}", i.GetContainerProcess).Methods("GET")
+	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}/processes/{processid}", i.SendSignalProcess).Methods("POST")
+	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}/processes/{processid}", i.KillContainerProcess).Methods("DELETE")
 	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}/filesystems", i.FileDownload).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}/filesystems", i.FileUpload).Methods("POST")
 	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}/filesystems", i.FileDelete).Methods("DELETE")
 	r.HandleFunc("/nodes/{nodeid}/processes", i.ListNodeProcesses).Methods("GET")
-	r.HandleFunc("/nodes/{nodeid}/processes/{proccessid}", i.GetNodeProcess).Methods("GET")
-	r.HandleFunc("/nodes/{nodeid}/processes/{proccessid}", i.KillNodeProcess).Methods("DELETE")
+	r.HandleFunc("/nodes/{nodeid}/processes/{processid}", i.GetNodeProcess).Methods("GET")
+	r.HandleFunc("/nodes/{nodeid}/processes/{processid}", i.KillNodeProcess).Methods("DELETE")
 	r.HandleFunc("/nodes/{nodeid}/ping", i.PingNode).Methods("POST")
 	r.HandleFunc("/nodes/{nodeid}/reboot", i.RebootNode).Methods("POST")
 	r.HandleFunc("/nodes/{nodeid}/cpus", i.GetCPUInfo).Methods("GET")

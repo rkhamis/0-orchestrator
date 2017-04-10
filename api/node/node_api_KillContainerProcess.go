@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-// KillContainerProcess is the handler for DELETE /nodes/{nodeid}/container/{containerid}/process/{proccessid}
+// KillContainerProcess is the handler for DELETE /nodes/{nodeid}/containers/{containerid}/processes/{processid}
 // Kill Process
 func (api NodeAPI) KillContainerProcess(w http.ResponseWriter, r *http.Request) {
 }
