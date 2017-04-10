@@ -32,7 +32,7 @@ struct Schema {
     }
 
     struct Nic {
-        type @0: Text;
+        type @0: NicType;
         id @1: Text;
         config @2: NicConfig
     }
