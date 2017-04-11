@@ -2,15 +2,20 @@ package node
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	str "strings"
+
+	client "github.com/g8os/go-client"
+	"github.com/g8os/grid/api/tools"
+	"github.com/gorilla/mux"
 )
 
 // StartContainerProcess is the handler for POST /nodes/{nodeid}/containers/{containerid}/processes
 // Start a new process in this container
 func (api NodeAPI) StartContainerProcess(w http.ResponseWriter, r *http.Request) {
 	var reqBody CoreSystem
-	// nodeid := mux.Vars(r)["nodeid"]
-	// containerid := mux.Vars(r)["containerid"]
+	var env map[string]string
 
 	// decode request
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
@@ -24,7 +29,25 @@ func (api NodeAPI) StartContainerProcess(w http.ResponseWriter, r *http.Request)
 		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
 		return
 	}
-	// TODO: implement
-	// w.Header().Set("Location", fmt.Sprintf("/nodes/%s/containers/%s/processes/%s", nodeid, containerid, reqBody.))
+
+	for _, item := range reqBody.Environment {
+		items := str.Split(item, "=")
+		env[items[0]] = items[1]
+	}
+
+	containerClient, err := tools.GetContainerConnection(r, api)
+	if err != nil {
+		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	core := client.Core(containerClient)
+
+	jobID, err := core.SystemArgs(reqBody.Name, reqBody.Args, env, reqBody.Pwd, reqBody.Stdin)
+
+	vars := mux.Vars(r)
+	nodeID := vars["nodeid"]
+	containerID := vars["containerid"]
+	w.Header().Set("Location", fmt.Sprintf("/nodes/%s/containers/%s/jobs/%s", nodeID, containerID, jobID))
 	w.WriteHeader(http.StatusAccepted)
 }
