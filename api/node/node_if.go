@@ -160,6 +160,12 @@ type NodesInterface interface { // ListNodes is the handler for GET /node
 	// DeleteContainer is the handler for DELETE /node/{nodeid}/containers/{containerid}
 	// Delete Container instance
 	DeleteContainer(http.ResponseWriter, *http.Request)
+	// StopContainer is the handler for POST /nodes/{nodeid}/containers/{containerid}/stop
+	// Stop Container instance
+	StopContainer(http.ResponseWriter, *http.Request)
+	// StartContainer is the handler for POST /nodes/{nodeid}/containers/{containerid}/start
+	// Start Container instance
+	StartContainer(http.ResponseWriter, *http.Request)
 	// ListContainerJobs is the handler for GET /node/{nodeid}/containers/{containerid}/jobs
 	// List running jobs on the container
 	ListContainerJobs(http.ResponseWriter, *http.Request)
@@ -286,6 +292,8 @@ func NodesInterfaceRoutes(r *mux.Router, i NodesInterface) {
 	r.HandleFunc("/nodes/{nodeid}/containers", i.CreateContainer).Methods("POST")
 	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}", i.GetContainer).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}", i.DeleteContainer).Methods("DELETE")
+	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}/start", i.StartContainer).Methods("POST")
+	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}/stop", i.StopContainer).Methods("POST")
 	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}/jobs", i.ListContainerJobs).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}/jobs", i.KillAllContainerJobs).Methods("DELETE")
 	r.HandleFunc("/nodes/{nodeid}/containers/{containerid}/jobs/{jobid}", i.GetContainerJob).Methods("GET")

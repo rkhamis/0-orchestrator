@@ -3,6 +3,8 @@ package router
 import (
 	"net/http"
 
+	"time"
+
 	log "github.com/Sirupsen/logrus"
 	ays "github.com/g8os/grid/api/ays-client"
 	"github.com/g8os/grid/api/node"
@@ -12,7 +14,6 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/patrickmn/go-cache"
-	"time"
 )
 
 func LoggingMiddleware(h http.Handler) http.Handler {

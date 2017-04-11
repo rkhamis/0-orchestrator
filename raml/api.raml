@@ -473,6 +473,22 @@ types:
               body:
                 application/json:
                   type: Container
+        /start:
+          post:
+            (AYSBased):
+            displayName: StartContainer
+            description: Start Container instance
+            responses:
+              201:
+                description: Container started successfully
+        /stop:
+          post:
+            (AYSBased):
+            displayName: StopContainer
+            description: Stop Container instance
+            responses:
+              204:
+                description: Container stopped successfully
         /filesystem:
           post:
             (DirectAccess):

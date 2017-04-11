@@ -1,9 +1,9 @@
 package tools
 
 import (
+	"fmt"
 	"net/http"
 	"time"
-	"fmt"
 
 	ays "github.com/g8os/grid/api/ays-client"
 )
@@ -44,6 +44,7 @@ func ExecuteBlueprint(repoName, role, name, action string, blueprint map[string]
 
 func WaitRunDone(runid, repoName string) error {
 	run, err := getRun(runid, repoName)
+
 	if err != nil {
 		return err
 	}
