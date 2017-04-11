@@ -11,6 +11,8 @@ import (
 // StopContainer is the handler for POST /nodes/{nodeid}/containers/{containerid}/stop
 // Stop Container instance
 func (api NodeAPI) StopContainer(w http.ResponseWriter, r *http.Request) {
+	tools.DeleteContainerId(r, api)
+
 	vars := mux.Vars(r)
 	containerID := vars["containerid"]
 	// execute the delete action of the snapshot

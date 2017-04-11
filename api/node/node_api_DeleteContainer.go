@@ -11,6 +11,8 @@ import (
 // DeleteContainer is the handler for DELETE /nodes/{nodeid}/containers/{containerid}
 // Delete Container instance
 func (api NodeAPI) DeleteContainer(w http.ResponseWriter, r *http.Request) {
+	tools.DeleteContainerId(r, api)
+
 	vars := mux.Vars(r)
 	containerID := vars["containerid"]
 

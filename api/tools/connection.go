@@ -212,3 +212,9 @@ func GetContainerId(r *http.Request, api API) (int, error) {
 	c.Set(containerID, id, cache.DefaultExpiration)
 	return id, nil
 }
+
+func DeleteContainerId(r *http.Request, api API) {
+	vars := mux.Vars(r)
+	c := api.ContainerCache()
+	c.Delete(vars["containerid"])
+}
