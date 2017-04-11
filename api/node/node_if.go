@@ -316,6 +316,6 @@ func NodesInterfaceRoutes(r *mux.Router, i NodesInterface) {
 	r.HandleFunc("/nodes/{nodeid}/ping", i.PingNode).Methods("POST")
 	r.HandleFunc("/nodes/{nodeid}/reboot", i.RebootNode).Methods("POST")
 	r.HandleFunc("/nodes/{nodeid}/cpus", i.GetCPUInfo).Methods("GET")
-	r.HandleFunc("/nodes/{nodeid}/disk", i.GetDiskInfo).Methods("GET")
+	r.HandleFunc("/nodes/{nodeid}/disks", i.GetDiskInfo).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/state", i.GetNodeState).Methods("GET")
 }
