@@ -17,13 +17,13 @@ func (api NodeAPI) DeleteContainer(w http.ResponseWriter, r *http.Request) {
 	// execute the delete action of the snapshot
 	bp := map[string]interface{}{
 		"actions": []map[string]string{{
-			"action":  "delete",
+			"action":  "stop",
 			"actor":   "container",
 			"service": containerID,
 		}},
 	}
 
-	run, err := tools.ExecuteBlueprint(api.AysRepo, "container", containerID, "delete", bp)
+	run, err := tools.ExecuteBlueprint(api.AysRepo, "container", containerID, "stop", bp)
 	if err != nil {
 		httpErr := err.(tools.HTTPError)
 		log.Errorf("Error executing blueprint for container deletion : %+v", err.Error())
