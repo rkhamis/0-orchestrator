@@ -241,16 +241,16 @@ Process:
   properties:
     cmdline: string
     cpu: CPUStats
-    pid: 
+    pid:
       type: number
       format: int64
-    rss: 
+    rss:
       type: number
       format: int64
-    swap: 
+    swap:
       type: number
       format: int64
-    vms: 
+    vms:
       type: number
       format: int64
 
@@ -408,9 +408,9 @@ ContainerNIC:
            type: string
            description: Gateway for the the container
            required: false
-         nameservers:
+         dns:
            type: string[]
-           description: Nameservers to be used
+           description: List of dns to be used
            required: false
       description: Optional IPAddress configuration for this interface, only allowed for interfaces of type vxlan and vlan
     status:

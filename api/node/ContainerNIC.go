@@ -5,10 +5,10 @@ import (
 )
 
 type ContainerNICConfig struct {
-	Dhcp        bool     `json:"dhcp"`
-	Cidr        string   `json:"cidr"`
-	Gateway     string   `json:"gateway"`
-	Nameservers []string `json:"nameservers"`
+	Dhcp    bool     `json:"dhcp"`
+	Cidr    string   `json:"cidr"`
+	Gateway string   `json:"gateway"`
+	DNS     []string `json:"dns"`
 }
 
 type ContainerNIC struct {
