@@ -21,8 +21,7 @@ def start(job):
     container = Container.from_ays(job.service)
     container.start()
 
-    running, _ = container.is_running()
-    if running:
+    if container.is_running():
         job.service.model.data.status = "running"
     else:
         raise j.exceptions.RuntimeError("container didn't started")
@@ -30,12 +29,10 @@ def start(job):
 
 def stop(job):
     from JumpScale.sal.g8os.Container import Container
-
     container = Container.from_ays(job.service)
     container.stop()
 
-    running, _ = container.is_running()
-    if not running:
+    if not container.is_running():
         job.service.model.data.status = "halted"
     else:
         raise j.exceptions.RuntimeError("container didn't stopped")
@@ -49,14 +46,13 @@ def monitor(job):
     container.stop()
 
     if service.model.actionsState['install'] == 'ok':
-        running, process = container.is_running()
-        if not running:
+        if not container.is_running():
             try:
                 job.logger.warning("container {} not running, trying to restart".format(service.name))
                 service.model.dbobj.state = 'error'
                 container.start()
-                running, _ = container.is_running()
-                if running:
+
+                if container.is_running():
                     service.model.dbobj.state = 'ok'
             except:
                 job.logger.error("can't restart container {} not running".format(service.name))
