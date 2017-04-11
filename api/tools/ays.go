@@ -44,6 +44,9 @@ func ExecuteBlueprint(repoName, role, name, action string, blueprint map[string]
 
 func WaitRunDone(runid, repoName string) error {
 	run, err := getRun(runid, repoName)
+	if err != nil {
+		return err
+	}
 
 	for run.State == "new" || run.State == "running" {
 		time.Sleep(time.Second)

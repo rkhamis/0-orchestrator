@@ -6,8 +6,8 @@ import (
 
 type Log struct {
 	Category string `json:"category" validate:"nonzero"`
-	Epoch    string `json:"epoch" validate:"nonzero"`
-	Level    string `json:"level" validate:"nonzero"`
+	Epoch    int    `json:"epoch" validate:"nonzero"`
+	Level    int    `json:"level" validate:"nonzero"`
 	Log      string `json:"log" validate:"nonzero"`
 	Tags     string `json:"tags" validate:"nonzero"`
 }
