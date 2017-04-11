@@ -170,6 +170,17 @@ func GetContainerConnection(r *http.Request, api API) (client.Client, error) {
 		return nil, err
 	}
 
+	id, err := GetContainerId(r, api)
+	if err != nil {
+		return nil, err
+	}
+	
+	container := client.Container(nodeClient).Client(id)
+
+	return container, nil
+}
+
+func GetContainerId(r *http.Request, api API) (int, error) {
 	vars := mux.Vars(r)
 	containerID := vars["containerid"]
 	c := api.ContainerCache()
@@ -179,11 +190,11 @@ func GetContainerConnection(r *http.Request, api API) (client.Client, error) {
 		srv, res, err := api.AysAPIClient().Ays.GetServiceByName(containerID, "container", api.AysRepoName(), nil, nil)
 
 		if err != nil {
-			return nil, err
+			return id, err
 		}
 
 		if res.StatusCode != http.StatusOK {
-			return nil, fmt.Errorf("Error getting service %v", id)
+			return id, fmt.Errorf("Error getting service %v", id)
 		}
 
 		var cID struct {
@@ -191,7 +202,7 @@ func GetContainerConnection(r *http.Request, api API) (client.Client, error) {
 		}
 
 		if err := json.Unmarshal(srv.Data, &cID); err != nil {
-			return nil, err
+			return id, err
 		}
 		id = cID.Id
 	} else {
@@ -199,9 +210,5 @@ func GetContainerConnection(r *http.Request, api API) (client.Client, error) {
 	}
 
 	c.Set(containerID, id, cache.DefaultExpiration)
-
-	contMgr := client.Container(nodeClient)
-	container := contMgr.Client(id)
-
-	return container, nil
+	return id, nil
 }

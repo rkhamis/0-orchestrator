@@ -3,7 +3,6 @@ package node
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	client "github.com/g8os/go-client"
 	"github.com/g8os/grid/api/tools"
@@ -39,7 +38,7 @@ func (api NodeAPI) GetContainerJob(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cID, err := strconv.Atoi(vars["containerid"])
+	cID, err := tools.GetContainerId(r, api)
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
