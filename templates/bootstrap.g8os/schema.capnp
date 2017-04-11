@@ -1,6 +1,9 @@
 @0xdab765cd6c357ea4;
 
 struct Schema {
-    networks @0:List(Text);
-    # List of networks that the node created need to consume
+    zerotierNetID @0 :Text;
+    zerotierToken @1 :Text;
+
+    networks @2 :List(Text);
+    # networks the new node needs to consume
 }
