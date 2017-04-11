@@ -798,6 +798,15 @@ types:
         204:
           description: Cluster destroyed
 /volumes:
+  get:
+    (AYSBased):
+    displayName: ListVolumes
+    description: List volumes
+    responses:
+      200:
+        body:
+          application/json:
+            type: VolumeListItem[]
   post:
     (AYSBased):
     displayName: CreateNewVolume

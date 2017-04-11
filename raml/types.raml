@@ -966,6 +966,18 @@ Volume:
       type: string
       description: the storagecluster used for this volume's transaction logs
 
+VolumeListItem:
+  properties:
+    id: string
+    status:
+      enum: [running, halted, rollingback]
+      description: Status of the volume
+    volumetype:
+      enum: [boot, db, cache, tmp]
+      description: The type of volume.
+    storagecluster:
+      type: string
+      description: the storagecluster used for this volume's main storage.
 
 VolumeResize:
   properties:
