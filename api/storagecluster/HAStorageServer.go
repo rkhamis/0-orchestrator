@@ -1,4 +1,4 @@
-package main
+package storagecluster
 
 import (
 	"gopkg.in/validator.v2"
