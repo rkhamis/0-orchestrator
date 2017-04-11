@@ -5,11 +5,11 @@ import (
 )
 
 type Cluster struct {
-	DataStorage     []StorageServer      `json:"dataStorage" validate:"nonzero"`
+	DataStorage     []HAStorageServer    `json:"dataStorage" validate:"nonzero"`
 	DriveType       EnumClusterDriveType `json:"driveType" validate:"nonzero"`
 	Label           string               `json:"label" validate:"nonzero"`
-	MetadataStorage []StorageServer      `json:"metadataStorage" validate:"nonzero"`
-	SlaveNodes      bool                 `json:"slaveNodes" validate:"nonzero"`
+	MetadataStorage []HAStorageServer    `json:"metadataStorage" validate:"nonzero"`
+	Nodes           []string             `json:"nodes" validate:"nonzero"`
 	Status          EnumClusterStatus    `json:"status" validate:"nonzero"`
 }
 

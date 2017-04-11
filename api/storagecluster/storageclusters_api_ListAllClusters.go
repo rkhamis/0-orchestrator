@@ -5,9 +5,9 @@ import (
 	"net/http"
 )
 
-// ListAllClusters is the handler for GET /storagecluster
+// ListAllClusters is the handler for GET /storageclusters
 // List all running clusters
-func (api StorageclusterAPI) ListAllClusters(w http.ResponseWriter, r *http.Request) {
+func (api StorageclustersAPI) ListAllClusters(w http.ResponseWriter, r *http.Request) {
 	var respBody []string
 	json.NewEncoder(w).Encode(&respBody)
 }

@@ -5,9 +5,9 @@ import (
 	"net/http"
 )
 
-// GetClusterInfo is the handler for GET /storagecluster/{label}
+// GetClusterInfo is the handler for GET /storageclusters/{label}
 // Get full Information about specific cluster
-func (api StorageclusterAPI) GetClusterInfo(w http.ResponseWriter, r *http.Request) {
+func (api StorageclustersAPI) GetClusterInfo(w http.ResponseWriter, r *http.Request) {
 	var respBody Cluster
 	json.NewEncoder(w).Encode(&respBody)
 }
