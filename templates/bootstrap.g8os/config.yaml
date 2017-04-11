@@ -10,3 +10,8 @@ links:
       argname: networks
       min: 0
       max: 9999
+
+recurring:
+  - action: bootstrap
+    log: true
+    period: 30s

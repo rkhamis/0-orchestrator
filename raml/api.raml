@@ -162,7 +162,7 @@ types:
              body:
                application/json:
                  type: Process[]
-       /{proccessid}:
+       /{processid}:
          get:
            (DirectAccess):
            displayName: GetNodeProcess
@@ -529,13 +529,6 @@ types:
             responses:
               204:
                 description: Jobs killed successfully
-          post:
-            (DirectAccess):
-            displayName: SendSignalToJob
-            description: Send signal to the job
-            body:
-              application/json:
-                type: ProcessSignal
           /{jobid}:
             get:
               (DirectAccess):
@@ -546,6 +539,13 @@ types:
                   body:
                     application/json:
                       type: JobResult
+            post:
+              (DirectAccess):
+              displayName: SendSignalToJob
+              description: Send signal to the job
+              body:
+                application/json:
+                  type: ProcessSignal
             delete:
               (DirectAccess):
               displayName: KillContainerJob
@@ -606,7 +606,7 @@ types:
                  headers:
                    Location:
                      description: Url to the job object handling this request
-           /{proccessid}:
+           /{processid}:
              get:
                (DirectAccess):
                displayName: GetContainerProcess

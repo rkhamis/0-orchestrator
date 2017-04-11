@@ -194,17 +194,65 @@ DeleteFile:
       displayName: Path on the target system where the file should be written
       type: string
 
+CPUStats:
+  description: cpu time stats of all cpus combined
+  type: object
+  properties:
+    user:
+      description: The time the process spent running in user space
+      type: number
+      format: float
+    system:
+      description: The time the process spent running in kernel
+      type: number
+      format: float
+    idle:
+      description: The time the process spent idle
+      type: number
+      format: float
+    nice:
+      description: The time the niced process spent running in user space
+      type: number
+      format: float
+    ioWait:
+      description: The time the process spent idle waiting for I/O operation to complete
+      type: number
+      format: float
+    irq:
+      description: The time the process spent servicing hardware interrupts
+      type: number
+      format: float
+    softIrq:
+      description: The time the process spent servicing software interrupts
+      type: number
+      format: float
+    steal:
+      type: number
+      format: float
+    guestNice:
+      type: number
+      format: float
+    stolen:
+      type: number
+      format: float
+
 Process:
   type: object
   properties:
-    cmd: Job
-    pid: integer
-    name: string
-    cpu: number
-    debug: string
-    rss: number
-    swap: number
-    vms: number
+    cmdline: string
+    cpu: CPUStats
+    pid:
+      type: number
+      format: int64
+    rss:
+      type: number
+      format: int64
+    swap:
+      type: number
+      format: int64
+    vms:
+      type: number
+      format: int64
 
 ProcessSignal:
   type: object
@@ -360,9 +408,9 @@ ContainerNIC:
            type: string
            description: Gateway for the the container
            required: false
-         nameservers:
+         dns:
            type: string[]
-           description: Nameservers to be used
+           description: List of dns to be used
            required: false
       description: Optional IPAddress configuration for this interface, only allowed for interfaces of type vxlan and vlan
     status:
@@ -433,9 +481,6 @@ CreateContainer:
     id:
       description: unique identifier
       type: string
-    status:
-      enum: [running, halted]
-      description: Status of the container
     hostname:
       description: Hostname for the Container
       type: string
@@ -445,6 +490,7 @@ CreateContainer:
     initProcesses:
       type: CoreSystem[]
       description: Definition of the processes to start in the container
+      required: false
     filesystems:
       description: |
         List of filesystems that will be exposed to the container
@@ -456,6 +502,7 @@ CreateContainer:
     nics:
       type: ContainerNIC[]
       description: List of container nics
+      required: false
     hostNetworking:
       type: boolean
       description: Make host networking available to the guest. If true means that the container will be able participate in the networks available in the host operating system.
@@ -464,8 +511,11 @@ CreateContainer:
       description: |
         List of node to container post mappings.
       example: ['10022:22', '8080:80']
+      required: false
+      default: []
     storage:
       type: string
+      required: false
       description: A Url to the ardb storage to use to mount the root plist
 
 JobListItem:
