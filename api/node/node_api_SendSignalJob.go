@@ -17,28 +17,28 @@ func (api NodeAPI) SendSignalJob(w http.ResponseWriter, r *http.Request) {
 
 	// decode request
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
-		w.WriteHeader(400)
+		tools.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
 	// validate request
 	if err := reqBody.Validate(); err != nil {
-		w.WriteHeader(400)
-		w.Write([]byte(`{"error":"` + err.Error() + `"}`))
+		tools.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	containerId := mux.Vars(r)["containerid"]
-
-	// Get a connection
-	cl, err := tools.GetConnection(r, api)
+	// Get a container connection
+	cl, err := tools.GetContainerConnection(r, api)
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
 
+	jobId := mux.Vars(r)["jobId"]
+	core := client.Core(cl)
+
 	// Send signal to the container
-	if err := client.Core(cl).KillJob(client.JobId(containerId), syscall.Signal(reqBody.Signal)); err != nil {
+	if err := core.KillJob(client.JobId(jobId), syscall.Signal(reqBody.Signal)); err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
