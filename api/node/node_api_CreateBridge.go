@@ -48,9 +48,21 @@ func (api NodeAPI) CreateBridge(w http.ResponseWriter, r *http.Request) {
 	obj[fmt.Sprintf("bridge__%s", reqBody.Name)] = bp
 	obj["actions"] = []map[string]string{map[string]string{"action": "install"}}
 
-	if _, err := tools.ExecuteBlueprint(api.AysRepo, "bridge", reqBody.Name, "install", obj); err != nil {
+	run, err := tools.ExecuteBlueprint(api.AysRepo, "bridge", reqBody.Name, "install", obj)
+	if err != nil {
 		log.Errorf("error executing blueprint for bridge %s creation : %+v", reqBody.Name, err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Wait for the delete job to be finshed before we delete the service
+	if err := tools.WaitRunDone(run.Key, api.AysRepo); err != nil {
+		httpErr, ok := err.(tools.HTTPError)
+		if ok {
+			tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)
+		} else {
+			tools.WriteError(w, http.StatusInternalServerError, err)
+		}
 		return
 	}
 
