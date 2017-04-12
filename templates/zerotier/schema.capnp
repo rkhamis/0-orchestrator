@@ -2,5 +2,5 @@
 
 struct Schema {
     networkID @0:Text;
-    container @1:Text; # parent
+    node @1:Text; # parent
 }
