@@ -19,16 +19,29 @@ func (api NodeAPI) ExitZerotier(w http.ResponseWriter, r *http.Request) {
 	// execute the exit action of the zerotier
 	bp := map[string]interface{}{
 		"actions": []map[string]string{{
-			"action":  "leave",
+			"action":  "delete",
 			"actor":   "zerotier",
 			"service": fmt.Sprintf("%s_%s", nodeID, zerotierID),
 		}},
 	}
 
 	// And execute
-	if _, err := tools.ExecuteBlueprint(api.AysRepo, "zerotier", zerotierID, "exit", bp); err != nil {
+	run, err := tools.ExecuteBlueprint(api.AysRepo, "zerotier", zerotierID, "delete", bp)
+
+	if err != nil {
 		log.Errorf("error executing blueprint for zerotier %s exit : %+v", zerotierID, err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Wait for the delete job to be finshed before we delete the service
+	if err := tools.WaitRunDone(run.Key, api.AysRepo); err != nil {
+		httpErr, ok := err.(tools.HTTPError)
+		if ok {
+			tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)
+		} else {
+			tools.WriteError(w, http.StatusInternalServerError, err)
+		}
 		return
 	}
 
