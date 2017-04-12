@@ -2,5 +2,5 @@ links:
   parent:
     auto: false
     optional: false
-    role: container
-    argname: container
+    role: node
+    argname: node
