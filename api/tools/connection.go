@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"encoding/json"
+
 	"github.com/g8os/go-client"
 	ays "github.com/g8os/grid/api/ays-client"
 	"github.com/garyburd/redigo/redis"
@@ -174,7 +175,7 @@ func GetContainerConnection(r *http.Request, api API) (client.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	container := client.Container(nodeClient).Client(id)
 
 	return container, nil
@@ -209,6 +210,9 @@ func GetContainerId(r *http.Request, api API) (int, error) {
 		id = cachedId.(int)
 	}
 
+	if id == 0 {
+		return id, fmt.Errorf("ContainerID is not known")
+	}
 	c.Set(containerID, id, cache.DefaultExpiration)
 	return id, nil
 }

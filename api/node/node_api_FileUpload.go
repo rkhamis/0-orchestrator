@@ -41,6 +41,7 @@ func (api NodeAPI) FileUpload(w http.ResponseWriter, r *http.Request) {
 	container, err := tools.GetContainerConnection(r, api)
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	fs := client.Filesystem(container)
