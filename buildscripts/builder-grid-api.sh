@@ -17,12 +17,10 @@ export PATH=$PATH:/usr/local/go/bin
 mkdir -p /gopath
 export GOPATH=/gopath
 
-go get -v -d github.com/g8os/grid
-
-git fetch origin "${branch}:${branch}" || true
-git checkout "${branch}" || true
+git clone -b "${branch}" https://github.com/g8os/grid.git $GOPATH/src/github.com/g8os/grid
 
 cd $GOPATH/src/github.com/g8os/grid/api
+go get -v
 
 CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' .
 
