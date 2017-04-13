@@ -110,7 +110,8 @@ def install(job):
         service.name,
         media=medias,
         cpu=service.model.data.cpu,
-        memory=service.model.data.memory
+        memory=service.model.data.memory,
+        nics=service.model.data.nics,
         # port=None, #TODO
         # bridge=None #TODO
     )

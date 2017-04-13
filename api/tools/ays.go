@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -124,7 +125,26 @@ func getRun(runid, repoName string) (*ays.AYSRun, error) {
 		return nil, NewHTTPError(resp, resp.Status)
 	}
 
+	if err = checkRun(run); err != nil {
+		resp.StatusCode = http.StatusInternalServerError
+		return nil, NewHTTPError(resp, err.Error())
+	}
 	return &run, nil
+}
+
+func checkRun(run ays.AYSRun) error {
+	var logs string
+	if run.State == "error" {
+		for _, step := range run.Steps {
+			for _, job := range step.Jobs {
+				for _, log := range job.Logs {
+					logs = fmt.Sprintf("%s\n\n%s", logs, log.Log)
+				}
+			}
+		}
+		return errors.New(logs)
+	}
+	return nil
 }
 
 func DeleteServiceByName(name, role, repository string) error {

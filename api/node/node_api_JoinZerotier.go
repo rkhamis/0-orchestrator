@@ -32,18 +32,31 @@ func (api NodeAPI) JoinZerotier(w http.ResponseWriter, r *http.Request) {
 
 	// Create join blueprint
 	bp := struct {
-		Nwid string `json:"nwid"`
+		NetworkID string `json:"networkID"`
+		Node      string `json:"node"`
 	}{
-		Nwid: reqBody.Nwid,
+		NetworkID: reqBody.Nwid,
+		Node:      nodeID,
 	}
 
 	obj := make(map[string]interface{})
 	obj[fmt.Sprintf("zerotier__%s_%s", nodeID, reqBody.Nwid)] = bp
-	obj["actions"] = []map[string]string{map[string]string{"action": "join"}}
+	obj["actions"] = []map[string]string{map[string]string{"action": "install"}}
 
-	if _, err := tools.ExecuteBlueprint(api.AysRepo, "zerotier", reqBody.Nwid, "join", obj); err != nil {
+	run, err := tools.ExecuteBlueprint(api.AysRepo, "zerotier", reqBody.Nwid, "join", obj)
+	if err != nil {
 		log.Errorf("error executing blueprint for zerotiers %s join : %+v", reqBody.Nwid, err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if err := tools.WaitRunDone(run.Key, api.AysRepo); err != nil {
+		httpErr, ok := err.(tools.HTTPError)
+		if ok {
+			tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)
+		} else {
+			tools.WriteError(w, http.StatusInternalServerError, err)
+		}
 		return
 	}
 

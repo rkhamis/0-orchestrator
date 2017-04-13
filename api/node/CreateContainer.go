@@ -5,7 +5,7 @@ import (
 )
 
 type CreateContainer struct {
-	Nics           []ContainerNIC `json:"nics" validate:"nonzero"`
+	Nics           []ContainerNIC `json:"nics"`
 	Filesystems    []string       `json:"filesystems"`
 	Flist          string         `json:"flist" validate:"nonzero"`
 	HostNetworking bool           `json:"hostNetworking"`
