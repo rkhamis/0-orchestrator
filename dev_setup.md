@@ -30,9 +30,10 @@ ays repo create --name grid --git http://github.com/user/repo
 cd /opt/code/
 git clone https://github.com/g8os/grid/
 cd grid
-git checkout 0.2.0
+git checkout {branch}
 ays reload
 ```
+Replace {branch} with the version you want to have
 
 ## 5. Install auto node discovery service:
 Copy this in the blueprints directory of you AYS repo:
