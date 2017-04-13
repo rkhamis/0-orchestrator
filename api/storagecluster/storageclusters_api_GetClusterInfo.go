@@ -43,8 +43,8 @@ func getArdb(name string, api StorageclustersAPI, w http.ResponseWriter) (Storag
 	}
 	storageServer := StorageServer{
 		Container: ardb.Container,
-		Id:        id,
-		Ip:        bind[0],
+		ID:        id,
+		IP:        bind[0],
 		Port:      port,
 		Status:    state,
 	}

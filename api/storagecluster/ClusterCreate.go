@@ -5,11 +5,11 @@ import (
 )
 
 type ClusterCreate struct {
-	DriveType  EnumClusterCreateDriveType `json:"driveType" validate:"nonzero"`
-	Label      string                     `json:"label" validate:"nonzero"`
-	Nodes      []string                   `json:"nodes" validate:"nonzero"`
-	Servers    int                        `json:"servers" validate:"nonzero"`
-	SlaveNodes bool                       `json:"slaveNodes"`
+	DriveType  EnumClusterCreateDriveType `yaml:"driveType" json:"driveType" validate:"nonzero"`
+	Label      string                     `yaml:"label" json:"label" validate:"nonzero"`
+	Nodes      []string                   `yaml:"nodes" json:"nodes" validate:"nonzero"`
+	Servers    int                        `yaml:"servers" json:"servers" validate:"nonzero"`
+	SlaveNodes bool                       `yaml:"slaveNodes" json:"slaveNodes"`
 }
 
 func (s ClusterCreate) Validate() error {

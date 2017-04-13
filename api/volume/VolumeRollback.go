@@ -5,7 +5,7 @@ import (
 )
 
 type VolumeRollback struct {
-	Epoch int `json:"epoch" validate:"nonzero"`
+	Epoch int `yaml:"epoch" json:"epoch" validate:"nonzero"`
 }
 
 func (s VolumeRollback) Validate() error {

@@ -5,10 +5,10 @@ import (
 )
 
 type VolumeListItem struct {
-	ID             string                     `json:"id" validate:"nonzero"`
-	Status         EnumVolumeStatus           `json:"status,omitempty"`
-	Storagecluster string                     `json:"storageCluster" validate:"nonzero"`
-	Volumetype     EnumVolumeCreateVolumetype `json:"type" validate:"nonzero"`
+	ID             string                     `yaml:"id" json:"id" validate:"nonzero"`
+	Status         EnumVolumeStatus           `yaml:"status" json:"status,omitempty"`
+	Storagecluster string                     `yaml:"storageCluster" json:"storageCluster" validate:"nonzero"`
+	Volumetype     EnumVolumeCreateVolumetype `yaml:"type" json:"type" validate:"nonzero"`
 }
 
 func (s VolumeListItem) Validate() error {

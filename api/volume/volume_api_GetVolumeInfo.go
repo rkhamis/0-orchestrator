@@ -24,7 +24,7 @@ func (api VolumesAPI) GetVolumeInfo(w http.ResponseWriter, r *http.Request) {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
-	respBody.Id = serv.Name
+	respBody.ID = serv.Name
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

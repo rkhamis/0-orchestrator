@@ -5,14 +5,14 @@ import (
 )
 
 type Volume struct {
-	Blocksize          int                  `json:"blocksize" validate:"nonzero"`
-	Id                 string               `json:"id" validate:"nonzero"`
-	ReadOnly           bool                 `json:"readOnly,omitempty"`
-	Size               int                  `json:"size" validate:"nonzero"`
-	Status             EnumVolumeStatus     `json:"status" validate:"nonzero"`
-	Storagecluster     string               `json:"storagecluster" validate:"nonzero"`
-	TlogStoragecluster string               `json:"tlogStoragecluster" validate:"nonzero"`
-	Volumetype         EnumVolumeVolumetype `json:"volumetype" validate:"nonzero"`
+	Blocksize          int                  `yaml:"blocksize" json:"blocksize" validate:"nonzero"`
+	ID                 string               `yaml:"id" json:"id" validate:"nonzero"`
+	ReadOnly           bool                 `yaml:"readOnly" json:"readOnly,omitempty"`
+	Size               int                  `yaml:"size" json:"size" validate:"nonzero"`
+	Status             EnumVolumeStatus     `yaml:"status" json:"status" validate:"nonzero"`
+	Storagecluster     string               `yaml:"storagecluster" json:"storagecluster" validate:"nonzero"`
+	TlogStoragecluster string               `yaml:"tlogStoragecluster" json:"tlogStoragecluster" validate:"nonzero"`
+	Volumetype         EnumVolumeVolumetype `yaml:"volumetype" json:"volumetype" validate:"nonzero"`
 }
 
 func (s Volume) Validate() error {

@@ -5,7 +5,7 @@ import (
 )
 
 type VolumeResize struct {
-	NewSize int `json:"newSize" validate:"nonzero"`
+	NewSize int `yaml:"newSize" json:"newSize" validate:"nonzero"`
 }
 
 func (s VolumeResize) Validate() error {
