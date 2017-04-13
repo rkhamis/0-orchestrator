@@ -5,10 +5,10 @@ import (
 )
 
 type VMDiskInfo struct {
-	ReadIops        int `json:"readIops" validate:"nonzero"`
-	ReadThroughput  int `json:"readThroughput" validate:"nonzero"`
-	WriteIops       int `json:"writeIops" validate:"nonzero"`
-	WriteThroughput int `json:"writeThroughput" validate:"nonzero"`
+	ReadIops        uint64 `json:"readIops" validate:"nonzero"`
+	ReadThroughput  uint64 `json:"readThroughput" validate:"nonzero"`
+	WriteIops       uint64 `json:"writeIops" validate:"nonzero"`
+	WriteThroughput uint64 `json:"writeThroughput" validate:"nonzero"`
 }
 
 func (s VMDiskInfo) Validate() error {

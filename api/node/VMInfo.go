@@ -6,9 +6,9 @@ import (
 
 // VMInfo Statistical information about a vm
 type VMInfo struct {
-	CPU  []float64    `json:"cpu" validate:"nonzero"`
-	Disk []VMDiskInfo `json:"disk" validate:"nonzero"`
-	Net  []VMNetInfo  `json:"net" validate:"nonzero"`
+	CPU  []float64    `yaml:"cpu" json:"cpu" validate:"nonzero"`
+	Disk []VMDiskInfo `yaml:"disk" json:"disk" validate:"nonzero"`
+	Net  []VMNetInfo  `yaml:"disk" json:"disk" validate:"nonzero"`
 }
 
 func (s VMInfo) Validate() error {
