@@ -1,6 +1,8 @@
 @0x9e47335012092925;
 
 struct Schema {
-    backplaneNetwork @1:Text;
-    mgmtNetwork @0: Text;
+    id @0 :Text;
+    apiURL @1 :Text;
+    # URL of the grid API, this is used by nbdservers to know where to
+    # get information about the storage cluster and volumes
 }

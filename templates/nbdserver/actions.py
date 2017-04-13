@@ -22,23 +22,22 @@ def is_running(client, key):
 
 def install(job):
     service = job.service
+
+    services = service.aysrepo.servicesFind(role='grid_config')
+    if len(services) <= 0:
+        raise j.exceptions.NotFound("not grid_config service installed. {} can't get the grid API URL.".format(service))
+
+    grid_addr = services[0].model.data.apiURL
+
     container = get_container_client(service)
-    # client.system(
-    #     '/nbdserver \
-    #     -protocol unix \
-    #     -address "/server.socket.{id}" \
-    #     -export {id} \
-    #     -backendcontroller {api} \
-    #     -volumecontroller {api}'
-    #     .format(id=service.model.key, api=service.model.data.gridApiUrl)
-    # )
-    # FIXME: update when the change on the nbd server for grid API are done.
     container.system(
         '/nbdserver \
         -protocol unix \
         -address "/server.socket.{id}" \
-        -export {id}'
-        .format(id=service.model.key))
+        -export {id} \
+        -gridapi {api}'
+        .format(id=service.model.key, api=grid_addr)
+    )
 
     service.model.data.socketPath = '/server.socket.{id}'.format(id=service.model.key)
 
