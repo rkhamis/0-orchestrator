@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 
@@ -60,8 +61,10 @@ func main() {
 			log.Debug("Debug logging enabled")
 		}
 
-		if err := testAYSURL(aysURL); err != nil {
-			log.Fatalf(err.Error())
+		var err error
+		for err = testAYSURL(aysURL); err != nil; err = testAYSURL(aysURL) {
+			log.Error(err)
+			time.Sleep(time.Second)
 		}
 
 		if err := ensureAYSRepo(aysURL, aysRepo); err != nil {
