@@ -920,7 +920,7 @@ VolumeCreate:
       type: integer
       description: blocksize in bytes
       default: 4096
-    volumetype:
+    type:
       enum: [boot, db, cache, tmp]
       description: The type of volume.
       required: true
@@ -953,7 +953,7 @@ Volume:
       type: integer
       description: blocksize in bytes
       default: 4096
-    volumetype:
+    type:
       enum: [boot, db, cache, tmp]
       description: The type of volume.
     readOnly:
@@ -973,7 +973,7 @@ VolumeListItem:
     status:
       enum: [running, halted, rollingback]
       description: Status of the volume
-    volumetype:
+    type:
       enum: [boot, db, cache, tmp]
       description: The type of volume.
     storagecluster:

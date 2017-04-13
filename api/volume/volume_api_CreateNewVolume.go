@@ -1,10 +1,11 @@
 package volume
 
 import (
+	"crypto/rand"
+	"encoding/base32"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	log "github.com/Sirupsen/logrus"
 
@@ -46,7 +47,13 @@ func (api VolumesAPI) CreateNewVolume(w http.ResponseWriter, r *http.Request) {
 		StorageCluster: reqBody.Storagecluster,
 	}
 
-	vName := fmt.Sprintf("v%v", time.Now().Unix())
+	byteSecret, err := generateRandomBytes(256)
+	if err != nil {
+		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+	name := base32.StdEncoding.EncodeToString(byteSecret)
+	vName := fmt.Sprintf("v%v", name)
 	bpName := fmt.Sprintf("volume__%v", vName)
 
 	obj := make(map[string]interface{})
@@ -62,4 +69,13 @@ func (api VolumesAPI) CreateNewVolume(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Location", fmt.Sprintf("/volumes/%v", vName))
 	w.WriteHeader(http.StatusCreated)
+}
+
+func generateRandomBytes(length int) ([]byte, error) {
+	b := make([]byte, length)
+	_, err := rand.Read(b)
+	if err != nil {
+		return b, err
+	}
+	return b, nil
 }
