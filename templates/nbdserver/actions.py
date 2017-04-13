@@ -57,7 +57,7 @@ def install(job):
         raise j.exceptions.RuntimeError("Failed to start nbdserver {}".format(service.name))
     # make sure nbd is still running
     for job in container.job.list():
-        if 'args' in job['cmd']['arguments'] and '/nbdserver' == job['cmd']['arguments']['args']['name']:
+        if 'args' in job['cmd']['arguments'] and '/nbdserver' == job['cmd']['arguments']['name']:
             break
     else:
         raise j.exceptions.RuntimeError("Failed to start nbdserver {}".format(service.name))

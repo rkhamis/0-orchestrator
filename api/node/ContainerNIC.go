@@ -12,10 +12,10 @@ type ContainerNICConfig struct {
 }
 
 type ContainerNIC struct {
-	Config ContainerNICConfig   `json:"config,omitempty"`
-	Hwaddr string               `json:"hwaddr,omitempty"`
-	Id     string               `json:"id" validate:"nonzero"`
-	Type   EnumContainerNICType `json:"type" validate:"nonzero"`
+	Config ContainerNICConfig   `json:"config,omitempty" yaml:"config,omitempty"`
+	Hwaddr string               `json:"hwaddr,omitempty" yaml:"hwaddr,omitempty"`
+	Id     string               `json:"id" validate:"nonzero" yaml:"id" validate:"nonzero"`
+	Type   EnumContainerNICType `json:"type" validate:"nonzero" yaml:"type" validate:"nonzero"`
 }
 
 func (s ContainerNIC) Validate() error {
