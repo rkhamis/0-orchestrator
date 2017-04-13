@@ -38,7 +38,7 @@ func (api NodeAPI) CreateStoragePoolDevices(w http.ResponseWriter, r *http.Reque
 	}
 
 	bpContent := struct {
-		Devices []string `json:"devices"`
+		Devices []string `yaml:"devices" json:"devices"`
 	}{
 		Devices: devices,
 	}
@@ -46,7 +46,7 @@ func (api NodeAPI) CreateStoragePoolDevices(w http.ResponseWriter, r *http.Reque
 		fmt.Sprintf("storagepool__%s", storagepool): bpContent,
 	}
 
-	if _, err := tools.ExecuteBlueprint(api.AysRepo, "storagepool", storagepool, "addDevices" , blueprint); err != nil {
+	if _, err := tools.ExecuteBlueprint(api.AysRepo, "storagepool", storagepool, "addDevices", blueprint); err != nil {
 		httpErr := err.(tools.HTTPError)
 		log.Errorf("Error executing blueprint for storagepool device creation : %+v", err.Error())
 		tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)

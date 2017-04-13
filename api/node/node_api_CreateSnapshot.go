@@ -27,8 +27,8 @@ func (api NodeAPI) CreateSnapshot(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bpContent := struct {
-		Filesystem string `json:"filesystem"`
-		Name       string `json:"name"`
+		Filesystem string `yaml:"filesystem" json:"filesystem"`
+		Name       string `yaml:"name" json:"name"`
 	}{
 
 		Filesystem: filessytem,

@@ -33,13 +33,13 @@ func (api NodeAPI) UpdateVM(w http.ResponseWriter, r *http.Request) {
 	vmid := vars["vmid"]
 
 	bp := struct {
-		Memory int         `json:"memory"`
-		Cpu    int         `json:"cpu"`
-		Nics   []NicLink   `json:"nics"`
-		Disks  []VDiskLink `json:"disks"`
+		Memory int         `yaml:"memory" json:"memory"`
+		CPU    int         `yaml:"cpu" json:"cpu"`
+		Nics   []NicLink   `yaml:"nics" json:"nics"`
+		Disks  []VDiskLink `yaml:"disks" json:"disks"`
 	}{
 		Memory: reqBody.Memory,
-		Cpu:    reqBody.Cpu,
+		CPU:    reqBody.Cpu,
 		Nics:   reqBody.Nics,
 		Disks:  reqBody.Disks,
 	}

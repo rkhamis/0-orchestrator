@@ -31,11 +31,11 @@ func (api NodeAPI) CreateBridge(w http.ResponseWriter, r *http.Request) {
 
 	// Create blueprint
 	bp := struct {
-		Hwaddr      string                      `json:"hwaddr"`
-		Nat         bool                        `json:"nat"`
-		NetworkMode EnumBridgeCreateNetworkMode `json:"networkMode"`
-		Setting     BridgeCreateSetting         `json:"setting"`
-		Node        string                      `json:"node"`
+		Hwaddr      string                      `json:"hwaddr" yaml:"hwaddr"`
+		Nat         bool                        `json:"nat" yaml:"nat"`
+		NetworkMode EnumBridgeCreateNetworkMode `json:"networkMode" yaml:"networkMode"`
+		Setting     BridgeCreateSetting         `json:"setting" yaml:"setting"`
+		Node        string                      `json:"node" yaml:"node"`
 	}{
 		Hwaddr:      reqBody.Hwaddr,
 		Nat:         reqBody.Nat,

@@ -31,7 +31,7 @@ func (api NodeAPI) CreateFilesystem(w http.ResponseWriter, r *http.Request) {
 
 	bpContent := struct {
 		FilesystemCreate
-		StoragePool string `json:"storagePool"`
+		StoragePool string `json:"storagePool" yaml:"storagePool"`
 	}{
 		FilesystemCreate: reqBody,
 		StoragePool:      storagepool,

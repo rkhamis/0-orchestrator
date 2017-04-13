@@ -27,7 +27,7 @@ func (api VolumesAPI) RollbackVolume(w http.ResponseWriter, r *http.Request) {
 	// TODO: define rollback
 	// volumeId := mux.Vars(r)["volumeid"]
 	// bp := struct {
-	// 	Epoch int `json:"epoch"`
+	// 	Epoch int `yaml:"epoch" json:"epoch"`
 	// }{
 	// 	Epoch: reqBody.Epoch,
 	// }

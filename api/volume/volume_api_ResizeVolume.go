@@ -33,7 +33,7 @@ func (api VolumesAPI) ResizeVolume(w http.ResponseWriter, r *http.Request) {
 
 	// Create resize blueprint
 	bp := struct {
-		Size int `json:"size"`
+		Size int `yaml:"size" json:"size"`
 	}{
 		Size: reqBody.NewSize,
 	}

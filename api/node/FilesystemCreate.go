@@ -6,9 +6,9 @@ import (
 
 // Arguments to create a new filesystem
 type FilesystemCreate struct {
-	Name     string `json:"name" validate:"nonzero"`
-	Quota    uint32 `json:"quota"`
-	ReadOnly bool   `json:"readOnly"`
+	Name     string `yaml:"name" json:"name" validate:"nonzero"`
+	Quota    uint32 `yaml:"quota" json:"quota"`
+	ReadOnly bool   `yaml:"readOnly" json:"readOnly"`
 }
 
 func (s FilesystemCreate) Validate() error {

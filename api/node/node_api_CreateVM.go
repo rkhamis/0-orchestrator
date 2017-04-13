@@ -46,17 +46,17 @@ func (api NodeAPI) CreateVM(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	bp := struct {
-		Node            string      `json:"node"`
-		Memory          int         `json:"memory"`
-		Cpu             int         `json:"cpu"`
-		Nics            []NicLink   `json:"nics"`
-		Disks           []VDiskLink `json:"disks"`
-		UserCloudInit   string      `json:"userCloudInit"`
-		SystemCloudInit string      `json:"systemCloudInit"`
+		Node            string      `yaml:"node" json:"node"`
+		Memory          int         `yaml:"memory" json:"memory"`
+		CPU             int         `yaml:"cpu" json:"cpu"`
+		Nics            []NicLink   `yaml:"nics" json:"nics"`
+		Disks           []VDiskLink `yaml:"disks" json:"disks"`
+		UserCloudInit   string      `yaml:"userCloudInit" json:"userCloudInit"`
+		SystemCloudInit string      `yaml:"systemCloudInit" json:"systemCloudInit"`
 	}{
 		Node:            nodeid,
 		Memory:          reqBody.Memory,
-		Cpu:             reqBody.Cpu,
+		CPU:             reqBody.Cpu,
 		Nics:            reqBody.Nics,
 		Disks:           reqBody.Disks,
 		UserCloudInit:   string(userCloudInit),

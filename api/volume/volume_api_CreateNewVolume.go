@@ -31,12 +31,12 @@ func (api VolumesAPI) CreateNewVolume(w http.ResponseWriter, r *http.Request) {
 
 	// Create the blueprint
 	bp := struct {
-		Size           int    `json:"size"`
-		BlockSize      int    `json:"blocksize"`
-		TemplateVolume string `json:"templateVolume,omitempty"`
-		ReadOnly       bool   `json:"readOnly"`
-		Driver         string `json:"driver"`
-		StorageCluster string `json:"storageCluster"`
+		Size           int    `yaml:"size" json:"size"`
+		BlockSize      int    `yaml:"blocksize" json:"blocksize"`
+		TemplateVolume string `yaml:"templateVolume" json:"templateVolume"`
+		ReadOnly       bool   `yaml:"readOnly" json:"readOnly"`
+		Driver         string `yaml:"driver" json:"driver"`
+		StorageCluster string `yaml:"storageCluster" json:"storageCluster"`
 	}{
 		Size:           reqBody.Size,
 		BlockSize:      reqBody.Blocksize,

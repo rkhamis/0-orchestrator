@@ -39,7 +39,7 @@ func (api NodeAPI) DeleteStoragePoolDevice(w http.ResponseWriter, r *http.Reques
 	}
 
 	bpContent := struct {
-		Devices []string `json:"devices"`
+		Devices []string `yaml:"devices" json:"devices"`
 	}{
 		Devices: devices,
 	}

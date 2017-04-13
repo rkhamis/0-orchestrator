@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	yaml "gopkg.in/yaml.v2"
+
 	ays "github.com/g8os/grid/api/ays-client"
 )
 
@@ -62,8 +64,9 @@ func WaitRunDone(runid, repoName string) error {
 }
 
 func createBlueprint(repoName string, name string, bp map[string]interface{}) error {
+	bpYaml, err := yaml.Marshal(bp)
 	blueprint := ays.Blueprint{
-		Content: bp,
+		Content: string(bpYaml),
 		Name:    name,
 	}
 

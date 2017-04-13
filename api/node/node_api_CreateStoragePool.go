@@ -32,10 +32,10 @@ func (api NodeAPI) CreateStoragePool(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bpContent := struct {
-		DataProfile     EnumStoragePoolCreateDataProfile     `json:"dataProfile"`
-		Devices         []string                             `json:"devices"`
-		MetadataProfile EnumStoragePoolCreateMetadataProfile `json:"metadataProfile"`
-		Node            string                               `json:"node"`
+		DataProfile     EnumStoragePoolCreateDataProfile     `yaml:"dataProfile" json:"dataProfile"`
+		Devices         []string                             `yaml:"devices" json:"devices"`
+		MetadataProfile EnumStoragePoolCreateMetadataProfile `yaml:"metadataProfile" json:"metadataProfile"`
+		Node            string                               `yaml:"node" json:"node"`
 	}{
 		DataProfile:     reqBody.DataProfile,
 		MetadataProfile: reqBody.MetadataProfile,

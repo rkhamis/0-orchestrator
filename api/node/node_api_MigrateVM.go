@@ -32,7 +32,7 @@ func (api NodeAPI) MigrateVM(w http.ResponseWriter, r *http.Request) {
 
 	// Create migrate blueprint
 	bp := struct {
-		Node string `json:"node"`
+		Node string `yaml:"node" json:"node"`
 	}{
 		Node: reqBody.Nodeid,
 	}
