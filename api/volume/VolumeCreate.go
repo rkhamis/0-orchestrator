@@ -12,7 +12,7 @@ type VolumeCreate struct {
 	Storagecluster     string                     `yaml:"storagecluster" json:"storagecluster" validate:"nonzero"`
 	Templatevolume     string                     `yaml:"templatevolume" json:"templatevolume,omitempty"`
 	TlogStoragecluster string                     `yaml:"tlogStoragecluster" json:"tlogStoragecluster,omitempty"`
-	Volumetype         EnumVolumeCreateVolumetype `yaml:"volumetype" json:"volumetype" validate:"nonzero"`
+	Volumetype         EnumVolumeCreateVolumetype `yaml:"type" json:"type" validate:"nonzero"`
 }
 
 func (s VolumeCreate) Validate() error {
