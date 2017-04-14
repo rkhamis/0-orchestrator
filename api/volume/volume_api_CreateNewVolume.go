@@ -1,8 +1,6 @@
 package volume
 
 import (
-	"crypto/rand"
-	"encoding/base32"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -30,6 +28,12 @@ func (api VolumesAPI) CreateNewVolume(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	_, resp, _ := api.AysAPI.Ays.GetServiceByName(reqBody.ID, "volume", api.AysRepo, nil, nil)
+	if resp.StatusCode != http.StatusNotFound {
+		tools.WriteError(w, http.StatusConflict, fmt.Errorf("A volume with ID %s already exists", reqBody.ID))
+		return
+	}
+
 	// Create the blueprint
 	bp := struct {
 		Size           int    `yaml:"size" json:"size"`
@@ -47,35 +51,19 @@ func (api VolumesAPI) CreateNewVolume(w http.ResponseWriter, r *http.Request) {
 		StorageCluster: reqBody.Storagecluster,
 	}
 
-	byteSecret, err := generateRandomBytes(256)
-	if err != nil {
-		tools.WriteError(w, http.StatusInternalServerError, err)
-		return
-	}
-	name := base32.StdEncoding.EncodeToString(byteSecret)
-	vName := fmt.Sprintf("v%v", name)
-	bpName := fmt.Sprintf("volume__%v", vName)
+	bpName := fmt.Sprintf("volume__%s", reqBody.ID)
 
 	obj := make(map[string]interface{})
 	obj[bpName] = bp
 	obj["actions"] = []map[string]string{map[string]string{"action": "install"}}
 
 	// And Execute
-	if _, err := tools.ExecuteBlueprint(api.AysRepo, "volume", vName, "install", obj); err != nil {
-		log.Errorf("error executing blueprint for volume %v creation : %+v", vName, err)
+	if _, err := tools.ExecuteBlueprint(api.AysRepo, "volume", reqBody.ID, "install", obj); err != nil {
+		log.Errorf("error executing blueprint for volume %s creation : %+v", reqBody.ID, err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	w.Header().Set("Location", fmt.Sprintf("/volumes/%v", vName))
+	w.Header().Set("Location", fmt.Sprintf("/volumes/%s", reqBody.ID))
 	w.WriteHeader(http.StatusCreated)
-}
-
-func generateRandomBytes(length int) ([]byte, error) {
-	b := make([]byte, length)
-	_, err := rand.Read(b)
-	if err != nil {
-		return b, err
-	}
-	return b, nil
 }
