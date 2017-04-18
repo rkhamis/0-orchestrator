@@ -29,7 +29,7 @@ func (api StorageclustersAPI) DeployNewCluster(w http.ResponseWriter, r *http.Re
 	}
 
 	blueprint := struct {
-		Label    string   `yaml:"disks" json:"label"`
+		Label    string   `yaml:"label" json:"label"`
 		NrServer int      `yaml:"nrServer" json:"nrServer"`
 		HasSlave bool     `yaml:"hasSlave" json:"hasSlave"`
 		DiskType string   `yaml:"diskType" json:"diskType"`
