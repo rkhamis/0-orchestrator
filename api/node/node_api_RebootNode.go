@@ -10,6 +10,7 @@ import (
 // RebootNode is the handler for POST /nodes/{nodeid}/reboot
 // Immediately reboot the machine.
 func (api NodeAPI) RebootNode(w http.ResponseWriter, r *http.Request) {
+	tools.DeleteConnection(r)
 	vars := mux.Vars(r)
 	nodeId := vars["nodeid"]
 

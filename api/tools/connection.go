@@ -130,6 +130,10 @@ func (c *connectionMiddleware) getConnection(
 	return client.NewClientWithPool(pool), nil
 }
 
+func (c *connectionMiddleware) deleteConnection(id string) {
+	c.pools.Delete(id)
+}
+
 func (c *connectionMiddleware) onEvict(_ string, x interface{}) {
 	x.(*redis.Pool).Close()
 }
@@ -221,4 +225,15 @@ func DeleteContainerId(r *http.Request, api API) {
 	vars := mux.Vars(r)
 	c := api.ContainerCache()
 	c.Delete(vars["containerid"])
+}
+
+func DeleteConnection(r *http.Request) {
+	p := r.Context().Value(connectionPoolMiddlewareKey)
+	if p == nil {
+		panic("middleware not injected")
+	}
+
+	vars := mux.Vars(r)
+	mw := p.(*connectionMiddleware)
+	mw.deleteConnection(vars["nodeid"])
 }
