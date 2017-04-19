@@ -12,6 +12,11 @@ def input(job):
         if mount['filesystem'] not in filesystems:
             args['filesystems'].append(mount['filesystem'])
 
+    args['bridges'] = []
+    for nic in args['nics']:
+        if nic['type'] == 'bridge':
+            args['bridges'].append(nic['id'])
+
     return args
 
 

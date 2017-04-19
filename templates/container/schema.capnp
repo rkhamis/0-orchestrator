@@ -1,4 +1,4 @@
-@0x935023b5e21ba041;
+@0x935023b5e21ba044;
 
 struct Schema {
     node @0 :Text; # pointer to the parent service
@@ -7,6 +7,7 @@ struct Schema {
     flist @3 :Text; # Url to the root filesystem flist
     initProcesses @4 :List(Process);
     filesystems @5 :List(Text); # pointer to the filesystem to mount into the container
+    bridges @12 :List(Text); # comsumed bridges, automaticly filled don't pass in blueprint
     nics @6 :List(Nic); # Configuration of the attached nics to the container
     hostNetworking @7 :Bool;
     # Make host networking available to the guest.
@@ -54,5 +55,6 @@ struct Schema {
         zerotier @1;
         vlan @2;
         vxlan @3;
+        bridge @4;
     }
 }
