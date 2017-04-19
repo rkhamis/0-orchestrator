@@ -34,4 +34,4 @@ cd $BLOCKSTOR/cmd/copyvolume
 CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' .
 
 mkdir -p /tmp/archives/
-tar -czf "/tmp/archives/gonbdserver-${branch}.tar.gz" -C $BLOCKSTOR/nbdserver nbdserver -C $BLOCKSTOR/cmd/copyvolume copyvolume
+tar -czf "/tmp/archives/blockstor-${branch}.tar.gz" -C $BLOCKSTOR/nbdserver nbdserver -C $BLOCKSTOR/cmd/copyvolume copyvolume
