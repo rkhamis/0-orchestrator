@@ -15,6 +15,7 @@ type Container struct {
 	Ports          []string            `json:"ports" validate:"nonzero"`
 	Status         EnumContainerStatus `json:"status" validate:"nonzero"`
 	Zerotier       string              `json:"zerotier,omitempty"`
+	Storage        string              `json:"storage,omitempty"`
 }
 
 func (s Container) Validate() error {

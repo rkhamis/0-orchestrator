@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// GetContainer is the handler for GET /nodes/{nodeid}/container/{containerid}
+// GetContainer is the handler for GET /nodes/{nodeid}/containers/{containerid}
 // Get Container
 func (api NodeAPI) GetContainer(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -25,11 +25,12 @@ func (api NodeAPI) GetContainer(w http.ResponseWriter, r *http.Request) {
 		Flist          string
 		HostNetworking bool
 		Hostname       string
-		Id             int
+		ID             int
 		Initprocesses  []CoreSystem
 		Ports          []string
 		Status         EnumContainerStatus
 		Zerotier       string
+		Storage        string
 	}{}
 
 	if err := json.Unmarshal(service.Data, &containerItem); err != nil {
@@ -43,11 +44,12 @@ func (api NodeAPI) GetContainer(w http.ResponseWriter, r *http.Request) {
 		Status:         containerItem.Status,
 		Ports:          containerItem.Ports,
 		Initprocesses:  containerItem.Initprocesses,
-		ContainerId:    containerItem.Id,
+		ContainerId:    containerItem.ID,
 		Hostname:       containerItem.Hostname,
 		HostNetworking: containerItem.HostNetworking,
 		Flist:          containerItem.Flist,
 		Filesystems:    containerItem.Filesystems,
+		Storage:        containerItem.Storage,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
