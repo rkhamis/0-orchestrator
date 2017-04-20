@@ -8,7 +8,7 @@ def is_valid_nic(nic):
 
 def bootstrap(job):
     from zerotier import client
-    from  redis import ConnectionError
+    from redis import ConnectionError
     import time
 
     service = job.service
@@ -17,7 +17,6 @@ def bootstrap(job):
 
     zerotier = client.Client()
     zerotier.set_auth_header('bearer {}'.format(token))
-
 
     resp = zerotier.network.listMembers(netid)
     members = resp.json()
@@ -60,11 +59,11 @@ def bootstrap(job):
                     mac = nic['hardwareaddr']
                     break
         except ConnectionError:
-            j.logger.error("can't connect to g8os at {}".format(zerotier_ip))
+            job.logger.error("can't connect to g8os at {}".format(zerotier_ip))
             continue
 
         if mac is None:
-            j.logger.error("can't find mac address of the zerotier member ({})".format(member['physicalAddress']))
+            job.logger.error("can't find mac address of the zerotier member ({})".format(member['physicalAddress']))
             continue
 
         # create node.g8os service
@@ -84,7 +83,7 @@ def bootstrap(job):
 
             node_args = {
                 'id': mac,
-                'status':'running',
+                'status': 'running',
                 'networks': networks,
                 'redisAddr': zerotier_ip,
             }
