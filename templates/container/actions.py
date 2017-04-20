@@ -13,7 +13,7 @@ def input(job):
             args['filesystems'].append(mount['filesystem'])
 
     args['bridges'] = []
-    for nic in args['nics']:
+    for nic in args.get('nics', []):
         if nic['type'] == 'bridge':
             args['bridges'].append(nic['id'])
 
