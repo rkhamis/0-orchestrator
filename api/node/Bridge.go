@@ -5,9 +5,9 @@ import (
 )
 
 type Bridge struct {
-	Setting string           `json:"setting" validate:"nonzero"`
-	Name    string           `json:"name" validate:"nonzero"`
-	Status  EnumBridgeStatus `json:"status" validate:"nonzero"`
+	Setting BridgeCreateSetting `json:"setting" validate:"nonzero"`
+	Name    string              `json:"name" validate:"nonzero"`
+	Status  EnumBridgeStatus    `json:"status" validate:"nonzero"`
 }
 
 func (s Bridge) Validate() error {
