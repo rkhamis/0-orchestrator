@@ -4,8 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"strconv"
+	"strings"
+
 	"github.com/g8os/go-client"
 	"github.com/g8os/grid/api/tools"
+	psdisk "github.com/shirou/gopsutil/disk"
 )
 
 // GetDiskInfo is the handler for GET /nodes/{nodeid}/disk
@@ -17,21 +21,66 @@ func (api NodeAPI) GetDiskInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	info := client.Info(cl)
-	result, err := info.Disk()
+	disk := client.Disk(cl)
+	result, err := disk.List()
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
 
+	info := client.Info(cl)
+	mountedDisks, err := info.Disk()
+	if err != nil {
+		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	mountedDisksMap := make(map[string]psdisk.PartitionStat, len(mountedDisks))
+
+	for _, mountedDisk := range mountedDisks {
+		mountedDisksMap[mountedDisk.Mountpoint] = mountedDisk
+	}
+
 	var respBody []DiskInfo
-	for _, disk := range result {
-		var info DiskInfo
-		info.Device = disk.Device
-		info.Fstype = disk.Fstype
-		info.Mountpoint = disk.Mountpoint
-		info.Opts = disk.Opts
-		respBody = append(respBody, info)
+
+	for _, disk := range result.BlockDevices {
+		var diskInfo DiskInfo
+
+		device := []string{"/dev", disk.Name}
+		diskInfo.Device = strings.Join(device, "/")
+		diskInfo.Fstype = disk.Fstype
+
+		if disk.Mountpoint != "" {
+			diskInfo.Mountpoint = disk.Mountpoint
+			mDisk, ok := mountedDisksMap[disk.Mountpoint]
+			if ok {
+				diskInfo.Opts = mDisk.Opts
+			}
+		}
+
+		if disk.Rota == "1" {
+			size, err := strconv.Atoi(disk.Size)
+			if err != nil {
+				tools.WriteError(w, http.StatusInternalServerError, err)
+				return
+			}
+
+			diskInfo.Size = size / (1024 * 1024 * 1024) // Convert the size to GB
+
+			// Assume that if a disk is more than 7TB it's a SMR disk
+			if diskInfo.Size > (1024 * 7) {
+				diskInfo.Type = EnumDiskInfoTypearchive
+			} else {
+				diskInfo.Type = EnumDiskInfoTypehdd
+			}
+		} else {
+			if strings.Contains(disk.Name, "nvme") {
+				diskInfo.Type = EnumDiskInfoTypenvme
+			} else {
+				diskInfo.Type = EnumDiskInfoTypessd
+			}
+		}
+		respBody = append(respBody, diskInfo)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
