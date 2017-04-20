@@ -11,7 +11,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// CreateContainer is the handler for POST /nodes/{nodeid}/container
+// CreateContainer is the handler for POST /nodes/{nodeid}/containers
 // Create a new Container
 func (api NodeAPI) CreateContainer(w http.ResponseWriter, r *http.Request) {
 	var reqBody CreateContainer
@@ -29,7 +29,7 @@ func (api NodeAPI) CreateContainer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	vars := mux.Vars(r)
-	nodeId := vars["nodeid"]
+	nodeID := vars["nodeid"]
 
 	container := struct {
 		Nics           []ContainerNIC `json:"nics" yaml:"nics"`
@@ -48,7 +48,7 @@ func (api NodeAPI) CreateContainer(w http.ResponseWriter, r *http.Request) {
 		HostNetworking: reqBody.HostNetworking,
 		Hostname:       reqBody.Hostname,
 		InitProcesses:  reqBody.InitProcesses,
-		Node:           nodeId,
+		Node:           nodeID,
 		Ports:          reqBody.Ports,
 		Storage:        reqBody.Storage,
 	}
@@ -63,7 +63,7 @@ func (api NodeAPI) CreateContainer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Location", fmt.Sprintf("/nodes/%s/containers/%s", nodeId, reqBody.Id))
+	w.Header().Set("Location", fmt.Sprintf("/nodes/%s/containers/%s", nodeID, reqBody.Id))
 	w.WriteHeader(http.StatusCreated)
 
 }
