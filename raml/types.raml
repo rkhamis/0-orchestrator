@@ -89,7 +89,7 @@ DiskInfo:
       description: Type of filesystem
     mountpoint:
       type: string
-      description: Mountpoint of the device
+      description: Mount point of the device
     opts:
       type: string
       description: Mount options
@@ -108,7 +108,7 @@ BridgeCreate:
       description: Name for the bridge to be created
       type: string
     hwaddr:
-      description: Macaddress for the bridge to be created. If none, a random macaddress will be assigned
+      description: MAC address for the bridge to be created. If none, a random MAC address will be assigned.
       type: string
       required: false
     networkMode:
@@ -126,48 +126,46 @@ BridgeCreateSetting:
     start: string
     end: string
   description: |
-    Networking settings, depending on the selected mode.
-      none:
-        no settings, bridge won't get any ip settings
-      static:
-        settings={'cidr': 'ip/net'}
-        bridge will get assigned the given IP address
-      dnsmasq:
-        settings={'cidr': 'ip/net', 'start': 'ip', 'end': 'ip'}
-        bridge will get assigned the ip in cidr
-        and each running container that is attached to this IP will get
-        IP from the start/end range. Netmask of the range is the netmask
-        part of the provided cidr.
-        if nat is true, SNAT rules will be automatically added in the firewall.
+    Networking settings are depending on the selected 'networkMode' as follows:
+      - networkMode = 'none': No settings
+        Bridge won't get any IP settings.
+      - networkMode = 'static': settings={'cidr': 'ip/net'}
+        Bridge will get assigned the given IP address.
+      - networkMode= 'dnsmasq': settings={'cidr': 'ip/net', 'start': 'ip', 'end': 'ip'}
+        Bridge will get assigned the IP address specified for 'cidr'
+        and each running container that is attached to this IP address will get an
+        IP address within the specified start/end range. Netmask of the range is the netmask
+        part of the provided CIDR.
+        If 'nat' is set to true, SNAT rules will be automatically added in the firewall.
 
 
 Job:
   type: object
-  description: Job that is be executed in the Node/Container. More information can be found here https://github.com/g8os/node/blob/master/docs/commands.md
+  description: Job that is be executed in the node/container. More information can be found here https://github.com/g8os/node/blob/master/docs/commands.md
   properties:
     id:
-      description: A unique id for the job with which later on results can be retrieved. If not supplied an id will be generated.
+      description: A unique id for the job. If not supplied an id will be generated.
       type: string
     queue:
-      description: Name of the queue in which this job was be enqued.
+      description: Name of the queue in which this job was been enquequed.
       type: string
     tags:
-      description: Metadata that is be submitted together with the job and is returned with the result.
+      description: Metadata that is been submitted together with the job and is returned with the result.
       type: string
     statsInterval:
       description: Stats gathering interval.
       default: 0
       type: integer
     maxTime:
-      description: Max run time of the job, if exceeded job will be killed
+      description: Max run time of the job, if exceeded job will be killed.
       default: 0
       type: integer
     maxRestart:
-      description: Max number of retries to start the job if failed before giving up.
+      description: Max number of retries to start the job.
       default: 0
       type: integer
     recurringPeriod:
-      description: If provided job is executed every X seconds.
+      description: If provided, job is executed every specified number of seconds.
       default: 0
       type: integer
     logLevels:
@@ -195,7 +193,7 @@ DeleteFile:
       type: string
 
 CPUStats:
-  description: cpu time stats of all cpus combined
+  description: CPU time stats of all CPUs combined
   type: object
   properties:
     user:
@@ -265,17 +263,17 @@ ProcessSignal:
 
 NicLink:
   type: object
-  description: Definition of a virtual nic
+  description: Definition of a virtual NIC.
   properties:
     id:
       type: string
-      description: Vlantag or vxlanid
+      description: VLAN tag or vxlanid
     type:
       enum: [vlan, vxlan, default]
-      description: Type of nic
+      description: Type of NIC
     macaddress:
       type: string
-      description: Phyiscal address of the nic
+      description: Phyiscal address of the NIC
 
 VDiskLink:
   type: object
@@ -285,7 +283,7 @@ VDiskLink:
       type: string
       description: Id of the vdisk
     maxIOps:
-      description: Maximum amount of iops the virtual disk should deliver
+      description: Maximum amount of IOPS the virtual disk should deliver
       type: integer
 
 VMListItem:
@@ -303,7 +301,7 @@ VM:
   type: object
   properties:
     id:
-      description: Unique identifier of the vm
+      description: Unique identifier of the virtual machine
       type: string
     status:
       enum: [running, halted, paused, halting, migrating]
@@ -312,10 +310,10 @@ VM:
       description: Amount of memory in MiB
       type: integer
     cpu:
-      description: Number of virtual CUPs
+      description: Number of virtual CPUs
       type: integer
     nics:
-      description: List of nic specifications.
+      description: List of NIC specifications
       type: NicLink[]
     disks:
       description: List of virtual disks
@@ -329,19 +327,19 @@ VMCreate:
       description: Amount of memory in MiB
       type: integer
     cpu:
-      description: Number of virtual CUPs
+      description: Number of virtual CPUs
       type: integer
     nics:
-      description: List of nic specifications.
+      description: List of NIC specifications
       type: NicLink[]
     disks:
       description: List of virtual disks
       type: string[]
     userCloudInit:
-      description: Userlevel cloudinit configuration
+      description: User level cloudinit configuration
       type: object
     systemCloudInit:
-      description: Systemlevel cloudinit configuration
+      description: System level cloudinit configuration
       type: object
 
 VMUpdate:
@@ -351,10 +349,10 @@ VMUpdate:
       description: Amount of memory in MiB
       type: integer
     cpu:
-      description: Number of virtual CUPs
+      description: Number of virtual CPUs
       type: integer
     nics:
-      description: List of nic specifications.
+      description: List of NIC specifications
       type: NicLink[]
     disks:
       description: List of virtual disks
@@ -369,13 +367,13 @@ Bridge:
       type: string
     setting:
       description: |
-        '' or 'none':
-          no IP is gonna be set on the link
-        'dhcp':
+        - '' or 'none':
+          No IP address is gonna be set on the link
+        - 'dhcp':
           Run `udhcpc` on the container link, of course this will
           only work if the `bridge` is created with `dnsmasq` networking
-        'CIDR':
-          Assign static IP to the link
+        - 'CIDR':
+          Assign static IP address to the link
       type: BridgeCreateSetting
     status:
       enum: [up, down]
@@ -391,7 +389,7 @@ ContainerNIC:
       description: Id specific for interface type either vlantag vxlanid or zerotier networkid
       type: string
     hwaddr:
-      description: Macaddress for the interface. If none, a random macaddress will be assigned
+      description: Mac address for the interface. If none, a random MAC address will be assigned
       type: string
       required: false
     config:
@@ -402,7 +400,7 @@ ContainerNIC:
            default: false
            description: If passed true all other config will be ignored
          cidr:
-           description: IPAddress/Prefix for the interface eg 192.168.103.1/24
+           description: IP Address/Prefix for the interface eg 192.168.103.1/24
            type: string
          gateway:
            type: string
@@ -412,7 +410,7 @@ ContainerNIC:
            type: string[]
            description: List of dns to be used
            required: false
-      description: Optional IPAddress configuration for this interface, only allowed for interfaces of type vxlan and vlan
+      description: Optional IP address configuration for this interface, only allowed for interfaces of type vxlan and vlan
     status:
       enum: [up, down]
       description: Status of the bridge
