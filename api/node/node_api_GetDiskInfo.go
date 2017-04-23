@@ -58,15 +58,15 @@ func (api NodeAPI) GetDiskInfo(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
+		size, err := strconv.Atoi(disk.Size)
+		if err != nil {
+			tools.WriteError(w, http.StatusInternalServerError, err)
+			return
+		}
+
+		diskInfo.Size = size / (1024 * 1024 * 1024) // Convert the size to GB
+
 		if disk.Rota == "1" {
-			size, err := strconv.Atoi(disk.Size)
-			if err != nil {
-				tools.WriteError(w, http.StatusInternalServerError, err)
-				return
-			}
-
-			diskInfo.Size = size / (1024 * 1024 * 1024) // Convert the size to GB
-
 			// Assume that if a disk is more than 7TB it's a SMR disk
 			if diskInfo.Size > (1024 * 7) {
 				diskInfo.Type = EnumDiskInfoTypearchive
