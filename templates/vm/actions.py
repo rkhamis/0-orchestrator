@@ -45,7 +45,7 @@ def create_nbdserver_container(service, parent):
         container_actor = service.aysrepo.actorGet('container')
         args = {
             'node': parent.name,
-            'flist': 'https://hub.gig.tech/gig-official-apps/gonbdserver-master.flist',
+            'flist': 'https://hub.gig.tech/gig-official-apps/blockstor-master.flist',
             'hostNetworking': True,
             'storage': 'ardb://hub.gig.tech:16379',
         }
