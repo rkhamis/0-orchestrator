@@ -2,7 +2,6 @@ package storagecluster
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/g8os/grid/api/tools"
@@ -29,14 +28,11 @@ func (api StorageclustersAPI) ListAllClusters(w http.ResponseWriter, r *http.Req
 	}
 
 	for _, service := range services {
-		fmt.Print("\nname is  ", service.Name)
-		fmt.Print("\n\ndata is  ", service.Data)
 		Data := data{}
 		if err := json.Unmarshal(service.Data, &Data); err != nil {
 			tools.WriteError(w, http.StatusInternalServerError, err)
 			return
 		}
-		fmt.Print("\n\nlabel is ", Data, "\n\n")
 		respBody = append(respBody, Data.Label)
 	}
 	w.Header().Set("Content-Type", "application/json")
