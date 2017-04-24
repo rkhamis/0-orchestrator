@@ -31,16 +31,24 @@ func (api NodeAPI) CreateStoragePool(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	type partitionMap struct {
+		Device   string `yaml:"device" json:"device"`
+		PartUUID string `yaml:"partUUID" json:"partUUID"`
+	}
+
 	bpContent := struct {
 		DataProfile     EnumStoragePoolCreateDataProfile     `yaml:"dataProfile" json:"dataProfile"`
-		Devices         []string                             `yaml:"devices" json:"devices"`
+		Devices         []partitionMap                       `yaml:"devices" json:"devices"`
 		MetadataProfile EnumStoragePoolCreateMetadataProfile `yaml:"metadataProfile" json:"metadataProfile"`
 		Node            string                               `yaml:"node" json:"node"`
 	}{
 		DataProfile:     reqBody.DataProfile,
 		MetadataProfile: reqBody.MetadataProfile,
-		Devices:         reqBody.Devices,
 		Node:            node,
+	}
+
+	for _, device := range reqBody.Devices {
+		bpContent.Devices = append(bpContent.Devices, partitionMap{Device: device})
 	}
 
 	blueprint := map[string]interface{}{
