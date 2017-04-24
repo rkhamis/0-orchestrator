@@ -29,7 +29,7 @@ func KillProcess(pid string, cl client.Client, w http.ResponseWriter) {
 			WriteError(w, http.StatusInternalServerError, err)
 			return
 		}
-		time.Sleep(time.Microsecond * 50)
+		time.Sleep(time.Millisecond * 50)
 
 		if alive, err := core.ProcessAlive(processID); err != nil {
 			WriteError(w, http.StatusInternalServerError, err)
