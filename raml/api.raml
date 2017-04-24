@@ -175,7 +175,8 @@ types:
          delete:
            (DirectAccess):
            displayName: KillNodeProcess
-           description: Kill process
+           description: Kills the process by sending sigterm signal to the process.
+                        If it is still running, a sigkill signal will be sent to the process
            responses:
              204:
                description: Job killed successfully
@@ -635,7 +636,8 @@ types:
              delete:
                (DirectAccess):
                displayName: KillContainerProcess
-               description: Kill Process
+               description: Kills the process by sending sigterm signal to the process.
+                            If it is still running, a sigkill signal will be sent to the process
                responses:
                  204:
                    description: Process killed successfully
