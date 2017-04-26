@@ -30,11 +30,15 @@ func (api NodeAPI) CreateFilesystem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bpContent := struct {
-		FilesystemCreate
+		Name        string `yaml:"name" json:"name"`
+		Quota       uint32 `yaml:"quota" json:"quota"`
+		ReadOnly    bool   `yaml:"readOnly" json:"readOnly"`
 		StoragePool string `json:"storagePool" yaml:"storagePool"`
 	}{
-		FilesystemCreate: reqBody,
-		StoragePool:      storagepool,
+		Name:        reqBody.Name,
+		Quota:       reqBody.Quota,
+		ReadOnly:    reqBody.ReadOnly,
+		StoragePool: storagepool,
 	}
 
 	blueprint := map[string]interface{}{
