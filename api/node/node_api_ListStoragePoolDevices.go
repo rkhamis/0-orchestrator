@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"sort"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/g8os/grid/api/tools"
@@ -18,18 +17,16 @@ func (api NodeAPI) ListStoragePoolDevices(w http.ResponseWriter, r *http.Request
 	var respBody []StoragePoolDevice
 
 	vars := mux.Vars(r)
-	storagepoolname := vars["storagepoolname"]
-	nodeid := vars["nodeid"]
+	storagePoolName := vars["storagepoolname"]
+	nodeId := vars["nodeid"]
 
-	devicesMap, err := api.getStoragePoolDevices(nodeid, storagepoolname)
-	if err != nil {
-		log.Errorf("Error Listing storage pool devices: %+v", err)
-		tools.WriteError(w, http.StatusInternalServerError, err)
+	devices, err := api.getStoragePoolDevices(nodeId, storagePoolName, w)
+	if err {
 		return
 	}
 
-	for _, device := range devicesMap {
-		respBody = append(respBody, StoragePoolDevice{UUID: device.PartUUID})
+	for _, device := range devices {
+		respBody = append(respBody, StoragePoolDevice{UUID: device.PartUUID, DeviceName: device.Device})
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -43,12 +40,12 @@ type DeviceInfo struct {
 }
 
 // Get storagepool devices
-func (api NodeAPI) getStoragePoolDevices(node, storagepool string) ([]DeviceInfo, error) {
+func (api NodeAPI) getStoragePoolDevices(node, storagePool string, w http.ResponseWriter) ([]DeviceInfo, bool) {
 	queryParams := map[string]interface{}{"parent": fmt.Sprintf("node.g8os!%s", node)}
 
-	service, _, err := api.AysAPI.Ays.GetServiceByName(storagepool, "storagepool", api.AysRepo, nil, queryParams)
-	if err != nil {
-		return nil, err
+	service, res, err := api.AysAPI.Ays.GetServiceByName(storagePool, "storagepool", api.AysRepo, nil, queryParams)
+	if !tools.HandleAYSResponse(err, res, w, "Getting storagepool service") {
+		return nil, true
 	}
 
 	var data struct {
@@ -56,18 +53,11 @@ func (api NodeAPI) getStoragePoolDevices(node, storagepool string) ([]DeviceInfo
 	}
 
 	if err := json.Unmarshal(service.Data, &data); err != nil {
-		log.Errorf("Error Unmarshal storagepool service '%s' data: %+v", storagepool, err)
-		return nil, err
+		errMessage := fmt.Errorf("Error Unmarshal storagepool service '%s' data: %+v", storagePool, err)
+		log.Error(errMessage)
+		tools.WriteError(w, http.StatusInternalServerError, errMessage)
+		return nil, true
 	}
 
-	return data.Devices, nil
-}
-
-func containsStrings(slice []string, target string) bool {
-	sort.Strings(slice)
-	i := sort.SearchStrings(slice, target)
-	if i < len(slice) && slice[i] == target {
-		return true
-	}
-	return false
+	return data.Devices, false
 }

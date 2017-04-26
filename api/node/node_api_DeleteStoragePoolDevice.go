@@ -14,13 +14,11 @@ import (
 func (api NodeAPI) DeleteStoragePoolDevice(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	node := vars["nodeid"]
-	storagepool := vars["storagepoolname"]
+	storagePool := vars["storagepoolname"]
 	toDeleteUUID := vars["deviceuuid"]
 
-	devices, err := api.getStoragePoolDevices(node, storagepool)
-	if err != nil {
-		log.Errorf("Error Listing storage pool devices: %+v", err)
-		tools.WriteError(w, http.StatusInternalServerError, err)
+	devices, err := api.getStoragePoolDevices(node, storagePool, w)
+	if err {
 		return
 	}
 
@@ -38,10 +36,10 @@ func (api NodeAPI) DeleteStoragePoolDevice(w http.ResponseWriter, r *http.Reques
 		Devices: updatedDevices,
 	}
 	blueprint := map[string]interface{}{
-		fmt.Sprintf("storagepool__%s", storagepool): bpContent,
+		fmt.Sprintf("storagepool__%s", storagePool): bpContent,
 	}
 
-	if _, err := tools.ExecuteBlueprint(api.AysRepo, "storagepool", storagepool, "removeDevices", blueprint); err != nil {
+	if _, err := tools.ExecuteBlueprint(api.AysRepo, "storagepool", storagePool, "removeDevices", blueprint); err != nil {
 		httpErr := err.(tools.HTTPError)
 		log.Errorf("Error executing blueprint for storagepool device deletion : %+v", err.Error())
 		tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)

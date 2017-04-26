@@ -17,10 +17,8 @@ func (api NodeAPI) CreateStoragePoolDevices(w http.ResponseWriter, r *http.Reque
 	node := vars["nodeid"]
 	storagepool := vars["storagepoolname"]
 
-	devices, err := api.getStoragePoolDevices(node, storagepool)
-	if err != nil {
-		log.Errorf("Error Listing storage pool devices: %+v", err)
-		tools.WriteError(w, http.StatusInternalServerError, err)
+	devices, err := api.getStoragePoolDevices(node, storagepool, w)
+	if err {
 		return
 	}
 
