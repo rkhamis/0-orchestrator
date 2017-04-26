@@ -7,6 +7,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	tools "github.com/g8os/grid/api/tools"
+	//"fmt"
 )
 
 // DeleteVM is the handler for DELETE /nodes/{nodeid}/vms/{vmid}
@@ -14,33 +15,33 @@ import (
 func (api NodeAPI) DeleteVM(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
-	vmid := vars["vmid"]
+	vmId := vars["vmid"]
 
 	obj := make(map[string]interface{})
 	obj["actions"] = []tools.ActionBlock{{
 		"action":  "stop",
 		"actor":   "vm",
-		"service": vmid,
+		"service": vmId,
 		"force":   true,
 	}}
 
-	run, err := tools.ExecuteBlueprint(api.AysRepo, "vm", vmid, "delete", obj)
+	run, err := tools.ExecuteBlueprint(api.AysRepo, "vm", vmId, "delete", obj)
 	if err != nil {
-		log.Errorf("Error executing blueprint for vm %s deletion : %+v", vmid, err)
+		log.Errorf("Error executing blueprint for vm %s deletion : %+v", vmId, err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	if err := tools.WaitRunDone(run.Key, api.AysRepo); err != nil {
-		log.Errorf("Error while waiting for vm %s deletion : %+v", vmid, err)
+		log.Errorf("Error while waiting for vm %s deletion : %+v", vmId, err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	if err := tools.DeleteServiceByName(vmid, "vm", api.AysRepo); err != nil {
-		log.Errorf("Error while deleting vm service %s : %+v", vmid, err)
-		tools.WriteError(w, http.StatusInternalServerError, err)
+	res, err := api.AysAPI.Ays.DeleteServiceByName(vmId, "vm", api.AysRepo, nil, nil)
+	if !tools.HandleAYSResponse(err, res, w, "deleting vm") {
 		return
 	}
+
 	w.WriteHeader(http.StatusNoContent)
 }

@@ -151,14 +151,3 @@ func checkRun(run ays.AYSRun) error {
 	}
 	return nil
 }
-
-func DeleteServiceByName(name, role, repository string) error {
-	resp, err := ayscl.Ays.DeleteServiceByName(name, role, repository, nil, nil)
-	if err != nil {
-		return NewHTTPError(resp, err.Error())
-	}
-	if resp.StatusCode != http.StatusNoContent {
-		return NewHTTPError(resp, resp.Status)
-	}
-	return nil
-}
