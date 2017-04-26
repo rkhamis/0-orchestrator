@@ -38,14 +38,14 @@ func (api VdisksAPI) CreateNewVdisk(w http.ResponseWriter, r *http.Request) {
 	bp := struct {
 		Size           int    `yaml:"size" json:"size"`
 		BlockSize      int    `yaml:"blocksize" json:"blocksize"`
-		TemplateVdisk string `yaml:"templateVdisk" json:"templateVdisk"`
+		TemplateVdisk  string `yaml:"templateVdisk" json:"templateVdisk"`
 		ReadOnly       bool   `yaml:"readOnly" json:"readOnly"`
 		Type           string `yaml:"type" json:"type"`
 		StorageCluster string `yaml:"storageCluster" json:"storageCluster"`
 	}{
 		Size:           reqBody.Size,
 		BlockSize:      reqBody.Blocksize,
-		TemplateVdisk: reqBody.Templatevdisk,
+		TemplateVdisk:  reqBody.Templatevdisk,
 		ReadOnly:       reqBody.ReadOnly,
 		Type:           string(reqBody.Vdisktype),
 		StorageCluster: reqBody.Storagecluster,
