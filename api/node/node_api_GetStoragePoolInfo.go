@@ -45,10 +45,8 @@ type storagePoolSchema struct {
 	DataProfile     EnumStoragePoolDataProfile     `json:"dataProfile"`
 	MetadataProfile EnumStoragePoolMetadataProfile `json:"metadataProfile"`
 	Status          EnumStoragePoolStatus          `json:"status"`
-	Devices         []string                       `json:"devices"`
 	FreeCapacity    uint64                         `json:"freeCapacity"`
 	Mountpoint      string                         `json:"mountpoint" validate:"nonzero"`
-	Node            string                         `json:"node"`
 	TotalCapacity   uint64                         `json:"totalCapacity"`
 }
 
