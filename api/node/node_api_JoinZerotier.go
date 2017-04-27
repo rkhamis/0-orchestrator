@@ -60,6 +60,7 @@ func (api NodeAPI) JoinZerotier(w http.ResponseWriter, r *http.Request) {
 		} else {
 			tools.WriteError(w, http.StatusInternalServerError, err)
 		}
+		api.AysAPI.Ays.DeleteServiceByName(fmt.Sprintf("%s_%s", nodeID, reqBody.Nwid), "zerotier", api.AysRepo, nil, nil)
 		return
 	}
 
