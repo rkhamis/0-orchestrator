@@ -46,5 +46,11 @@ func (api NodeAPI) ExitZerotier(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	res, err := api.AysAPI.Ays.DeleteServiceByName(fmt.Sprintf("%s_%s", nodeID, zerotierID), "zerotier", api.AysRepo, nil, nil)
+
+	if !tools.HandleAYSResponse(err, res, w, fmt.Sprintf("Exiting zerotier %s", fmt.Sprintf("%s_%s", nodeID, zerotierID))) {
+		return
+	}
+
 	w.WriteHeader(http.StatusNoContent)
 }

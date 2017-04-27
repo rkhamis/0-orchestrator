@@ -12,11 +12,11 @@ import (
 // ListZerotier is the handler for GET /nodes/{nodeid}/zerotiers
 // List running Zerotier networks
 func (api NodeAPI) ListZerotier(w http.ResponseWriter, r *http.Request) {
-	nodeId := mux.Vars(r)["nodeid"]
+	nodeID := mux.Vars(r)["nodeid"]
 	// Only zerotiers with the node from the request as parent
 	queryParams := map[string]interface{}{
 		"fields": "nwid,status,type",
-		"parent": fmt.Sprintf("node.g8os!%s", nodeId),
+		"parent": fmt.Sprintf("node.g8os!%s", nodeID),
 	}
 
 	services, res, err := api.AysAPI.Ays.ListServicesByRole("zerotier", api.AysRepo, nil, queryParams)
