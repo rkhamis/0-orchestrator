@@ -185,7 +185,7 @@ def stop(job):
 
 def pause(job):
     service = job.service
-    job.logger.info("resume vm {}".format(service.name))
+    job.logger.info("pause vm {}".format(service.name))
     client = get_node_client(service)
     kvm = get_domain(service)
     if kvm:
@@ -199,6 +199,15 @@ def resume(job):
     kvm = get_domain(service)
     if kvm:
         client.kvm.resume(kvm['uuid'])
+
+
+def shutdown(job):
+    service = job.service
+    job.logger.info("shutdown vm {}".format(service.name))
+    client = get_node_client(service)
+    kvm = get_domain(service)
+    if kvm:
+        client.kvm.shutdown(kvm['uuid'])
 
 
 def migrate(job):
