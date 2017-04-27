@@ -32,7 +32,7 @@ func (api NodeAPI) JoinZerotier(w http.ResponseWriter, r *http.Request) {
 
 	// Create join blueprint
 	bp := struct {
-		NetworkID string `json:"networkID" yaml:"networkID"`
+		NetworkID string `json:"nwid" yaml:"nwid"`
 		Node      string `json:"node" yaml:"node"`
 	}{
 		NetworkID: reqBody.Nwid,
