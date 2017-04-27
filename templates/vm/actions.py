@@ -190,6 +190,7 @@ def pause(job):
     kvm = get_domain(service)
     if kvm:
         client.kvm.pause(kvm['uuid'])
+        service.model.data.status = 'paused'
 
 
 def resume(job):
@@ -199,15 +200,29 @@ def resume(job):
     kvm = get_domain(service)
     if kvm:
         client.kvm.resume(kvm['uuid'])
+        service.model.data.status = 'running'
 
 
 def shutdown(job):
+    import time
     service = job.service
     job.logger.info("shutdown vm {}".format(service.name))
     client = get_node_client(service)
     kvm = get_domain(service)
     if kvm:
         client.kvm.shutdown(kvm['uuid'])
+        service.model.data.status = 'halting'
+        # wait for max 60 seconds for vm to be shutdown
+        start = time.time()
+        while start + 60 > time.time():
+            kvm = get_domain(service)
+            if kvm and kvm['state'] == 'shutdown':
+                service.model.data.status = 'halted'
+                break
+            else:
+                time.sleep(3)
+        else:
+            raise j.exceptions.RuntimeError("Failed to shutdown vm {}".format(service.name))
 
 
 def migrate(job):
