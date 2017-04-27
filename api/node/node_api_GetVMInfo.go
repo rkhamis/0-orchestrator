@@ -62,6 +62,7 @@ func (api NodeAPI) GetVMInfo(w http.ResponseWriter, r *http.Request) {
 		respBody.CPU = append(respBody.CPU, cpu.Time)
 	}
 
+	respBody.Disk = []VMDiskInfo{}
 	// Get Disk Information
 	for _, disk := range vminfo.Block {
 		diskInfo := VMDiskInfo{
@@ -73,6 +74,7 @@ func (api NodeAPI) GetVMInfo(w http.ResponseWriter, r *http.Request) {
 		respBody.Disk = append(respBody.Disk, diskInfo)
 	}
 
+	respBody.Net = []VMNetInfo{}
 	// Get network information
 	for _, net := range vminfo.Network {
 		netInfo := VMNetInfo{
