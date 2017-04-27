@@ -1,5 +1,13 @@
 from JumpScale import j
 
+def input(job):
+    for required in['zerotierNetID', 'zerotierToken']:
+        if not job.model.args.get(required):
+            raise j.exceptions.Input("{} cannot be empty".format(required))
+
+    return job.model.args
+
+
 def is_valid_nic(nic):
     for exclude in ['zt', 'core', 'kvm', 'lo']:
         if nic['name'].startswith(exclude):
@@ -20,11 +28,14 @@ def bootstrap(job):
     members = resp.json()
 
     for member in members:
-        try_authorize(service, job.logger, netid, member, zerotier)
-
+        try:
+            try_authorize(service, job.logger, netid, member, zerotier)
+        except Exception as err:
+            job.logger.error(str(err))
+            member['config']['authorized'] = False
+            zerotier.network.updateMember(member, member['nodeId'], netid)
 
 def try_authorize(service, logger, netid, member, zerotier):
-    from redis import ConnectionError
     import time
 
     if not member['online'] or member['config']['authorized']:
@@ -55,26 +66,19 @@ def try_authorize(service, logger, netid, member, zerotier):
         except:
             continue
     else:
-        logger.info("can't connect, unauthorize member IP: {}".format(zerotier_ip))
-        member['config']['authorized'] = False
-        zerotier.network.updateMember(member, member['nodeId'], netid)
-        return
+        raise RuntimeError("can't connect, unauthorize member IP: {}".format(zerotier_ip))
 
     # read mac Addr of g8os
     mac = None
-    try:
-        for nic in filter(is_valid_nic, g8.info.nic()):
-            # get mac address and ip of the management interface
-            if len(nic['addrs']) > 0 and nic['addrs'][0]['addr'] != '':
-                mac = nic['hardwareaddr']
-                break
-    except ConnectionError:
-        logger.error("can't connect to g8os at {}".format(zerotier_ip))
-        return
+
+    for nic in filter(is_valid_nic, g8.info.nic()):
+        # get mac address and ip of the management interface
+        if len(nic['addrs']) > 0 and nic['addrs'][0]['addr'] != '':
+            mac = nic['hardwareaddr']
+            break
 
     if mac is None:
-        logger.error("can't find mac address of the zerotier member ({})".format(member['physicalAddress']))
-        return
+        raise RuntimeError("can't find mac address of the zerotier member ({})".format(member['physicalAddress']))
 
     # create node.g8os service
     mac = mac.replace(':', '')
@@ -99,6 +103,22 @@ def try_authorize(service, logger, netid, member, zerotier):
         }
         logger.info("create node.g8os service {}".format(mac))
         node = node_actor.serviceCreate(instance=mac, args=node_args)
+        try:
 
-        logger.info("install node.g8os service {}".format(mac))
-        j.tools.async.wrappers.sync(node.executeAction('install'))
+            logger.info("install node.g8os service {}".format(mac))
+            j.tools.async.wrappers.sync(node.executeAction('install'))
+        except:
+            j.tools.async.wrappers.sync(node.delete())
+            raise
+
+def processChange(job):
+    service = job.service
+    args = job.model.args
+    category = args.pop('changeCategory')
+    if category == "dataschema":
+        ztID = job.model.args.get('zerotierNetID')
+        if ztID:
+            service.model.data.zerotierNetID = ztID
+        token = job.model.args.get('zerotierToken')
+        if token:
+            service.model.data.zerotierToken = token
