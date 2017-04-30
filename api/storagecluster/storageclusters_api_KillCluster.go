@@ -1,6 +1,7 @@
 package storagecluster
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/g8os/grid/api/tools"
@@ -22,6 +23,19 @@ func (api StorageclustersAPI) KillCluster(w http.ResponseWriter, r *http.Request
 			"actor":   "storage_cluster",
 			"service": storage_cluster,
 		}},
+	}
+
+	_, resp, err := api.AysAPI.Ays.GetServiceByName(storage_cluster, "storage_cluster", api.AysRepo, nil, nil)
+
+	if err != nil {
+		log.Errorf("error executing blueprint for Storage cluster %s deletion : %+v", storage_cluster, err)
+		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if resp.StatusCode == http.StatusNotFound {
+		tools.WriteError(w, http.StatusNotFound, fmt.Errorf("Storage cluster %s does not exist", storage_cluster))
+		return
 	}
 
 	run, err := tools.ExecuteBlueprint(api.AysRepo, "storage_cluster", storage_cluster, "delete", blueprint)
