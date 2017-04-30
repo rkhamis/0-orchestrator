@@ -273,12 +273,12 @@ def updatedevices(service, client, args):
             if new_disks:
                 new_disks = list(new_disks)
                 for new_disk in new_disks:
-                    client.experimental.kvm.attachDisk(service.name, new_disk)
+                    client.kvm.attachDisk(service.name, new_disk)
             old_disks = set(service.model.data.disks) - set(args['disks'])
             if old_disks:
                 old_disks = list(old_disks)
                 for old_disk in old_disks:
-                    client.experimental.kvm.detachDisk(service.name, old_disk)
+                    client.kvm.detachDisk(service.name, old_disk)
 
 # TODO removeNic and addNic not implmented as required code will be added when they are done.
     # if 'nics' in args['nics'] != service.model.data.nics:
@@ -301,6 +301,15 @@ def monitor(job):
     # raise NotADirectoryError()
 
 
+def update_data(job, client, args):
+    service = job.service
+
+    service.model.data.memory = args['memory']
+    service.model.data.cpu = args['cpu']
+    stop(job)
+    start(job)
+
+
 def processChange(job):
     service = job.service
 
@@ -309,6 +318,7 @@ def processChange(job):
     if category == "dataschema" and service.model.actionsState['install'] == 'ok':
         try:
             client = get_node_client(service)
+            update_data(job, client, args)
             updatedevices(service, client, args)
         except ValueError:
             job.logger.error("vm {} doesn't exist, cant update devices", service.name)
