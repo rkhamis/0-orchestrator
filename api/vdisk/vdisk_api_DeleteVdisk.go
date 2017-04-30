@@ -1,6 +1,7 @@
 package vdisk
 
 import (
+	"fmt"
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
@@ -15,6 +16,19 @@ func (api VdisksAPI) DeleteVdisk(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	vdiskID := vars["vdiskid"]
+
+	_, resp, err := api.AysAPI.Ays.GetServiceByName(vdiskID, "vdisk", api.AysRepo, nil, nil)
+
+	if err != nil {
+		log.Errorf("error executing blueprint for vdisk %s deletion : %+v", vdiskID, err)
+		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if resp.StatusCode == http.StatusNotFound {
+		tools.WriteError(w, http.StatusNotFound, fmt.Errorf("A vdisk with ID %s does not exist", vdiskID))
+		return
+	}
 
 	// execute the delete action of the snapshot
 	blueprint := map[string]interface{}{
