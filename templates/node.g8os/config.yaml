@@ -1,6 +1,6 @@
 links:
   consume:
-    - auto: true
+    - auto: false
       min: 0
       max: 9999
       role: network
