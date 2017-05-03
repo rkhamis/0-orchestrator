@@ -30,10 +30,14 @@ def install(job):
         raise j.exceptions.NotFound("not grid_config service installed. {} can't get the grid API URL.".format(service))
 
     grid_addr = services[0].model.data.apiURL
-
+    vdiskservice = service.aysrepo.serviceGet(role='vdisk', instance=service.name)
     container = get_container(service)
-    config = container.node.client.config.get()
-    rootardb = urlparse(config['globals']['storage']).netloc
+    template = urlparse(vdiskservice.model.data.templateVdisk)
+    if template.scheme == 'ardb':
+        rootardb = template.netloc
+    else:
+        config = container.node.client.config.get()
+        rootardb = urlparse(config['globals']['storage']).netloc
     socketpath = '/server.socket.{id}'.format(id=service.name)
     if not is_running(container, service.name):
         container.client.system(
