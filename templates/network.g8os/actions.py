@@ -108,5 +108,7 @@ def configure(job):
     container_client.json('ovs.bridge-add', {"bridge": "backplane"})
     container_client.json('ovs.port-add', {"bridge": "backplane", "port": interface, "vlan": 0})
     node_client.system('ip address add {addr} dev backplane'.format(addr=storageaddr))
+    node_client.system('ip link set dev backplane up')
     container_client.json('ovs.vlan-ensure', {'master': 'backplane', 'vlan': service.model.data.vlanTag, 'name': 'vxbackend'})
     node_client.system('ip address add {addr} dev vxbackend'.format(addr=vxaddr))
+    node_client.system('ip link set dev vxbackend up')
