@@ -42,7 +42,6 @@ func (api VdisksAPI) ResizeVdisk(w http.ResponseWriter, r *http.Request) {
 
 	obj := make(map[string]interface{})
 	obj[decl] = bp
-	obj["actions"] = []map[string]string{map[string]string{"action": "resize"}}
 
 	// And execute
 	if _, err := tools.ExecuteBlueprint(api.AysRepo, "vdisk", vdiskID, "resize", obj); err != nil {

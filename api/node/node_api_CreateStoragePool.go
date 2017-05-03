@@ -63,6 +63,7 @@ func (api NodeAPI) CreateStoragePool(w http.ResponseWriter, r *http.Request) {
 		httpErr := err.(tools.HTTPError)
 		log.Errorf("Error executing blueprint for storagepool creation : %+v", err.Error())
 		tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)
+		return
 	}
 
 	w.Header().Set("Location", fmt.Sprintf("/nodes/%s/storagepools/%s", node, reqBody.Name))
