@@ -55,16 +55,16 @@ type NodesInterface interface { // ListNodes is the handler for GET /node
 	// ListFilesystemSnapshots is the handler for GET /node/{nodeid}/storagepool/{storagepoolname}/filesystems/{filesystemname}/snapshot
 	// List snapshots of this filesystem
 	ListFilesystemSnapshots(http.ResponseWriter, *http.Request)
-	// CreateSnapshot is the handler for POST /node/{nodeid}/storagepool/{storagepoolname}/filesystems/{filesystemname}/snapshot
+	// CreateSnapshot is the handler for POST /node/{nodeid}/storagepool/{storagepoolname}/filesystems/{filesystemname}/snapshots
 	// Create a new readonly filesystem of the current state of the vdisk
 	CreateSnapshot(http.ResponseWriter, *http.Request)
-	// GetFilesystemSnapshotInfo is the handler for GET /node/{nodeid}/storagepool/{storagepoolname}/filesystems/{filesystemname}/snapshot/{snapshotname}
+	// GetFilesystemSnapshotInfo is the handler for GET /node/{nodeid}/storagepool/{storagepoolname}/filesystems/{filesystemname}/snapshots/{snapshotname}
 	// Get detailed information on the snapshot
 	GetFilesystemSnapshotInfo(http.ResponseWriter, *http.Request)
-	// DeleteFilesystemSnapshot is the handler for DELETE /node/{nodeid}/storagepool/{storagepoolname}/filesystems/{filesystemname}/snapshot/{snapshotname}
+	// DeleteFilesystemSnapshot is the handler for DELETE /node/{nodeid}/storagepool/{storagepoolname}/filesystems/{filesystemname}/snapshots/{snapshotname}
 	// Delete snapshot
 	DeleteFilesystemSnapshot(http.ResponseWriter, *http.Request)
-	// RollbackFilesystemSnapshot is the handler for POST /node/{nodeid}/storagepool/{storagepoolname}/filesystems/{filesystemname}/snapshot/{snapshotname}/rollback
+	// RollbackFilesystemSnapshot is the handler for POST /node/{nodeid}/storagepool/{storagepoolname}/filesystems/{filesystemname}/snapshots/{snapshotname}/rollback
 	// Rollback the filesystem to the state at the moment the snapshot was taken
 	RollbackFilesystemSnapshot(http.ResponseWriter, *http.Request)
 	// ListVMs is the handler for GET /node/{nodeid}/vms
@@ -256,11 +256,11 @@ func NodesInterfaceRoutes(r *mux.Router, i NodesInterface) {
 	r.HandleFunc("/nodes/{nodeid}/storagepools/{storagepoolname}/filesystems", i.CreateFilesystem).Methods("POST")
 	r.HandleFunc("/nodes/{nodeid}/storagepools/{storagepoolname}/filesystems/{filesystemname}", i.GetFilesystemInfo).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/storagepools/{storagepoolname}/filesystems/{filesystemname}", i.DeleteFilesystem).Methods("DELETE")
-	r.HandleFunc("/nodes/{nodeid}/storagepools/{storagepoolname}/filesystems/{filesystemname}/snapshot", i.ListFilesystemSnapshots).Methods("GET")
-	r.HandleFunc("/nodes/{nodeid}/storagepools/{storagepoolname}/filesystems/{filesystemname}/snapshot", i.CreateSnapshot).Methods("POST")
-	r.HandleFunc("/nodes/{nodeid}/storagepools/{storagepoolname}/filesystems/{filesystemname}/snapshot/{snapshotname}", i.GetFilesystemSnapshotInfo).Methods("GET")
-	r.HandleFunc("/nodes/{nodeid}/storagepools/{storagepoolname}/filesystems/{filesystemname}/snapshot/{snapshotname}", i.DeleteFilesystemSnapshot).Methods("DELETE")
-	r.HandleFunc("/nodes/{nodeid}/storagepools/{storagepoolname}/filesystems/{filesystemname}/snapshot/{snapshotname}/rollback", i.RollbackFilesystemSnapshot).Methods("POST")
+	r.HandleFunc("/nodes/{nodeid}/storagepools/{storagepoolname}/filesystems/{filesystemname}/snapshots", i.ListFilesystemSnapshots).Methods("GET")
+	r.HandleFunc("/nodes/{nodeid}/storagepools/{storagepoolname}/filesystems/{filesystemname}/snapshots", i.CreateSnapshot).Methods("POST")
+	r.HandleFunc("/nodes/{nodeid}/storagepools/{storagepoolname}/filesystems/{filesystemname}/snapshots/{snapshotname}", i.GetFilesystemSnapshotInfo).Methods("GET")
+	r.HandleFunc("/nodes/{nodeid}/storagepools/{storagepoolname}/filesystems/{filesystemname}/snapshots/{snapshotname}", i.DeleteFilesystemSnapshot).Methods("DELETE")
+	r.HandleFunc("/nodes/{nodeid}/storagepools/{storagepoolname}/filesystems/{filesystemname}/snapshots/{snapshotname}/rollback", i.RollbackFilesystemSnapshot).Methods("POST")
 	r.HandleFunc("/nodes/{nodeid}/vms", i.ListVMs).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/vms", i.CreateVM).Methods("POST")
 	r.HandleFunc("/nodes/{nodeid}/vms/{vmid}", i.GetVM).Methods("GET")
