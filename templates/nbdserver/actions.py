@@ -63,6 +63,7 @@ def install(job):
         raise j.exceptions.RuntimeError("Failed to start nbdserver {}".format(service.name))
 
     service.model.data.socketPath = '/server.socket.{id}'.format(id=service.name)
+    service.saveAll()
 
 
 def start(job):

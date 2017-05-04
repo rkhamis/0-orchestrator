@@ -7,7 +7,7 @@ def input(job):
     if args.get('vdisks'):
         raise j.exceptions.Input('vdisks property should not be set in the blueprint. Instead use disks property.')
     disks = args.get("disks", [])
-    if disks:
+    if disks != []:
         args['vdisks'] = [disk['vdiskid'] for disk in disks]
     return args
 
@@ -61,13 +61,33 @@ def create_nbd(service, container, vdisk):
     if nbdserver is None:
         nbd_actor = service.aysrepo.actorGet('nbdserver')
         args = {
-            # 'backendControllerUrl': '', #FIXME
-            # 'vdiskControllerUrl': '', #FIXME
+            # 'backendControllerUrl': '', # FIXME
+            # 'vdiskControllerUrl': '', # FIXME
             'container': container.name,
         }
         nbdserver = nbd_actor.serviceCreate(instance=nbd_name, args=args)
 
     return nbdserver
+
+
+def _init_nbd_services(job, vdisk_container, vdisks):
+    service = job.service
+    for vdisk in vdisks:
+        if isinstance(vdisk, str):
+            try:
+                vdisk = service.aysrepo.serviceGet(role='vdisk', instance=vdisk)
+            except j.exceptions.NotFound:
+                raise j.exceptions.RuntimeError("Service vdisk!{} not found".format(vdisk))
+
+        job.logger.info("creates nbd server for vm {}".format(service.name))
+        nbdserver = create_nbd(service, vdisk_container, vdisk)
+        service.consume(nbdserver)
+
+
+def _nbd_url(container, nbdserver):
+    container_root = container.info['container']['root']
+    socket_path = j.sal.fs.joinPaths(container_root, nbdserver.model.data.socketPath.lstrip('/'))
+    return 'nbd+unix:///{id}?socket={socket}'.format(id=nbdserver.model.name, socket=socket_path)
 
 
 def init(job):
@@ -76,17 +96,11 @@ def init(job):
     # creates all nbd servers for each vdisk this vm uses
     job.logger.info("creates vdisks container for vm {}".format(service.name))
     vdisk_container = create_nbdserver_container(service, service.parent)
-
-    for vdisk in service.producers.get('vdisk', []):
-        job.logger.info("creates nbd server for vm {}".format(service.name))
-        nbdserver = create_nbd(service, vdisk_container, vdisk)
-        service.consume(nbdserver)
+    _init_nbd_services(job, vdisk_container, service.producers.get('vdisk', []))
 
 
-def install(job):
+def _start_nbds(service):
     from JumpScale.sal.g8os.Container import Container
-    import time
-    service = job.service
 
     # get all path to the vdisks serve by the nbdservers
     medias = []
@@ -96,13 +110,20 @@ def install(job):
         if not container.is_running():
             # start container
             j.tools.async.wrappers.sync(nbdserver.parent.executeAction('start'))
-        container_root = container.info['container']['root']
-        socket_path = j.sal.fs.joinPaths(container_root, nbdserver.model.data.socketPath.lstrip('/'))
-        url = 'nbd+unix:///{id}?socket={socket}'.format(id=nbdserver.model.name, socket=socket_path)
-        medias.append({'url': url})
 
         # make sure the nbdserver is started
         j.tools.async.wrappers.sync(nbdserver.executeAction('start'))
+        url = _nbd_url(container, nbdserver)
+        medias.append({'url': url})
+    return medias
+
+
+def install(job):
+    import time
+    service = job.service
+
+    # get all path to the vdisks serve by the nbdservers
+    medias = _start_nbds(service)
 
     job.logger.info("create vm {}".format(service.name))
     node = get_node(service)
@@ -252,36 +273,95 @@ def migrate(job):
     j.tools.async.wrappers.sync(old_vdisk_container.delete())
 
 
-def updatedevices(service, node, args):
+def _remove_duplicates(col):
+    try:
+        return [dict(t) for t in set([tuple(element.items()) for element in col])]
+    except AttributeError:
+        return [dict(t) for t in set([tuple(element.to_dict().items()) for element in col])]
+
+
+def _diff(col1, col2):
+    col1 = _remove_duplicates(col1)
+    col2 = _remove_duplicates(col2)
+    return [elem for elem in col1 if elem not in col2]
+
+
+def updateDisks(job, client, args):
+    from JumpScale.sal.g8os.Container import Container
+    service = job.service
+
+    vdisk_container = create_nbdserver_container(service, service.parent)
+    uuid = get_domain(service)['uuid']
+
     # mean we want to migrate vm from a node to another
     if 'node' in args and args['node'] != service.model.data.node:
         j.tools.async.wrappers.sync(service.executeAction('migrate', args={'node': args['node']}))
-    if 'disks' in args['disks'] != service.model.data.disks:
-            new_disks = set(args['disks']) - set(service.model.data.disks)
-            if new_disks:
-                new_disks = list(new_disks)
-                for new_disk in new_disks:
-                    node.client.kvm.attachDisk(service.name, new_disk)
-            old_disks = set(service.model.data.disks) - set(args['disks'])
-            if old_disks:
-                old_disks = list(old_disks)
-                for old_disk in old_disks:
-                    node.client.kvm.detachDisk(service.name, old_disk)
 
-# TODO removeNic and addNic not implmented as required code will be added when they are done.
-    # if 'nics' in args['nics'] != service.model.data.nics:
-    #     bp_nics = [(nic.id, nic.type) for nic in args['nics']]
-    #     loaded_nics = [(nic.id, nic.type) for nic in service.model.data.nics]
-    #     nics = set(bp_nics) - set(loaded_nics)
-    #     if nics:
-    #         nics = list(nics)
-    #         for nic in nics:
-    #             client.experimental.kvm.addNic(service.name, nic)
-    #     nics = set(loaded_nics) - set(bp_nics)
-    #     if nics:
-    #         nics = list(nics)
-    #         for nic in nics:
-    #             client.experimental.kvm.removeNic(service.name, nic)
+    # Get new and old disks
+    new_disks = _diff(args['disks'], service.model.data.disks)
+    old_disks = _diff(service.model.data.disks, args['disks'])
+
+    # Do nothing if no disk change
+    if new_disks == [] and old_disks == []:
+        return
+
+    old_disks_id = [disk['vdiskid'] for disk in old_disks]
+
+    # Set model to new data
+    service.model.data.disks = args['disks']
+    service.model.data.vdisks = [disk['vdiskid'] for disk in args['disks']]
+
+    # Detatching and Cleaning old disks
+    if old_disks != []:
+        for nbdserver in service.producers.get('nbdserver', []):
+            nbdserver_name = nbdserver.name
+            if nbdserver_name in old_disks_id:
+                container = Container.from_ays(nbdserver.parent)
+                url = _nbd_url(container, nbdserver)
+                client.client.kvm.detach_disk(uuid, {'url': url})
+                j.tools.async.wrappers.sync(nbdserver.executeAction('stop'))
+                j.tools.async.wrappers.sync(nbdserver.delete())
+
+    # Attaching new disks
+    if new_disks != []:
+        _init_nbd_services(job, vdisk_container, service.model.data.vdisks)
+        medias = _start_nbds(service)
+        for media in medias:
+            client.client.kvm.attach_disk(uuid, media)
+            # TODO: Limit IOPS
+    service.saveAll()
+
+
+def updateNics(job, client, args):
+    service = job.service
+    uuid = get_domain(service)['uuid']
+
+    # Get new and old disks
+    new_nics = _diff(args['nics'], service.model.data.nics)
+    old_nics = _diff(service.model.data.nics, args['nics'])
+
+    # Do nothing if no nic change
+    if new_nics == [] and old_nics == []:
+        return
+
+    # Add new nics
+    for nic in new_nics:
+        if nic not in service.model.data.nics:
+            for nic in service.model.data.nics:
+                nic = nic.to_dict()
+                nic['hwaddr'] = nic.pop('macaddress', None)
+                client.client.kvm.add_nic(uuid, nic)
+
+    # Remove nics
+    for nic in old_nics:
+        if nic not in service.model.data.nics:
+            for nic in service.model.data.nics:
+                nic = nic.to_dict()
+                nic['hwaddr'] = nic.pop('macaddress', None)
+                client.client.kvm.add_nic(uuid, nic)
+
+    service.model.data.nics = args['nics']
+    service.saveAll()
 
 
 def monitor(job):
@@ -307,6 +387,6 @@ def processChange(job):
         try:
             node = get_node(service)
             update_data(job, args)
-            updatedevices(service, node, args)
+            updateDisks(job, node, args)
         except ValueError:
             job.logger.error("vm {} doesn't exist, cant update devices", service.name)
