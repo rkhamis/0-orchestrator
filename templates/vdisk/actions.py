@@ -11,20 +11,24 @@ def install(job):
         if len(services) <= 0:
             raise j.exceptions.NotFound("not grid_config service installed. {} can't get the grid API URL.".format(service))
 
+        template = urlparse(service.model.data.templateVdisk)
         grid_addr = services[0].model.data.apiURL
         storagecluster = service.aysrepo.serviceGet(role='storage_cluster', instance=service.model.data.storageCluster)
         target_node = random.choice(storagecluster.producers['node'])
 
         volume_container = create_from_template_container(service, target_node)
         try:
-            node_client = j.clients.g8core.get(host=target_node.model.data.redisAddr,
-                                               port=target_node.model.data.redisPort,
-                                               password=target_node.model.data.redisPassword)
-            config = node_client.config.get()
-            masterardb = urlparse(config['globals']['storage']).netloc
-            CMD = '/bin/copyvdisk -sourcetype direct -targettype api {src_name} {dst_name} {masterardb} {grid_addr}'
-            cmd = CMD.format(dst_name=service.name, src_name=service.model.data.templateVdisk, grid_addr=grid_addr,
-                             masterardb=masterardb)
+            if template.scheme in ('', 'ardb'):
+                if template.scheme == '':
+                    config = volume_container.node.client.config.get()
+                    masterardb = urlparse(config['globals']['storage']).netloc
+                else:
+                    masterardb = template.netloc
+                CMD = '/bin/copyvdisk -sourcetype direct -targettype api {src_name} {dst_name} {masterardb} {grid_addr}'
+                cmd = CMD.format(dst_name=service.name, src_name=template.path.lstrip('/'), grid_addr=grid_addr,
+                                 masterardb=masterardb)
+            else:
+                raise j.exceptions.RuntimeError("Unsupport protocol {}".format(template.scheme))
             print(cmd)
             result = volume_container.client.system(cmd).get()
             if result.state != 'SUCCESS':
