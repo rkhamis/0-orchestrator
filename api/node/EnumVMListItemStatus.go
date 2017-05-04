@@ -6,4 +6,5 @@ const (
 	EnumVMListItemStatusrunning EnumVMListItemStatus = "running"
 	EnumVMListItemStatushalted  EnumVMListItemStatus = "halted"
 	EnumVMListItemStatuspaused  EnumVMListItemStatus = "paused"
+	EnumVMListItemStatuserror   EnumVMListItemStatus = "error"
 )

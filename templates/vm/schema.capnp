@@ -13,11 +13,12 @@ struct Schema {
     systemCloudInit @9: Text;
 
     enum Status{
-        halted @0;
-        running @1;
-        paused @2;
-        halting @3;
-        migrating @4;
+        error @0;
+        halted @1;
+        running @2;
+        paused @3;
+        halting @4;
+        migrating @5;
     }
 
     struct NicLink {
