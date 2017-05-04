@@ -33,7 +33,7 @@ def install(job):
     vdiskservice = service.aysrepo.serviceGet(role='vdisk', instance=service.name)
     container = get_container(service)
     template = urlparse(vdiskservice.model.data.templateVdisk)
-    if template.scheme == 'ardb':
+    if template.scheme == 'ardb' and template.netloc:
         rootardb = template.netloc
     else:
         config = container.node.client.config.get()

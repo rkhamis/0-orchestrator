@@ -19,7 +19,7 @@ def install(job):
         volume_container = create_from_template_container(service, target_node)
         try:
             if template.scheme in ('', 'ardb'):
-                if template.scheme == '':
+                if template.scheme == '' or template.netloc == '':
                     config = volume_container.node.client.config.get()
                     masterardb = urlparse(config['globals']['storage']).netloc
                 else:
