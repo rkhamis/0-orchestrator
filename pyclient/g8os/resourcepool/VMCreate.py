@@ -2,6 +2,7 @@
 Auto-generated class for VMCreate
 """
 from .NicLink import NicLink
+from .VDiskLink import VDiskLink
 
 from . import client_support
 
@@ -15,7 +16,7 @@ class VMCreate(object):
     def create(cpu, disks, id, memory, nics, systemCloudInit, userCloudInit):
         """
         :type cpu: int
-        :type disks: list[str]
+        :type disks: list[VDiskLink]
         :type id: str
         :type memory: int
         :type nics: list[NicLink]
@@ -58,7 +59,7 @@ class VMCreate(object):
         property_name = 'disks'
         val = data.get(property_name)
         if val is not None:
-            datatypes = [str]
+            datatypes = [VDiskLink]
             try:
                 self.disks = client_support.list_factory(val, datatypes)
             except ValueError as err:
