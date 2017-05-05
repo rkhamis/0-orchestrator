@@ -49,7 +49,7 @@ def try_authorize(service, logger, netid, member, zerotier):
     zerotier_ip = member['config']['ipAssignments'][0]
 
     # test if we can connect to the new member
-    g8 = j.clients.g8core.get(zerotier_ip)
+    g8 = j.clients.g8core.get(zerotier_ip, testConnectionAttempts=0)
     g8.timeout = 10
     for attempt in range(5):
         try:
