@@ -1,6 +1,6 @@
-# grid
-Stateless g8os grid api server
+# resource pool
+Stateless g8os resource pool api server
 
 
 Architecture:
-![Architecture](g8os-grid.png)
+![Architecture](g8os-resourcepool.png)
