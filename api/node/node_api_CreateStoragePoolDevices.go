@@ -22,6 +22,12 @@ func (api NodeAPI) CreateStoragePoolDevices(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	nodeDevices, errMsg := api.GetNodeDevices(w, r)
+	if errMsg != nil {
+		tools.WriteError(w, http.StatusInternalServerError, errMsg)
+		return
+	}
+
 	deviceMap := map[string]struct{}{}
 	for _, dev := range devices {
 		deviceMap[dev.Device] = struct{}{}
@@ -40,6 +46,14 @@ func (api NodeAPI) CreateStoragePoolDevices(w http.ResponseWriter, r *http.Reque
 		if _, exists := deviceMap[dev]; exists {
 			continue
 		}
+
+		_, ok := nodeDevices[dev]
+		if !ok {
+			err := fmt.Errorf("Device %v doesn't exist", dev)
+			tools.WriteError(w, http.StatusBadRequest, err)
+			return
+		}
+
 		devices = append(devices, DeviceInfo{
 			Device: dev,
 		})

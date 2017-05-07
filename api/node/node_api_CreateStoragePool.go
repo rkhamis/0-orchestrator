@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/g8os/go-client"
 	"github.com/g8os/grid/api/tools"
 	"github.com/gorilla/mux"
 
@@ -31,6 +32,12 @@ func (api NodeAPI) CreateStoragePool(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	devices, err := api.GetNodeDevices(w, r)
+	if err != nil {
+		tools.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
 	type partitionMap struct {
 		Device   string `yaml:"device" json:"device"`
 		PartUUID string `yaml:"partUUID" json:"partUUID"`
@@ -48,6 +55,12 @@ func (api NodeAPI) CreateStoragePool(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, device := range reqBody.Devices {
+		_, ok := devices[device]
+		if !ok {
+			err := fmt.Errorf("Device %v doesn't exist", device)
+			tools.WriteError(w, http.StatusBadRequest, err)
+			return
+		}
 		bpContent.Devices = append(bpContent.Devices, partitionMap{Device: device})
 	}
 
@@ -68,4 +81,23 @@ func (api NodeAPI) CreateStoragePool(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Location", fmt.Sprintf("/nodes/%s/storagepools/%s", node, reqBody.Name))
 	w.WriteHeader(http.StatusCreated)
+}
+
+func (api NodeAPI) GetNodeDevices(w http.ResponseWriter, r *http.Request) (map[string]struct{}, error) {
+	cl, err := tools.GetConnection(r, api)
+	if err != nil {
+		return nil, err
+	}
+
+	diskClient := client.Disk(cl)
+	disks, err := diskClient.List()
+	if err != nil {
+		return nil, err
+	}
+
+	devices := make(map[string]struct{})
+	for _, dev := range disks.BlockDevices {
+		devices[fmt.Sprintf("/dev/%v", dev.Kname)] = struct{}{}
+	}
+	return devices, nil
 }
