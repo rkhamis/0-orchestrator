@@ -928,7 +928,9 @@ VdiskCreate:
       required: true
     templatevdisk:
       type: string
-      description: Name of template or url to ardb server eg. ardb://myardb:16379/mytemplatename
+      description: |
+        Url to ardb server with the name of the template as path eg. ardb://myardb:16379/mytemplatename
+        You can ommit the netlocation to use storage server defined in the g8os eg. ardb:///mytemplatename
       required: false
     readOnly:
       type: boolean
