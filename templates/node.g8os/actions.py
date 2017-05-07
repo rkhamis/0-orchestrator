@@ -70,7 +70,7 @@ def monitor(job):
     import redis
     service = job.service
     addr = service.model.data.redisAddr
-    node = j.clients.g8core.get(addr)
+    node = j.clients.g8core.get(addr, testConnectionAttempts=0)
     node.timeout = 15
     try:
         state = node.ping()

@@ -5,18 +5,17 @@ import (
 	"net/http"
 
 	"github.com/g8os/go-client"
-	"github.com/g8os/resourcepool/api/tools"
+	"github.com/g8os/grid/api/tools"
 )
 
-// GetNicInfo is the handler for GET /nodes/{nodeid}/nic
-// Get detailed information about the network interfaces in the node
-func (api NodeAPI) GetNicInfo(w http.ResponseWriter, r *http.Request) {
-	cl, err := tools.GetConnection(r, api)
+// GetContainerNicInfo is the handler for GET /nodes/{nodeid}/containers/{containername}/nics
+// Get detailed information about the network interfaces in the container
+func (api NodeAPI) GetContainerNicInfo(w http.ResponseWriter, r *http.Request) {
+	cl, err := tools.GetContainerConnection(r, api)
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
-
 	info := client.Info(cl)
 	result, err := info.Nic()
 	if err != nil {

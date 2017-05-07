@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/g8os/grid/api/tools"
+	"github.com/g8os/resourcepool/api/tools"
 )
 
 // ListNodes is the handler for GET /nodes
@@ -14,7 +14,7 @@ func (api NodeAPI) ListNodes(w http.ResponseWriter, r *http.Request) {
 	queryParams := map[string]interface{}{
 		"fields": "hostname,status,id",
 	}
-	services, res, err := api.AysAPI.Ays.ListServicesByRole("node", api.AysRepo, nil, queryParams)
+	services, res, err := api.AysAPI.Ays.ListServicesByRole("node.g8os", api.AysRepo, nil, queryParams)
 	if !tools.HandleAYSResponse(err, res, w, "listing nodes") {
 		return
 	}
@@ -26,6 +26,7 @@ func (api NodeAPI) ListNodes(w http.ResponseWriter, r *http.Request) {
 			tools.WriteError(w, http.StatusInternalServerError, err)
 			return
 		}
+
 		node.Id = service.Name
 
 		respBody[i] = node
