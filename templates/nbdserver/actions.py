@@ -28,11 +28,6 @@ def install(job):
     from urllib.parse import urlparse
     service = job.service
 
-    services = service.aysrepo.servicesFind(role='grid_config')
-    if len(services) <= 0:
-        raise j.exceptions.NotFound("not grid_config service installed. {} can't get the grid API URL.".format(service))
-
-    grid_addr = services[0].model.data.apiURL
     vdiskservice = service.aysrepo.serviceGet(role='vdisk', instance=service.name)
     container = get_container(service)
     template = urlparse(vdiskservice.model.data.templateVdisk)
@@ -69,7 +64,7 @@ def install(job):
             -protocol unix \
             -address "{socketpath}" \
             -config {config}'
-            .format(id=service.name, api=grid_addr, socketpath=socketpath, config=configpath)
+            .format(id=service.name, socketpath=socketpath, config=configpath)
         )
     # wait for socket to be created
     start = time.time()
