@@ -328,7 +328,12 @@ def updateDisks(job, client, args):
         medias = _start_nbds(service)
         for media in medias:
             client.client.kvm.attach_disk(uuid, media)
-            # TODO: Limit IOPS
+        for disk in new_disks:
+            if disk.maxIOps > 0:
+                client.client.kvm.limit_disk_io(uuid=uuid,
+                                                target=disk['vdiskid'],
+                                                totaliopssecmaxset=True,
+                                                totaliopssecmax=disk['maxIOps'])
     service.saveAll()
 
 
@@ -348,17 +353,19 @@ def updateNics(job, client, args):
     for nic in new_nics:
         if nic not in service.model.data.nics:
             for nic in service.model.data.nics:
-                nic = nic.to_dict()
-                nic['hwaddr'] = nic.pop('macaddress', None)
-                client.client.kvm.add_nic(uuid, nic)
+                client.client.kvm.add_nic(uuid=uuid,
+                                          type=str(nic.type),
+                                          id=nic.id or None,
+                                          hwaddr=nic.macaddress or None)
 
     # Remove nics
     for nic in old_nics:
         if nic not in service.model.data.nics:
             for nic in service.model.data.nics:
-                nic = nic.to_dict()
-                nic['hwaddr'] = nic.pop('macaddress', None)
-                client.client.kvm.add_nic(uuid, nic)
+                client.client.kvm.remove_nic(uuid=uuid,
+                                             type=str(nic.type),
+                                             id=nic.id or None,
+                                             hwaddr=nic.macaddress or None)
 
     service.model.data.nics = args['nics']
     service.saveAll()
