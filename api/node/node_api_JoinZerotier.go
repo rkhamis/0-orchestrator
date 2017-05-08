@@ -44,7 +44,7 @@ func (api NodeAPI) JoinZerotier(w http.ResponseWriter, r *http.Request) {
 	obj["actions"] = []tools.ActionBlock{{
 		Action:  "install",
 		Actor:   "zerotier",
-		Service: reqBody.Nwid,
+		Service: fmt.Sprintf("%s_%s", nodeID, reqBody.Nwid),
 		Force:   true,
 	}}
 
