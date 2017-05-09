@@ -93,3 +93,10 @@ def reboot(job):
         password=service.model.data.redisPassword or None,
     )
     node.client.raw('core.reboot', {})
+
+
+def uninstall(job):
+    service = job.service
+    bootstraps = service.aysrepo.servicesFind(actor='bootstrap.g8os')
+    if bootstraps:
+        j.tools.async.wrappers.sync(bootstraps[0].getJob('delete_node', args={'node_name': service.name}).execute())
