@@ -1,4 +1,4 @@
-## G8OS Resource Pool
+# G8OS Resource Pool
 
 A G8OS resource pool is a **cluster of G8OS nodes**, in the below picture 8 physical nodes, all connected through a ZeroTier network.
 
