@@ -120,68 +120,68 @@ pip3 install zerotier
 <a id="resourcepool-api"></a>
 ## Setup the resource pool API server
 
-  * Build the resource pool API server
+* Build the resource pool API server
 
-    If not already done before, first clone the resource pool server repository, and then build the server:
+  If not already done before, first clone the resource pool server repository, and then build the server:
 
-    ```shell
-    git clone https://github.com/g8os/resourcepool
-    cd resourcepool/api
-    git checkout 1.1.0-alpha
-    go build
-    ```
+  ```shell
+  git clone https://github.com/g8os/resourcepool
+  cd resourcepool/api
+  git checkout 1.1.0-alpha
+  go build
+  ```
 
-  * Run the resource pool API server
+* Run the resource pool API server
 
-    Execute:
+  Execute:
 
-    `./api --bind :8080 --ays-url http://localhost:5000 --ays-repo {repo-name}`
+  `./api --bind :8080 --ays-url http://localhost:5000 --ays-repo {repo-name}`
 
-    Options:
-    - `--bind :8080` makes the server listen on all interfaces on port 8080
-    - `--ays-url` needed to point to the AYS REST API
-    - `--ays-repo` is the name of the AYS repository the resource pool API need to use. It should be the repo you created in step 1.
+  Options:
+  - `--bind :8080` makes the server listen on all interfaces on port 8080
+  - `--ays-url` needed to point to the AYS REST API
+  - `--ays-repo` is the name of the AYS repository the resource pool API need to use. It should be the repo you created in step 1.
 
 <a id="bootstrap-service"></a>
 ## Install the auto node discovery service
 
-      Add the following blueprint in the `blueprints` directory of your AYS repository:
+Add the following blueprint in the `blueprints` directory of your AYS repository:
 
-      ```
-      bootstrap.g8os__resourcepool1:
-        zerotierNetID: {ZeroTier-Network-ID}
-        zerotierToken: '{ZeroTier-API-Token}'
+```
+bootstrap.g8os__resourcepool1:
+  zerotierNetID: {ZeroTier-Network-ID}
+  zerotierToken: '{ZeroTier-API-Token}'
 
-      actions:
-        - action: install
-      ```
+actions:
+  - action: install
+```
 
-      Values:
-      - **{ZeroTier-Network-ID}**: a ZeroTier Network ID
-      - **{ZeroTier-API-Token}**: a ZeroTier API Access Token
+Values:
+- **{ZeroTier-Network-ID}**: a ZeroTier Network ID
+- **{ZeroTier-API-Token}**: a ZeroTier API Access Token
 
-      You get both values from the ZeroTier web portal: https://my.zerotier.com/
+You get both values from the ZeroTier web portal: https://my.zerotier.com/
 
-      This blueprint will install the **auto discovery service** which will auto discover all G8OS nodes that were setup to connect to the same ZeroTier network.
+This blueprint will install the **auto discovery service** which will auto discover all G8OS nodes that were setup to connect to the same ZeroTier network.
 
-      Alternatively you can also manually add a G8OS node to the resource pool with following blueprint:
+Alternatively you can also manually add a G8OS node to the resource pool with following blueprint:
 
-      ```
-      node.g8os__525400123456:
-        redisAddr: 172.17.0.1
+```
+node.g8os__525400123456:
+  redisAddr: 172.17.0.1
 
-      actions:
-       - action: install
-      ```
+actions:
+ - action: install
+```
 
-      In the above example `525400123456` is the MAC address of the G8OS node with the ':' removed and the `redisAddr` is the IP address of the node.
+In the above example `525400123456` is the MAC address of the G8OS node with the ':' removed and the `redisAddr` is the IP address of the node.
 
-      After creating both blueprints, run the following commands to execute the blueprints and have the actions executed:
+After creating both blueprints, run the following commands to execute the blueprints and have the actions executed:
 
-      ```shell
-      ays blueprint
-      ays run create --follow
-      ```
+```shell
+ays blueprint
+ays run create --follow
+```
 
 <a id="boot-nodes"></a>
 ## Create the G8OS nodes
