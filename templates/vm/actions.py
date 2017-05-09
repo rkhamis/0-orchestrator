@@ -344,7 +344,6 @@ def updateNics(job, client, args):
     # Get new and old disks
     new_nics = _diff(args['nics'], service.model.data.nics)
     old_nics = _diff(service.model.data.nics, args['nics'])
-
     # Do nothing if no nic change
     if new_nics == [] and old_nics == []:
         return
@@ -352,20 +351,18 @@ def updateNics(job, client, args):
     # Add new nics
     for nic in new_nics:
         if nic not in service.model.data.nics:
-            for nic in service.model.data.nics:
-                client.client.kvm.add_nic(uuid=uuid,
-                                          type=str(nic.type),
-                                          id=nic.id or None,
-                                          hwaddr=nic.macaddress or None)
+            client.client.kvm.add_nic(uuid=uuid,
+                                      type=nic['type'],
+                                      id=nic['id'] or None,
+                                      hwaddr=nic['macaddress'] or None)
 
     # Remove nics
     for nic in old_nics:
         if nic not in service.model.data.nics:
-            for nic in service.model.data.nics:
-                client.client.kvm.remove_nic(uuid=uuid,
-                                             type=str(nic.type),
-                                             id=nic.id or None,
-                                             hwaddr=nic.macaddress or None)
+            client.client.kvm.remove_nic(uuid=uuid,
+                                         type=nic['type'],
+                                         id=nic['id'] or None,
+                                         hwaddr=nic['macaddress'] or None)
 
     service.model.data.nics = args['nics']
     service.saveAll()
@@ -395,5 +392,6 @@ def processChange(job):
             node = get_node(service)
             update_data(job, args)
             updateDisks(job, node, args)
+            updateNics(job, node, args)
         except ValueError:
             job.logger.error("vm {} doesn't exist, cant update devices", service.name)
