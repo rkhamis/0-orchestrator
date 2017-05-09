@@ -356,13 +356,12 @@ def updateNics(job, client, args):
                                       id=nic['id'] or None,
                                       hwaddr=nic['macaddress'] or None)
 
-    # Remove nics
+    # Remove old nics
     for nic in old_nics:
-        if nic not in service.model.data.nics:
-            client.client.kvm.remove_nic(uuid=uuid,
-                                         type=nic['type'],
-                                         id=nic['id'] or None,
-                                         hwaddr=nic['macaddress'] or None)
+        client.client.kvm.remove_nic(uuid=uuid,
+                                     type=nic['type'],
+                                     id=nic['id'] or None,
+                                     hwaddr=nic['macaddress'] or None)
 
     service.model.data.nics = args['nics']
     service.saveAll()
