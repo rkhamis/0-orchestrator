@@ -30,7 +30,12 @@ func (api NodeAPI) UpdateVM(w http.ResponseWriter, r *http.Request) {
 	}
 
 	vars := mux.Vars(r)
-	vmid := vars["vmid"]
+	vmID := vars["vmid"]
+
+	_, res, err := api.AysAPI.Ays.GetServiceByName(vmID, "vm", api.AysRepo, nil, nil)
+	if !tools.HandleAYSResponse(err, res, w, fmt.Sprintf("getting vm %s details", vmID)) {
+		return
+	}
 
 	bp := struct {
 		Memory int         `yaml:"memory" json:"memory"`
@@ -45,10 +50,10 @@ func (api NodeAPI) UpdateVM(w http.ResponseWriter, r *http.Request) {
 	}
 
 	obj := make(map[string]interface{})
-	obj[fmt.Sprintf("vm__%s", vmid)] = bp
+	obj[fmt.Sprintf("vm__%s", vmID)] = bp
 
-	if _, err := tools.ExecuteBlueprint(api.AysRepo, "vm", vmid, "update", obj); err != nil {
-		log.Errorf("error executing blueprint for vm %s creation : %+v", vmid, err)
+	if _, err := tools.ExecuteBlueprint(api.AysRepo, "vm", vmID, "update", obj); err != nil {
+		log.Errorf("error executing blueprint for vm %s creation : %+v", vmID, err)
 		tools.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
