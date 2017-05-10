@@ -1,6 +1,3 @@
-from JumpScale import j
-
-
 def configure(job):
     """
     For packet.net we just rename the public interface to storage so the rest of the config deals with it
@@ -13,7 +10,7 @@ def configure(job):
     node.client.bash("""
     pubint=$(ip route | grep default | awk '{print $5}')
     ip link set dev $pubint down
-    ip link set dev $pubint name storage
-    ip link set dev storage up
-    udhcpc -i storage -s /usr/share/udhcp/simple.script -q
+    ip link set dev $pubint name backplane
+    ip link set dev backplane up
+    udhcpc -i backplane -s /usr/share/udhcp/simple.script -q
     """).get()
