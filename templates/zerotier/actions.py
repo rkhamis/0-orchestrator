@@ -20,7 +20,7 @@ def install(job):
 
     while True:
         net = _get_network(service)
-        if net['status'] != 'REQUESTING_CONFIGURATION':
+        if net['status'] != 'OK':
             break
         time.sleep(1)
     service.model.data.allowDefault = net['allowDefault']
