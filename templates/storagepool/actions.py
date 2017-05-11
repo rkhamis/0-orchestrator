@@ -85,6 +85,9 @@ def updateDevices(service, pool, devices):
     # remove devices
     removeddevices = pooldevices - requireddevices
     if removeddevices:
+        for device in service.model.data.devices:
+            if device.device in removeddevices:
+                device.status = 'removing'
         pool.device_remove(*removeddevices)
 
 
@@ -107,3 +110,28 @@ def processChange(job):
             pool.ays.create(service.aysrepo)
         except ValueError:
             job.logger.error("pool {} doesn't exist, cant update devices", service.name)
+
+
+def monitor(job):
+    service = job.service
+    if service.model.actionsState['install'] == 'ok':
+        pservice = service.parent
+        node = j.sal.g8os.get_node(
+            addr=pservice.model.data.redisAddr,
+            port=pservice.model.data.redisPort,
+            password=pservice.model.data.redisPassword or None,
+        )
+
+        try:
+            pool = node.storagepools.get(service.name)
+            devices, status = pool.ays.get_devices_and_status()
+
+            service.model.data.init('devices', len(devices))
+            for i, device in enumerate(devices):
+                service.model.data.devices[i] = device
+
+            service.model.data.status = status
+            service.saveAll()
+
+        except ValueError:
+            job.logger.error("pool {} doesn't exist, cant monitor pool", service.name)
