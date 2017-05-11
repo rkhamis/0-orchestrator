@@ -6,3 +6,4 @@
   * [Production Setup](setup/prod.md)
 * [Resource Pool API](api.md)
 * [Storage Cluster](storagecluster/storagecluster.md)
+  * [Setup a Storage Cluster](storagecluster/setup.md)
