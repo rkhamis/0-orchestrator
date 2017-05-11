@@ -17,6 +17,7 @@ func (s NicLink) Validate() error {
 		EnumNicLinkTypevlan:    struct{}{},
 		EnumNicLinkTypevxlan:   struct{}{},
 		EnumNicLinkTypedefault: struct{}{},
+		EnumNicLinkTypebridge:  struct{}{},
 	}
 
 	if err := validators.ValidateEnum("Type", s.Type, typeEnums); err != nil {
