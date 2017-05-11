@@ -185,7 +185,7 @@ def stop(job):
         job.logger.info("container doesn't exists.")
 
     service.model.data.status = 'halted'
-    service.mode.data.vnc = -1
+    service.model.data.vnc = -1
 
 
 def pause(job):
