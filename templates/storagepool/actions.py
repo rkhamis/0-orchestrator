@@ -124,7 +124,7 @@ def monitor(job):
 
         try:
             pool = node.storagepools.get(service.name)
-            devices, status = pool.ays.get_devices_and_status()
+            devices, status = pool.get_devices_and_status()
 
             service.model.data.init('devices', len(devices))
             for i, device in enumerate(devices):
