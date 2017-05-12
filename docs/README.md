@@ -25,4 +25,4 @@ For more details see:
 
 Or see the full [table of contents](SUMMARY.md).
 
-In [Getting Started](gettingstarted/gettingstarted.md) you find a recommended path to get quickly up and running with a G8OS resource pool. 
+In [Getting Started with G8OS Resource Pool](gettingstarted/gettingstarted.md) you find a recommended path to get quickly up and running.
