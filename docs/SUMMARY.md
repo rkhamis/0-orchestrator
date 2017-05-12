@@ -7,3 +7,4 @@
 * [Resource Pool API](api.md)
 * [Storage Cluster](storagecluster/storagecluster.md)
   * [Setup a Storage Cluster](storagecluster/setup.md)
+* [Block Storage](blockstorage/blockstorage.md)

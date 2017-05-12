@@ -19,8 +19,4 @@ So the arguments to pass are:
 
 In the example shown above you will end up with a cluster of 256 master ARDB servers and another 256 slave ARDB servers using all SSDs in node1 and node2. So if each node has 6 SSDs that are not yet used, then you'll get 12 disk, used by 512 ARDBs. What actually will happen is that for each free SSD a new storage pool will be created. So each storage pool then includes on SSD disk.
 
-Once you have a storage cluster setup it can be used for multiple purposes, all discussed in separate sections:
-- [NBD Servers](../nbd/nbd.md)
-- [TLOG Servers](../tlog/tlog.md)
-- [NAS Servers](../nas/nas.md)
-- [S3 Servers](../s3/s3.md)
+Once you have a storage cluster setup it can be used for multiple purposes, most importantly creating vdisks as discussed in [Block Storage](../blockstorage/blockstorage.md).
