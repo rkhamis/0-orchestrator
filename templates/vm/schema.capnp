@@ -1,4 +1,4 @@
-@0xa7426da542a1e472;
+@0xabbd4793cfc91dff;
 
 struct Schema {
     node @0: Text; # pointer to the parent service
@@ -15,12 +15,14 @@ struct Schema {
     vnc @10: Int32 = -1; # the vnc port the machine is listening to
 
     enum Status{
-        error @0;
-        halted @1;
-        running @2;
-        paused @3;
-        halting @4;
-        migrating @5;
+        deploying @0;
+        error @1;
+        halted @2;
+        running @3;
+        paused @4;
+        halting @5;
+        migrating @6;
+        starting @7;
     }
 
     struct NicLink {
