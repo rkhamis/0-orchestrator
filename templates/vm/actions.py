@@ -145,13 +145,17 @@ def install(job):
             else:
                 time.sleep(3)
         else:
+            service.model.data.status = 'error'
             raise j.exceptions.RuntimeError("Failed to start vm {}".format(service.name))
 
     service.model.data.status = 'running'
+    service.saveAll()
 
 
 def start(job):
     service = job.service
+    service.model.data.status = 'starting'
+    service.saveAll()
     j.tools.async.wrappers.sync(service.executeAction('install'))
 
 
@@ -186,6 +190,7 @@ def stop(job):
 
     service.model.data.status = 'halted'
     service.model.data.vnc = -1
+    service.saveAll()
 
 
 def pause(job):
@@ -196,6 +201,7 @@ def pause(job):
     if kvm:
         node.client.kvm.pause(kvm['uuid'])
         service.model.data.status = 'paused'
+        service.saveAll()
 
 
 def resume(job):
@@ -206,6 +212,7 @@ def resume(job):
     if kvm:
         node.client.kvm.resume(kvm['uuid'])
         service.model.data.status = 'running'
+        service.saveAll()
 
 
 def shutdown(job):
@@ -228,6 +235,8 @@ def shutdown(job):
                 time.sleep(3)
         else:
             raise j.exceptions.RuntimeError("Failed to shutdown vm {}".format(service.name))
+    
+    service.saveAll()
 
 
 def migrate(job):
@@ -267,6 +276,7 @@ def migrate(job):
 
     j.tools.async.wrappers.sync(old_vdisk_container.executeAction('stop'))
     j.tools.async.wrappers.sync(old_vdisk_container.delete())
+    service.saveAll()
 
 
 def _remove_duplicates(col):
