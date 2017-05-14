@@ -8,4 +8,7 @@ const (
 	EnumVMStatuspaused    EnumVMStatus = "paused"
 	EnumVMStatushalting   EnumVMStatus = "halting"
 	EnumVMStatusmigrating EnumVMStatus = "migrating"
+	EnumVMStatusdeploying EnumVMStatus = "deploying"
+	EnumVMStatuserror     EnumVMStatus = "error"
+	EnumVMStatusstarting  EnumVMStatus = "starting"
 )
