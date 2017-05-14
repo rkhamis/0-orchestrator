@@ -1,7 +1,10 @@
-# G8OS Resource Pool
-
-A G8OS resource pool is a **cluster of G8OS nodes** connected through a ZeroTier network.
+# resource pool
+Stateless g8os resource pool api server
 
 All documentation is in the [`/docs`](./docs) directory, including a [table of contents](/docs/SUMMARY.md).
 
-In [Getting Started with G8OS Resource Pool](/docs/gettingstarted/gettingstarted.md) you find the recommended path to quickly get up and running.
+Architecture:
+![Architecture](g8os-resourcepool.png)
+
+## API:
+specs : https://cdn.rawgit.com/g8os/resourcepool/5c7d6a1f/raml/api.raml
