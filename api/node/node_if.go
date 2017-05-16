@@ -250,6 +250,9 @@ type NodesInterface interface { // ListNodes is the handler for GET /node
 	// GetNodeState is the handler for GET /node/{nodeid}/state
 	// The aggregated consumption of node + all processes (cpu, memory, etc...)
 	GetNodeState(http.ResponseWriter, *http.Request)
+	// GetNodeMounts is the handler for GET /node/{nodeid}/mounts
+	// The mountpoints of the node
+	GetNodeMounts(http.ResponseWriter, *http.Request)
 }
 
 // NodesInterfaceRoutes is routing for /node root endpoint
@@ -334,4 +337,5 @@ func NodesInterfaceRoutes(r *mux.Router, i NodesInterface) {
 	r.HandleFunc("/nodes/{nodeid}/cpus", i.GetCPUInfo).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/disks", i.GetDiskInfo).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/state", i.GetNodeState).Methods("GET")
+	r.HandleFunc("/nodes/{nodeid}/mounts", i.GetNodeMounts).Methods("GET")
 }

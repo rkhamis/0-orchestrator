@@ -115,6 +115,23 @@ DiskPartition:
       type: string
       description: Partition filesystem type
 
+NodeMount:
+  type: object
+  description: Information about the disk mountpoint
+  properties:
+    mountpoint:
+      type: string
+      description: Mountpoint name
+    device:
+      type: string
+      description: Device name
+    opts:
+      type: string
+      description: Mountpoint options
+    fstype:
+      type: string
+      description: Mountpoint filesystem type
+
 BridgeCreate:
   type: object
   description: Arguments for a bridge.create job
