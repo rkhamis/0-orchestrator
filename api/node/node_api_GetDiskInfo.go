@@ -27,30 +27,12 @@ func (api NodeAPI) GetDiskInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	info := client.Info(cl)
-	mounts, err := info.Disk()
-	if err != nil {
-		tools.WriteError(w, http.StatusInternalServerError, err)
-		return
-	}
-
 	var respBody []DiskInfo
 
 	for _, disk := range result.BlockDevices {
-		var diskInfo DiskInfo
-
-		device := []string{"/dev", disk.Name}
-		diskInfo.Device = strings.Join(device, "/")
-		diskInfo.Fstype = disk.Fstype
-
-		// disk information reflects info from any partition
-		for _, mount := range mounts {
-			if strings.HasPrefix(mount.Device, diskInfo.Device) {
-				diskInfo.Mountpoint = mount.Mountpoint
-				diskInfo.Opts = mount.Opts
-				diskInfo.Fstype = mount.Fstype
-				break
-			}
+		diskInfo := DiskInfo{
+			Device:     strings.Join([]string{"/dev", disk.Name}, "/"),
+			Partitions: []DiskPartition{},
 		}
 
 		size, err := strconv.Atoi(disk.Size)
@@ -74,6 +56,26 @@ func (api NodeAPI) GetDiskInfo(w http.ResponseWriter, r *http.Request) {
 			} else {
 				diskInfo.Type = EnumDiskInfoTypessd
 			}
+		}
+
+		for _, partition := range disk.Children {
+			diskPartition := DiskPartition{
+				Name:     strings.Join([]string{"/dev", partition.Name}, "/"),
+				PartUUID: partition.Partuuid,
+				Label:    partition.Label,
+				FsType:   partition.Fstype,
+			}
+
+			size, err := strconv.Atoi(partition.Size)
+			if err != nil {
+				tools.WriteError(w, http.StatusInternalServerError, err)
+				return
+			}
+
+			diskPartition.Size = size / (1024 * 1024 * 1024) // Convert the size to GB
+
+			diskInfo.Partitions = append(diskInfo.Partitions, diskPartition)
+
 		}
 		respBody = append(respBody, diskInfo)
 	}
