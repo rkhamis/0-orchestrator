@@ -230,22 +230,23 @@ def resume(job):
 def shutdown(job):
     import time
     service = job.service
+    service.model.data.status = 'halting'
     job.logger.info("shutdown vm {}".format(service.name))
     node = get_node(service)
     kvm = get_domain(service)
     if kvm:
         node.client.kvm.shutdown(kvm['uuid'])
-        service.model.data.status = 'halting'
         # wait for max 60 seconds for vm to be shutdown
         start = time.time()
         while start + 60 > time.time():
             kvm = get_domain(service)
-            if kvm and kvm['state'] == 'shutdown':
+            if kvm:
+                time.sleep(3)
+            else:
                 service.model.data.status = 'halted'
                 break
-            else:
-                time.sleep(3)
         else:
+            service.model.data.status = 'error'
             raise j.exceptions.RuntimeError("Failed to shutdown vm {}".format(service.name))
     
     service.saveAll()
