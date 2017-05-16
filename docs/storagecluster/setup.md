@@ -1,10 +1,10 @@
 # Setup a Storage Cluster
 
-Setting up a storage cluster is achieved through the resource pool API exposed by the resource pool server.
+Setting up a storage cluster is achieved through the resource pool API exposed by the Resource Pool API Server.
 
 So you first need to setup a G8OS resource pool, as documented in [G8OS Resource Pool Setup](/docs/setup/setup.md).
 
-Once the resource pool is setup, following storage cluster API endpoint is exposed by the resource pool server:
+Once the resource pool is setup, following storage cluster API endpoint is exposed by the Resource Pool API Server:
 
 ![](storageclusterapi.png)
 
