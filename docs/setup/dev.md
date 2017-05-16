@@ -43,7 +43,6 @@ For more details about using using `js_builder_js82_zerotier.sh` see [here](http
 From your machine, hosting the Docker container:
 ```
 BRANCH="..."
-
 ZT_API_TOKEN="..."
 curl -sL https://raw.githubusercontent.com/Jumpscale/developer/master/scripts/g8os_grid_installer82.sh | bash -s $BRANCH $ZT_NETWORK_ID $ZT_API_TOKEN
 ```
