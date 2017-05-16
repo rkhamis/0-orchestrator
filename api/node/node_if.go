@@ -175,9 +175,6 @@ type NodesInterface interface { // ListNodes is the handler for GET /node
 	// GetContainerNicInfo is the handler for GET /node/{nodeid}/containers/{containername}/nics
 	// List nic info on the container
 	GetContainerNicInfo(http.ResponseWriter, *http.Request)
-	// GetContainerDiskInfo is the handler for GET /node/{nodeid}/containers/{containername}/disks
-	// List disk info on the container
-	GetContainerDiskInfo(http.ResponseWriter, *http.Request)
 	// GetContainerMemInfo is the handler for GET /node/{nodeid}/containers/{containername}/mems
 	// List mem info on the container
 	GetContainerMemInfo(http.ResponseWriter, *http.Request)
@@ -316,7 +313,6 @@ func NodesInterfaceRoutes(r *mux.Router, i NodesInterface) {
 	r.HandleFunc("/nodes/{nodeid}/containers/{containername}/jobs/{jobid}", i.SendSignalJob).Methods("POST")
 	r.HandleFunc("/nodes/{nodeid}/containers/{containername}/jobs/{jobid}", i.KillContainerJob).Methods("DELETE")
 	r.HandleFunc("/nodes/{nodeid}/containers/{containername}/nics", i.GetContainerNicInfo).Methods("GET")
-	r.HandleFunc("/nodes/{nodeid}/containers/{containername}/disks", i.GetContainerDiskInfo).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/containers/{containername}/mems", i.GetContainerMemInfo).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/containers/{containername}/cpus", i.GetContainerCPUInfo).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/containers/{containername}/ping", i.PingContainer).Methods("POST")
