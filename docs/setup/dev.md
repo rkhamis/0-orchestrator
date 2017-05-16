@@ -3,9 +3,10 @@
 All steps:
 1. Create a ZeroTier network
 2. [Setup the AYS Server](#ays-server)
-3. [Setup the Resource Pool Server](#resourcepool-api)
+3. [Setup the Resource Pool API Server](#resourcepool-api)
 4. [Start the Bootstrap Service, using an AYS blueprint](#bootstrap-service)
-5. [Boot the G8OS nodes](#boot-nodes)
+5. [Format all hard disks](#format-disks)
+6. [Boot the G8OS nodes](#boot-nodes)
 
 The first step is pretty straight forward, go to https://my.zerotier.com/ and create your ZeroTier network.
 
@@ -49,6 +50,8 @@ tail -f /tmp/lastcommandoutput.txt
 ```
 
 Next step is to boot the G8OS nodes, documented in [Create the G8OS nodes](#create-nodes), the last section on this page.
+
+So skip all other sections here below, which are about the manual setup.
 
 
 <a id="ays-server"></a>
@@ -118,7 +121,7 @@ pip3 install zerotier
 
 
 <a id="resourcepool-api"></a>
-## Setup the resource pool API server
+## Setup the Resource Pool API Server
 
 * Build the resource pool API server
 
@@ -141,6 +144,7 @@ pip3 install zerotier
   - `--bind :8080` makes the server listen on all interfaces on port 8080
   - `--ays-url` needed to point to the AYS REST API
   - `--ays-repo` is the name of the AYS repository the resource pool API need to use. It should be the repo you created in step 1.
+
 
 <a id="bootstrap-service"></a>
 ## Install the auto node discovery service
@@ -181,6 +185,38 @@ After creating both blueprints, run the following commands to execute the bluepr
 ```shell
 ays blueprint
 ays run create --follow
+```
+
+
+<a id="format-disks></a>
+## Format all hard disks
+
+In order to prepare for the [setup of storage clusters](../storagecluster/setup.md) it is highly recommended to format all hard disks as part of the resource pool setup. This is achieved by using the resource pool Python client, as follows.
+
+From with in the JumpScale 8.2 he Docker container execute:
+
+```
+#!/usr/bin/env python3
+from g8os import resourcepool
+import g8core
+import argparse
+
+def main(url):
+    api = resourcepool.APIClient(base_uri=url)
+    for node in ['x.x.x.x','x.x.x.x']:     #nodes_MGMT_ip's
+        print('Wiping node {}'.format(node))
+        nodeclient = g8core.Client(node)
+        for disk in nodeclient.disk.list()['blockdevices']:
+            if not disk['mountpoint'] :
+                print('   * Wiping disk {kname}'.format(**disk))
+                nodeclient.system('dd if=/dev/zero of=/dev/{} bs=1M count=50'.format(disk['kname']))
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-u", "--url", required=True)
+    options = parser.parse_args()
+    main(options.url)
 ```
 
 <a id="boot-nodes"></a>
