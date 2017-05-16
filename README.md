@@ -11,4 +11,4 @@ This repository includes:
 - Some helper scripts: [scripts][/scripts]
 - Build scripts: [buildscripts](/buildscripts)
 
-All documentation is in the [`/docs`](./docs) directory, including a [table of contents](/docs/SUMMARY.md) and a Getting Started](/docs/gettingstarted/gettingstarted.md) section.
+All documentation is in the [`/docs`](./docs) directory, including a [table of contents](/docs/SUMMARY.md) and a [Getting Started](/docs/gettingstarted/gettingstarted.md) section.
