@@ -188,7 +188,7 @@ ays run create --follow
 ```
 
 
-<a id="format-disks></a>
+<a id="format-disks"></a>
 ## Format all hard disks
 
 In order to prepare for the [setup of storage clusters](../storagecluster/setup.md) it is highly recommended to format all hard disks as part of the resource pool setup. This is achieved by using the resource pool Python client, as follows.
