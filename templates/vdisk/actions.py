@@ -11,7 +11,7 @@ def install(job):
         template = urlparse(service.model.data.templateVdisk)
         storagecluster = service.aysrepo.serviceGet(role='storage_cluster', instance=service.model.data.storageCluster)
         cluster = StorageCluster.from_ays(storagecluster)
-        clusterardb = cluster.get_config()['metadataStorage']
+        clusterardb = cluster.get_config()['metadataStorage']['address']
         target_node = random.choice(storagecluster.producers['node'])
 
         volume_container = create_from_template_container(service, target_node)
