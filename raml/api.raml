@@ -453,6 +453,206 @@ types:
           responses:
             204:
               description: ZeroTier network exited successfully
+    /gws:
+      get:
+        (AYSBased):
+        displayName: ListGateways
+        description: List running gateways
+        responses:
+          200:
+            body:
+              application/json:
+                type: GW[]
+      post:
+        (AYSBased):
+        displayName: CreateGW
+        description: Create a new gateway
+        body:
+          application/json:
+            type: GW
+        responses:
+          201:
+            description: Gateway created successfully
+            headers:
+              Location:
+                description: URL to the created gateway resource
+      /{gwname}:
+        delete:
+          (AYSBased):
+          displayName: DeleteGateway
+          description: Delete gateway instance
+          responses:
+            204:
+              description: Gateway deleted successfully
+        get:
+          (AYSBased):
+          displayName: GetGateway
+          description: Get gateway
+          responses:
+            200:
+              body:
+                application/json:
+                  type: GW
+        put:
+          (AYSBased):
+          displayName: UpdateGateway
+          description: Update Gateway
+          body:
+            application/json:
+              type: GW
+          responses:
+            204:
+              description: Gateway updated successfully
+
+        /firewall:
+          /forwards:
+            get:
+              description: |
+                Get list for IPv4 Forwards
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: PortForward[]
+            post:
+              description: |
+                Create a new Portforwarding
+              body:
+                application/json: PortForward
+              responses:
+                201:
+                  description: |
+                    Succesfully created a new resource
+                  headers:
+                    Location:
+                      description: |
+                        Location of the newly created resource
+                      type: string
+                      required: false
+            /{forwardid}:
+              delete:
+                description: |
+                  Delete portforward, forwardid = srcip:srcport
+                responses:
+                  204:
+                    description: |
+                      Succesfully deleted resource
+          /forwards6:
+            get:
+              description: |
+                Get list for IPv6 Forwards
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: PortForward6[]
+            post:
+              description: |
+                Create a new Portforwarding
+              body:
+                application/json: PortForward6
+              responses:
+                201:
+                  description: |
+                    Succesfully created a new resource
+                  headers:
+                    Location:
+                      description: |
+                        Location of the newly created resource
+                      type: string
+                      required: false
+            /{forwardid}:
+              delete:
+                description: |
+                  Delete portforward, forwardid = srcip:srcport
+                responses:
+                  204:
+                    description: |
+                      Succesfully deleted resource
+
+
+        /dhcp:
+          /{interface}:
+            /hosts:
+              get:
+                displayName: ListGWDHCPHosts
+                description: List DHCPHosts for specified interface
+                responses:
+                  200:
+                    body:
+                      application/json:
+                        type: GWHost
+              post:
+                displayName: AddGWDHCPHost
+                description: Add a dhcp host to a specified interface
+                responses:
+                  204:
+                    description: Host added successfully
+                body:
+                  application/json:
+                    type: GWHost
+              /{macaddress}:
+                delete:
+                  description: |
+                    Delete dhcp host
+                  responses:
+                    204:
+                      description: |
+                        Succesfully deleted resource
+
+        /advanced:
+          /http:
+            get:
+              displayName: GetGWHTTPConfig
+              description: |
+                Get current HTTP config
+                Once used you can not use gw.httpproxxies any longer
+              responses:
+                200:
+                  body:
+                    text/plain:
+                      type: string
+            post:
+              displayName: SetGWHTTPConfig
+              description: Set HTTP config
+              body:
+                text/plain:
+                  type: string
+
+          /firewall:
+            get:
+              displayName: GetGWFWConfig
+              description: |
+                Get current FW config
+                Once used you can not use gw.portforwards any longer
+              responses:
+                200:
+                  body:
+                    text/plain:
+                      type: string
+            post:
+              displayName: SetGWFWConfig
+              description: Set FW config
+              body:
+                text/plain:
+                  type: string
+
+        /start:
+          post:
+            (AYSBased):
+            displayName: StartGateway
+            description: Start Gateway instance
+            responses:
+              201:
+                description: Gateway started successfully
+        /stop:
+          post:
+            (AYSBased):
+            displayName: StopGateway
+            description: Stop gateway instance
+            responses:
+              204:
+                description: Gateway stopped successfully
     /containers:
       get:
         (AYSBased):
