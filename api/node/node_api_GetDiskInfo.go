@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	"fmt"
+
 	"github.com/g8os/go-client"
 	"github.com/g8os/resourcepool/api/tools"
 )
@@ -31,7 +33,7 @@ func (api NodeAPI) GetDiskInfo(w http.ResponseWriter, r *http.Request) {
 
 	for _, disk := range result.BlockDevices {
 		diskInfo := DiskInfo{
-			Device:     strings.Join([]string{"/dev", disk.Name}, "/"),
+			Device:     fmt.Sprintf("/dev/%v", disk.Name),
 			Partitions: []DiskPartition{},
 		}
 
@@ -60,7 +62,7 @@ func (api NodeAPI) GetDiskInfo(w http.ResponseWriter, r *http.Request) {
 
 		for _, partition := range disk.Children {
 			diskPartition := DiskPartition{
-				Name:     strings.Join([]string{"/dev", partition.Name}, "/"),
+				Name:     fmt.Sprintf("/dev/%v", partition.Name),
 				PartUUID: partition.Partuuid,
 				Label:    partition.Label,
 				FsType:   partition.Fstype,
