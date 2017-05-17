@@ -1,6 +1,8 @@
 # Summary
 
 * [Introduction](README.md)
+* [Building the API Server](building/building.md)
+* [Running the API Server](running/running.md)
 * [Setting up the Resource Pool](setup/setup.md)
   * [Development Setup](setup/dev.md)
   * [Production Setup](setup/prod.md)

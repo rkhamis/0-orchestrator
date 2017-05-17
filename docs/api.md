@@ -1,8 +1,8 @@
 # Resource Pool API
 
-The resource pool API server exposes all the APIs to manage the resource pool.
+The Resource Pool API Server exposes all the APIs to manage the resource pool.
 
-This [link](https://rawgit.com/g8os/resourcepool/1.1.0-alpha/raml/api.html) shows all the available endpoints in the resource pool API and the different calls that can be done on each endpoint along with the expected request body and response.
+This [link](https://rawgit.com/g8os/resourcepool/master/raml/api.html) shows all the available endpoints in the resource pool API and the different calls that can be done on each endpoint along with the expected request body and response.
 
 The APIs are split into two categories:
 
