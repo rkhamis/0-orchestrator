@@ -76,7 +76,7 @@ class NodesService:
         return self.client.get(uri, headers, query_params, content_type)
 
 
-    def FileUpload(self, data, containername, nodeid, headers=None, query_params=None, content_type="multipart/form-data"):
+    def FileUpload(self, data, containername, nodeid, headers=None, query_params=None, content_type="application/json"):
         """
         Upload file to container
         It is method for POST /nodes/{nodeid}/containers/{containername}/filesystem
@@ -343,6 +343,15 @@ class NodesService:
         It is method for GET /nodes/{nodeid}/mem
         """
         uri = self.client.base_url + "/nodes/"+nodeid+"/mem"
+        return self.client.get(uri, headers, query_params, content_type)
+
+
+    def GetNodeMounts(self, nodeid, headers=None, query_params=None, content_type="application/json"):
+        """
+        Get detailed information of all the mountpoints on the node
+        It is method for GET /nodes/{nodeid}/mounts
+        """
+        uri = self.client.base_url + "/nodes/"+nodeid+"/mounts"
         return self.client.get(uri, headers, query_params, content_type)
 
 
