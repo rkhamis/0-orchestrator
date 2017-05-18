@@ -7,6 +7,6 @@ def install(job):
         'flist': 'https://hub.gig.tech/gig-official-apps/gw.flist',
         'hostNetworking': True,
     }
-    cont_service = actor.serviceCreate(instance=service.name., args=args)
+    cont_service = actor.serviceCreate(instance=service.name, args=args)
     j.tools.async.wrappers.sync(cont_service.executeAction('install'))
     pass
