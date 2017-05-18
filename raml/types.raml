@@ -1034,12 +1034,13 @@ VdiskRollback:
       description: Epoch to which we want to rollback the vdisk
 
 # GWS objects
+IPProtocol:
+  enum: [tcp, udp]
 
 PortForward:
   properties:
-    protocol:
-      type:
-        enum: [udp, tcp]
+    protocols:
+      type: IPProtocol[]
     srcport:
       type: integer
     srcip:
@@ -1051,17 +1052,21 @@ PortForward:
 
 PortForward6:
   properties:
-    protocol:
-      type:
-        enum: [udp, tcp]
+    protocols:
+      type: IPProtocol[]
     srcip:
       type: string
       required: false
+    srcport:
+      type: integer
     dstport:
       type: integer
       required: false
     dstip:
       type: string
+
+HTTPType:
+  enum: [http, https]
 
 HTTPProxy:
   properties:
@@ -1073,9 +1078,8 @@ HTTPProxy:
       description: |
         Destinations of the proxy eg. http://172.17.0.6:5000
         If multiple destinations are given loadbalancing will be applied
-    type:
-      type:
-        enum: [http, https, both]
+    types:
+      type: HTTPType[]
 
 CloudInit:
   properties:
@@ -1100,6 +1104,7 @@ GWHost:
     ip6address:
       type: string
       description: IP6 Address for hostname
+      required: false
     cloudinit:
       type: CloudInit
       description: Cloudinit configuration
