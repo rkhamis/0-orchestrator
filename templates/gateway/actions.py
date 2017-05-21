@@ -4,7 +4,7 @@ def init(job):
     nics = service.model.data.to_dict()['nics'] # get dict version of nics
     args = {
         'node': service.model.data.node,
-        'flist': 'https://hub.gig.tech/gig-official-apps/gw.flist',
+        'flist': 'https://hub.gig.tech/gig-official-apps/g8osgw.flist',
         'nics': nics,
         'hostname': service.model.data.hostname,
         'hostNetworking': False,
