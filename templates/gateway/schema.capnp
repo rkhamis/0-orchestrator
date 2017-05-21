@@ -10,6 +10,7 @@ struct Schema {
     portforwards6 @5 :List(PortForward);
     httpproxies @6 :List(HTTPProxy);
     dhcps @7 :List(DHCP);
+    container @8 :Text; # Container spawned by this service
 
     struct Nic {
         type @0: NicType;
