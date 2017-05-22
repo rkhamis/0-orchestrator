@@ -1050,21 +1050,6 @@ PortForward:
     dstip:
       type: string
 
-PortForward6:
-  properties:
-    protocols:
-      type: IPProtocol[]
-    srcip:
-      type: string
-      required: false
-    srcport:
-      type: integer
-    dstport:
-      type: integer
-      required: false
-    dstip:
-      type: string
-
 HTTPType:
   enum: [http, https]
 
@@ -1162,12 +1147,9 @@ GW:
   properties:
     nics:
       type: GWNIC[]
-      description: List of container nics
+      description: List of gateway nics
     portforwards:
       type: PortForward[]
-      description: List of portfowardings
-    portforwards6:
-      type: PortForward6[]
       description: List of portfowardings
     httpproxies:
       type: HTTPProxy[]

@@ -5,10 +5,9 @@ import (
 )
 
 type GW struct {
-	Httpproxies   []HTTPProxy    `json:"httpproxies" validate:"nonzero"`
-	Nics          []GWNIC        `json:"nics" validate:"nonzero"`
-	Portforwards  []PortForward  `json:"portforwards" validate:"nonzero"`
-	Portforwards6 []PortForward6 `json:"portforwards6" validate:"nonzero"`
+	Httpproxies  []HTTPProxy   `json:"httpproxies" validate:"nonzero"`
+	Nics         []GWNIC       `json:"nics" validate:"nonzero"`
+	Portforwards []PortForward `json:"portforwards" validate:"nonzero"`
 }
 
 func (s GW) Validate() error {

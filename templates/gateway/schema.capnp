@@ -7,7 +7,6 @@ struct Schema {
     hostname @2 :Text;
     nics @3 :List(Nic); # Configuration of the attached nics to the container
     portforwards @4 :List(PortForward);
-    portforwards6 @5 :List(PortForward);
     httpproxies @6 :List(HTTPProxy);
     container @7 :Text; # Container spawned by this service
 
