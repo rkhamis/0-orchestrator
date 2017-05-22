@@ -41,6 +41,13 @@ def init(job):
     }
     fwactor.serviceCreate(instance=service.name, args=args)
 
+    # create http
+    httpactor = service.aysrepo.actorGet("http")
+    args = {
+        'container': service.name
+    }
+    httpactor.serviceCreate(instance=service.name, args=args)
+
 
 def install(job):
     # nothing to do here all our children will be created by ays automagic

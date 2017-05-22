@@ -7,8 +7,8 @@ struct Schema {
     hostname @2 :Text;
     nics @3 :List(Nic); # Configuration of the attached nics to the container
     portforwards @4 :List(PortForward);
-    httpproxies @6 :List(HTTPProxy);
-    container @7 :Text; # Container spawned by this service
+    httpproxies @5 :List(HTTPProxy);
+    container @6 :Text; # Container spawned by this service
 
     struct Nic {
         type @0: NicType;
@@ -34,13 +34,13 @@ struct Schema {
     struct DHCP {
         nameservers @0: List(Text);
         hosts @1: List(Host);
-        domain @3: Text;
+        domain @2: Text;
     }
 
     struct NicConfig {
-        cidr @1: Text;
-        gateway @2: Text;
-        dns @3: List(Text);
+        cidr @0: Text;
+        gateway @1: Text;
+        dns @2: List(Text);
     }
 
     enum HTTPType {
@@ -50,7 +50,7 @@ struct Schema {
 
     struct HTTPProxy {
         host @0: Text;
-        distinations @1: List(Text);
+        destinations @1: List(Text);
         types @2: List(HTTPType);
     }
 
