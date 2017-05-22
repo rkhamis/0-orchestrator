@@ -1119,18 +1119,49 @@ DHCP:
     hosts:
       type: GWHost[]
       description: List of dhcpshosts
-    interface:
-      type: string
-      description: Interface to listen on
     domain:
       type: string
       description: Domain for dhcp
       required: false
 
+GWNIC:
+  type: object
+  properties:
+    type:
+      description: Type of the interface
+      enum: [zerotier, vxlan, vlan, default, bridge]
+    id:
+      description: |
+        Id for the specified network type
+          vlan: vlantag for the vlan
+          vxlan: vxlan id
+          zerotier: Zerotier network id
+          default: id can be ommited
+          bridge: name of the bridge to connect to
+      type: string
+    config:
+      required: false
+      properties:
+         cidr:
+           description: IP Address/Prefix for the interface eg 192.168.103.1/24
+           type: string
+         gateway:
+           type: string
+           description: Gateway for the the container
+           required: false
+      description: Optional IP address configuration for this interface, only allowed for interfaces of type vxlan and vlan
+    name:
+      description: Name of the interface
+      type: string
+    dhcpserver:
+      description: The DHCP config for the nic
+      required: false
+      type: DHCP
+
 GW:
   properties:
     nics:
-      type: ContainerNIC[]
+      type: GWNIC[]
       description: List of container nics
     portforwards:
       type: PortForward[]
@@ -1141,6 +1172,3 @@ GW:
     httpproxies:
       type: HTTPProxy[]
       description: List of HTTPProxy
-    dhcps:
-      type: DHCP[]
-      description: DHCP configuration
