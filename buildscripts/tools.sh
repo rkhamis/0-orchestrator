@@ -13,7 +13,7 @@ aptupdate() {
 
 aptinstall() {
     name=$1
-    if ! which $name; then
+    if ! dpkg-query -s "$name" &> /dev/null; then
         aptupdate
         apt-get install -y $name
     fi
