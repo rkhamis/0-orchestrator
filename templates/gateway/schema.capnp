@@ -9,13 +9,14 @@ struct Schema {
     portforwards @4 :List(PortForward);
     httpproxies @5 :List(HTTPProxy);
     container @6 :Text; # Container spawned by this service
+    domain @7: Text;
 
     struct Nic {
         type @0: NicType;
         id @1: Text;
         config @2: NicConfig;
         name @3: Text;
-        dhcp @4: DHCP;
+        dhcpserver @4: DHCP;
     }
 
     struct CloudInit {
@@ -34,13 +35,11 @@ struct Schema {
     struct DHCP {
         nameservers @0: List(Text);
         hosts @1: List(Host);
-        domain @2: Text;
     }
 
     struct NicConfig {
         cidr @0: Text;
         gateway @1: Text;
-        dns @2: List(Text);
     }
 
     enum HTTPType {
