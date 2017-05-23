@@ -7,8 +7,8 @@ def install(job):
     gateway = job.service.parent.consumers['gateway'][0]
 
     config = {}
-    for dhcp in gateway.model.data.dhcps:
-        for host in dhcp.hosts:
+    for nic in gateway.model.data.nics:
+        for host in nic.dhcpserver.hosts:
             userdata = json.loads(host.cloudinit.userdata)
             metadata = json.loads(host.cloudinit.metadata)
             config[host.macaddress] = json.dumps({
