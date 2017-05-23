@@ -5,8 +5,8 @@ import (
 )
 
 type CloudInit struct {
-	MetaData string `json:"meta-data" validate:"nonzero"`
-	UserData string `json:"user-data" validate:"nonzero"`
+	MetaData string `yaml:"metadata" json:"metadata" validate:"nonzero"`
+	UserData string `yaml:"userdata" json:"userdata" validate:"nonzero"`
 }
 
 func (s CloudInit) Validate() error {
