@@ -3,3 +3,4 @@ links:
     auto: false
     role: container
     argname: container
+    optional: false
