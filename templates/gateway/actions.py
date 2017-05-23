@@ -1,5 +1,6 @@
 from JumpScale import j
 
+
 def input(job):
     for arg in ['filesystems', 'arbds']:
         if job.model.args.get(arg, []) != []:
@@ -100,7 +101,14 @@ def processChange(job):
         cloudInitServ = service.aysrepo.serviceGet(role='cloudinit', instance=service.name)
         j.tools.async.wrappers.sync(cloudInitServ.executeAction('update', args={'nics': args['nics']}))
 
-        cloudInitServ = service.aysrepo.serviceGet(role='cloudinit', instance=service.name)
-        j.tools.async.wrappers.sync(cloudInitServ.executeAction('update', args={'data': args}))
+        firewallServ = service.aysrepo.serviceGet(role='firewall', instance=service.name)
+        j.tools.async.wrappers.sync(firewallServ.executeAction('update', args={'data': args}))
+
+        dhcpServ = service.aysrepo.serviceGet(role='dhcp', instance=service.name)
+        j.tools.async.wrappers.sync(dhcpServ.executeAction('update', args={'data': args}))
 
         service.model.data.nics = args['nics']
+
+    if args.get("httpproxies", None):
+        httpServ = service.aysrepo.serviceGet(role='http', instance=service.name)
+        j.tools.async.wrappers.sync(httpServ.executeAction('update', args={'httpproxies': args["httpproxies"]}))

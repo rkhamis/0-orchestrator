@@ -1,14 +1,17 @@
-from JumpScale import j
-
-
 def install(job):
+    gateway = job.service.parent.consumers['gateway'][0]
+    gwdata = gateway.model.data.to_dict()
+    apply_config(job, gwdata)
+
+
+def apply_config(job, gwdata=None):
     import ipaddress
     from JumpScale.sal.g8os.Container import Container
     from JumpScale.sal.g8os.gateway.dhcp import DHCP
 
     container = Container.from_ays(job.service.parent)
-    gateway = job.service.parent.consumers['gateway'][0]
-    gwdata = gateway.model.data.to_dict()
+
+    gwdata = {} if gwdata is None else gwdata
     nics = gwdata.get('nics', [])
     dhcpservers = []
 
@@ -27,9 +30,6 @@ def install(job):
     dhcp.apply_config()
 
 
-
-
-
-
-
-
+def update(job):
+    if job.model.args.get("nics", None):
+        apply_config(job, job.model.args)
