@@ -99,4 +99,8 @@ def processChange(job):
     if service.model.data.nics != args.get('nics', service.model.data.nics):
         cloudInitServ = service.aysrepo.serviceGet(role='cloudinit', instance=service.name)
         j.tools.async.wrappers.sync(cloudInitServ.executeAction('update', args={'nics': args['nics']}))
+
+        cloudInitServ = service.aysrepo.serviceGet(role='cloudinit', instance=service.name)
+        j.tools.async.wrappers.sync(cloudInitServ.executeAction('update', args={'data': args}))
+
         service.model.data.nics = args['nics']
