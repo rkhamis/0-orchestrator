@@ -1,6 +1,9 @@
 from JumpScale import j
 
+
 def input(job):
+    import ipaddress
+
     for arg in ['filesystems', 'arbds']:
         if job.model.args.get(arg, []) != []:
             raise j.exceptions.Input('{} should not be set as input'.format(arg))
@@ -25,6 +28,8 @@ def input(job):
             cidr = config.get('cidr')
             if config.get('gateway'):
                 publicnetwork = True
+                if dhcp:
+                    raise j.exceptions.Input('Dhcp can only be defined for private networks')
             else:
                 privatenetwork = True
 
@@ -36,6 +41,13 @@ def input(job):
 
             if not nameservers:
                 raise j.exceptions.Input('Dhcp nameservers should have at least one nameserver.')
+            hosts = dhcp.get('hosts')
+            for host in hosts:
+                ip = host.get('ipaddress')
+                subnet = ipaddress.IPv4Interface(cidr).network
+                if not ip or not ipaddress.ip_address(ip) in subnet:
+                    raise j.exceptions.Input('Dhcp host ipaddress should be within cidr subnet.')
+
 
     if not publicnetwork:
         raise j.exceptions.Input("Gateway should have at least one Public Address (gw defined)")
