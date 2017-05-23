@@ -71,11 +71,7 @@ def init(job):
 
     # Start cloudinit
     cloudinitActor = service.aysrepo.actorGet("cloudinit")
-    args = {
-        'container': service.name
-    }
-    cloudinitService = cloudinitActor.serviceCreate(instance=service.name, args=args)
-    cloudinitService.consume(cont_service)
+    cloudinitActor.serviceCreate(instance=service.name, args=args)
 
 
 def install(job):
