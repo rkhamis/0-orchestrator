@@ -14,8 +14,13 @@ def input(job):
     privatenetwork = False
     for nic in nics:
         config = nic.get('config')
+        name = nic.get('name')
         dhcp = nic.get('dhcpserver')
         cidr = None
+
+        if not name:
+            raise j.exceptions.Input('Gateway nic should have name defined.')
+
         if config:
             cidr = config.get('cidr')
             if config.get('gateway'):
