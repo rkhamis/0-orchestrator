@@ -1,3 +1,5 @@
+from JumpScale import j
+
 def input(job):
     for arg in ['filesystems', 'arbds']:
         if job.model.args.get(arg, []) != []:

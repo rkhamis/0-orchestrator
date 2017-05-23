@@ -17,7 +17,7 @@ def install(job):
         if not dhcpserver:
             continue
 
-        cidr = ipaddress.IPv4Interface(nic.config.cidr)
+        cidr = ipaddress.IPv4Interface(nic['config']['cidr'])
         dhcpserver['subnet'] = str(cidr.network)
         dhcpserver['gateway'] = str(cidr.ip)
         dhcpserver['interface'] = nic['name']
