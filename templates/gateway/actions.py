@@ -31,9 +31,9 @@ def input(job):
                 raise j.exceptions.Input('Dhcp nameservers should have at least one nameserver.')
 
     if not publicnetwork:
-        raise j.exceptions.Input('Gateway should have atleast one Public Address (gw defined)')
+        raise j.exceptions.Input("Gateway should have at least one Public Address (gw defined)")
     if not privatenetwork:
-        raise j.exceptions.Input('Gateway should have atleast one Private Address (no gw defined)')
+        raise j.exceptions.Input("Gateway should have at least one Private Address (no gw defined)")
     return job.model.args
 
 
@@ -67,6 +67,15 @@ def init(job):
     dhcpactor = service.aysrepo.actorGet('dhcp')
     dhcpactor.serviceCreate(instance=service.name, args=args)
 
+    # Start cloudinit
+    cloudinitActor = service.aysrepo.actorGet("cloudinit")
+    args = {
+        'container': service.name
+    }
+    cloudinitService = cloudinitActor.serviceCreate(instance=service.name, args=args)
+    cloudinitService.consume(cont_service)
+
 
 def install(job):
     # nothing to do here all our children will be created by ays automagic
+    pass
