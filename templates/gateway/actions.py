@@ -48,6 +48,10 @@ def init(job):
     service = job.service
     containeractor = service.aysrepo.actorGet("container")
     nics = service.model.data.to_dict()['nics']  # get dict version of nics
+    for nic in nics:
+        if 'dhcpserver' in nic:
+            nic.pop('dhcpserver')
+
     args = {
         'node': service.model.data.node,
         'flist': 'https://hub.gig.tech/gig-official-apps/g8osgw.flist',
