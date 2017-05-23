@@ -68,14 +68,24 @@ def init(job):
     dhcpactor.serviceCreate(instance=service.name, args=args)
 
     # Start cloudinit
-    cloudinitActor = service.aysrepo.actorGet("cloudinit")
-    args = {
-        'container': service.name
-    }
-    cloudinitService = cloudinitActor.serviceCreate(instance=service.name, args=args)
-    cloudinitService.consume(cont_service)
+    cloudinitactor = service.aysrepo.actorGet("cloudinit")
+    cloudinitactor.serviceCreate(instance=service.name, args=args)
 
 
 def install(job):
     # nothing to do here all our children will be created by ays automagic
     pass
+
+
+def processChange(job):
+    service = job.service
+    args = job.model.args
+    category = args.pop('changeCategory')
+
+    if category != 'dataschema':
+        return
+
+    if service.model.data.nics != args.get('nics', service.model.data.nics):
+        cloudInitServ = service.aysrepo.serviceGet(role='cloudinit', instance=service.name)
+        j.tools.async.wrappers.sync(cloudInitServ.executeAction('update', args={'nics': args['nics']}))
+        service.model.data.nics = args['nics']
