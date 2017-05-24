@@ -5,11 +5,11 @@ import (
 )
 
 type GWNIC struct {
-	Config     string        `json:"config,omitempty"`
-	Dhcpserver DHCP          `json:"dhcpserver,omitempty"`
-	Id         string        `json:"id" validate:"nonzero"`
-	Name       string        `json:"name" validate:"nonzero"`
-	Type       EnumGWNICType `json:"type" validate:"nonzero"`
+	Config     *GWNICConfig  `json:"config,omitempty" yaml:"config,omitempty"`
+	Dhcpserver *DHCP         `json:"dhcpserver,omitempty" yaml:"dhcpserver,omitempty"`
+	Id         string        `json:"id"   yaml:"id"   validate:"nonzero"`
+	Name       string        `json:"name" yaml:"name" validate:"nonzero"`
+	Type       EnumGWNICType `json:"type" yaml:"type" validate:"nonzero"`
 }
 
 func (s GWNIC) Validate() error {

@@ -5,9 +5,9 @@ import (
 )
 
 type HTTPProxy struct {
-	Destinations []string   `json:"destinations" validate:"nonzero"`
-	Host         string     `json:"host" validate:"nonzero"`
-	Types        []HTTPType `json:"types" validate:"nonzero"`
+	Destinations []string       `json:"destinations" validate:"nonzero"`
+	Host         string         `json:"host" validate:"nonzero"`
+	Types        []EnumHTTPType `json:"types" validate:"nonzero"`
 }
 
 func (s HTTPProxy) Validate() error {

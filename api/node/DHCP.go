@@ -5,10 +5,8 @@ import (
 )
 
 type DHCP struct {
-	Domain      string   `json:"domain,omitempty"`
-	Hosts       []GWHost `json:"hosts" validate:"nonzero"`
-	Interface   string   `json:"interface" validate:"nonzero"`
-	Nameservers []string `json:"nameservers,omitempty"`
+	Hosts       []GWHost `json:"hosts" yaml:"hosts" validate:"nonzero"`
+	Nameservers []string `json:"nameservers,omitempty" yaml:"nameservers,omitempty"`
 }
 
 func (s DHCP) Validate() error {
