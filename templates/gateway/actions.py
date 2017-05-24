@@ -48,7 +48,6 @@ def input(job):
                 if not ip or not ipaddress.ip_address(ip) in subnet:
                     raise j.exceptions.Input('Dhcp host ipaddress should be within cidr subnet.')
 
-
     if not publicnetwork:
         raise j.exceptions.Input("Gateway should have at least one Public Address (gw defined)")
     if not privatenetwork:
