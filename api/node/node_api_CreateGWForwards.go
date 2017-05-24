@@ -7,7 +7,7 @@ import (
 
 // nodeidgwsgwnamefirewallforwardsPost is the handler for POST /nodes/{nodeid}/gws/{gwname}/firewall/forwards
 // Create a new Portforwarding
-func (api NodeAPI) nodeidgwsgwnamefirewallforwardsPost(w http.ResponseWriter, r *http.Request) {
+func (api NodeAPI) CreateGWForwards(w http.ResponseWriter, r *http.Request) {
 	var reqBody PortForward
 
 	// decode request

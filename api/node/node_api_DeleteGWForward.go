@@ -6,5 +6,5 @@ import (
 
 // nodeidgwsgwnamefirewallforwardsforwardidDelete is the handler for DELETE /nodes/{nodeid}/gws/{gwname}/firewall/forwards/{forwardid}
 // Delete portforward, forwardid = srcip:srcport
-func (api NodeAPI) nodeidgwsgwnamefirewallforwardsforwardidDelete(w http.ResponseWriter, r *http.Request) {
+func (api NodeAPI) DeleteGWForward(w http.ResponseWriter, r *http.Request) {
 }

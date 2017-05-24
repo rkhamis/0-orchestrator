@@ -507,6 +507,7 @@ types:
         /firewall:
           /forwards:
             get:
+              displayName: GetGWForwards
               description: |
                 Get list for IPv4 Forwards
               responses:
@@ -515,6 +516,7 @@ types:
                     application/json:
                       type: PortForward[]
             post:
+              displayName: CreateGWForwards
               description: |
                 Create a new Portforwarding
               body:
@@ -532,46 +534,13 @@ types:
                       required: false
             /{forwardid}:
               delete:
+                displayName: DeleteGWForward
                 description: |
                   Delete portforward, forwardid = srcip:srcport
                 responses:
                   204:
                     description: |
                       Succesfully deleted resource
-          /forwards6:
-            get:
-              description: |
-                Get list for IPv6 Forwards
-              responses:
-                200:
-                  body:
-                    application/json:
-                      type: PortForward6[]
-            post:
-              description: |
-                Create a new Portforwarding
-              body:
-                application/json:
-                  type: PortForward6
-              responses:
-                201:
-                  description: |
-                    Succesfully created a new resource
-                  headers:
-                    Location:
-                      description: |
-                        Location of the newly created resource
-                      type: string
-                      required: false
-            /{forwardid}:
-              delete:
-                description: |
-                  Delete portforward, forwardid = srcip:srcport
-                responses:
-                  204:
-                    description: |
-                      Succesfully deleted resource
-
 
         /dhcp:
           /{interface}:
@@ -595,6 +564,7 @@ types:
                     type: GWHost
               /{macaddress}:
                 delete:
+                  displayName: DeleteDHCPHost
                   description: |
                     Delete dhcp host
                   responses:
