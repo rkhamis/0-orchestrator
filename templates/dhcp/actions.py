@@ -21,7 +21,7 @@ def apply_config(job, gwdata=None):
             continue
 
         cidr = ipaddress.IPv4Interface(nic['config']['cidr'])
-        dhcpserver['subnet'] = str(cidr.network)
+        dhcpserver['subnet'] = str(cidr.network.network_address)
         dhcpserver['gateway'] = str(cidr.ip)
         dhcpserver['interface'] = nic['name']
         dhcpservers.append(dhcpserver)
