@@ -19,7 +19,8 @@ def apply_rules(job, httpproxies=None, nics=None):
 
     # we add some proxies specially for cloud-init
     for nic in nics:
-        if 'dhcpserver' in nic and 'config' in nic and 'cidr' in nic['config']:
+        dhcpconfig = nic.get('dhcpserver')
+        if dhcpconfig and 'config' in nic and nic['config']['cidr']:
             gwip = str(ipaddress.IPv4Interface(nic['config']['cidr']).ip)
             httpproxies.append({
                 'host': gwip,
