@@ -6,7 +6,7 @@ links:
     argname: node
   consume:
     - auto: false
-      min: 0
+      min: 1
       max: 1
       role: container
       argname: container
