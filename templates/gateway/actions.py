@@ -107,6 +107,8 @@ def processChange(job):
     if category != 'dataschema':
         return
 
+    service.model.data.portforwards = args.get('portforwards', service.model.data.portforwards)
+
     if service.model.data.nics != args.get('nics', service.model.data.nics):
         cloudInitServ = service.aysrepo.serviceGet(role='cloudinit', instance=service.name)
         j.tools.async.wrappers.sync(cloudInitServ.executeAction('update', args={'nics': args['nics']}))
@@ -123,3 +125,4 @@ def processChange(job):
         httpServ = service.aysrepo.serviceGet(role='http', instance=service.name)
         http_args = {'httpproxies': args["httpproxies"], 'nics': args.get('nics', service.model.data.nics)}
         j.tools.async.wrappers.sync(httpServ.executeAction('update', args=http_args))
+        service.model.data.httpproxies = args['httpproxies']
