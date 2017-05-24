@@ -1147,6 +1147,24 @@ GWNIC:
       required: false
       type: DHCP
 
+GWCreate:
+  properties:
+    name:
+      type: string
+      description: Name of gateway
+    domain:
+      type: string
+      description: Name of domain
+    nics:
+      type: GWNIC[]
+      description: List of gateway nics
+    portforwards:
+      type: PortForward[]
+      description: List of portfowardings
+    httpproxies:
+      type: HTTPProxy[]
+      description: List of HTTPProxy
+
 GW:
   properties:
     nics:

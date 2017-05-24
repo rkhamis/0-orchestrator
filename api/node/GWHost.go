@@ -5,11 +5,11 @@ import (
 )
 
 type GWHost struct {
-	Cloudinit  CloudInit `json:"cloudinit,omitempty"`
-	Hostname   string    `json:"hostname" validate:"nonzero"`
-	Ip6address string    `json:"ip6address,omitempty"`
-	Ipaddress  string    `json:"ipaddress" validate:"nonzero"`
-	Macaddress string    `json:"macaddress" validate:"nonzero"`
+	Cloudinit  *CloudInit `json:"cloudinit,omitempty" yaml:"cloudinit,omitempty"`
+	Ip6address string     `json:"ip6address,omitempty" yaml:"ip6address,omitempty"`
+	Hostname   string     `json:"hostname"  yaml:"hostname" validate:"nonzero"`
+	Ipaddress  string     `json:"ipaddress" yaml:"ipaddress" validate:"nonzero,ip"`
+	Macaddress string     `json:"macaddress" yaml:"macaddress" validate:"nonzero,macaddress"`
 }
 
 func (s GWHost) Validate() error {
