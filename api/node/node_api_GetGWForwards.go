@@ -15,8 +15,10 @@ import (
 func (api NodeAPI) GetGWForwards(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	gateway := vars["gwname"]
+	nodeId := vars["nodeid"]
 
 	queryParams := map[string]interface{}{
+		"parent": fmt.Sprintf("node.g8os!%s", nodeId),
 		"fields": "portforwards",
 	}
 
