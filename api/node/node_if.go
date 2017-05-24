@@ -278,13 +278,13 @@ type NodesInterface interface { // ListNodes is the handler for GET /node
 	AddGWDHCPHost(http.ResponseWriter, *http.Request)
 	// nodeidgwsgwnamefirewallforwardsforwardidDelete is the handler for DELETE /nodes/{nodeid}/gws/{gwname}/firewall/forwards/{forwardid}
 	// Delete portforward, forwardid = srcip:srcport
-	nodeidgwsgwnamefirewallforwardsforwardidDelete(http.ResponseWriter, *http.Request)
+	DeleteGWForward(http.ResponseWriter, *http.Request)
 	// nodeidgwsgwnamefirewallforwardsGet is the handler for GET /nodes/{nodeid}/gws/{gwname}/firewall/forwards
 	// Get list for IPv4 Forwards
-	nodeidgwsgwnamefirewallforwardsGet(http.ResponseWriter, *http.Request)
+	GetGWForwards(http.ResponseWriter, *http.Request)
 	// nodeidgwsgwnamefirewallforwardsPost is the handler for POST /nodes/{nodeid}/gws/{gwname}/firewall/forwards
 	// Create a new Portforwarding
-	nodeidgwsgwnamefirewallforwardsPost(http.ResponseWriter, *http.Request)
+	CreateGWForwards(http.ResponseWriter, *http.Request)
 	// StartGateway is the handler for POST /nodes/{nodeid}/gws/{gwname}/start
 	// Start Gateway instance
 	StartGateway(http.ResponseWriter, *http.Request)
@@ -398,9 +398,9 @@ func NodesInterfaceRoutes(r *mux.Router, i NodesInterface) {
 	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/dhcp/{interface}/hosts/{macaddress}", i.nodeidgwsgwnamedhcpinterfacehostsmacaddressDelete).Methods("DELETE")
 	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/dhcp/{interface}/hosts", i.ListGWDHCPHosts).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/dhcp/{interface}/hosts", i.AddGWDHCPHost).Methods("POST")
-	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/firewall/forwards/{forwardid}", i.nodeidgwsgwnamefirewallforwardsforwardidDelete).Methods("DELETE")
-	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/firewall/forwards", i.nodeidgwsgwnamefirewallforwardsGet).Methods("GET")
-	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/firewall/forwards", i.nodeidgwsgwnamefirewallforwardsPost).Methods("POST")
+	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/firewall/forwards/{forwardid}", i.DeleteGWForward).Methods("DELETE")
+	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/firewall/forwards", i.GetGWForwards).Methods("GET")
+	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/firewall/forwards", i.CreateGWForwards).Methods("POST")
 	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/start", i.StartGateway).Methods("POST")
 	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/stop", i.StopGateway).Methods("POST")
 	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}", i.DeleteGateway).Methods("DELETE")
