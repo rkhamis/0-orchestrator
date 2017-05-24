@@ -9,12 +9,13 @@ def install(job):
     config = {}
     for nic in gateway.model.data.nics:
         for host in nic.dhcpserver.hosts:
-            userdata = json.loads(host.cloudinit.userdata)
-            metadata = json.loads(host.cloudinit.metadata)
-            config[host.macaddress] = json.dumps({
-                "meta-data": metadata,
-                "user-data": userdata,
-            })
+            if host.cloudinit.userdata and host.cloudinit.metadata:
+                userdata = json.loads(host.cloudinit.userdata)
+                metadata = json.loads(host.cloudinit.metadata)
+                config[host.macaddress] = json.dumps({
+                    "meta-data": metadata,
+                    "user-data": userdata,
+                })
 
     cloudinit = CloudInit(container, config)
     cloudinit.apply_config()
