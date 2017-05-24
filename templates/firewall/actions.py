@@ -14,10 +14,10 @@ def apply_rules(job, gwdata=None):
     # lets assume the public ip is the ip of the nic which has a gateway configured
 
     publicnetwork = None
-    privatenetworks = None
+    privatenetworks = []
     for nic in gwdata["nics"]:
         if nic["config"]:
-            if nic["config"]["gateway"]:
+            if nic["config"].get("gateway", None):
                 publicnetwork = Network(nic["name"], nic["config"]["cidr"])
             else:
                 privatenetworks.append(Network(nic["name"], nic["config"]["cidr"]))

@@ -48,7 +48,6 @@ def input(job):
                 if not ip or not ipaddress.ip_address(ip) in subnet:
                     raise j.exceptions.Input('Dhcp host ipaddress should be within cidr subnet.')
 
-
     if not publicnetwork:
         raise j.exceptions.Input("Gateway should have at least one Public Address (gw defined)")
     if not privatenetwork:
@@ -122,4 +121,5 @@ def processChange(job):
 
     if args.get("httpproxies", None):
         httpServ = service.aysrepo.serviceGet(role='http', instance=service.name)
-        j.tools.async.wrappers.sync(httpServ.executeAction('update', args={'httpproxies': args["httpproxies"]}))
+        http_args = {'httpproxies': args["httpproxies"], 'nics': args.get('nics', service.model.data.nics)}
+        j.tools.async.wrappers.sync(httpServ.executeAction('update', args=http_args))

@@ -15,17 +15,24 @@ def config_cloud_init(job, nics=None):
     container = Container.from_ays(job.service.parent)
     nics = [] if nics is None else nics
     config = {}
+
     for nic in nics:
-        for host in nic["dhcpserver"]["hosts"]:
-            userdata = json.loads(host["cloudinit"]["userdata"])
-            metadata = json.loads(host["cloudinit"]["metadata"])
-            config[host.macaddress] = json.dumps({
-                "meta-data": metadata,
-                "user-data": userdata,
-            })
+        if not nic.get("dhcpserver", None):
+            continue
+
+        for host in nic["dhcpserver"].get("hosts", []):
+            if host.get("cloudinit", None):
+                if host["cloudinit"]["userdata"] and host["cloudinit"]["metadata"]:
+                    userdata = json.loads(host["cloudinit"]["userdata"])
+                    metadata = json.loads(host["cloudinit"]["metadata"])
+                    config[host.macaddress] = json.dumps({
+                        "meta-data": metadata,
+                        "user-data": userdata,
+                    })
 
     cloudinit = CloudInit(container, config)
-    cloudinit.apply_config()
+    if config != {}:
+        cloudinit.apply_config()
     return cloudinit
 
 
