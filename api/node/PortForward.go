@@ -7,7 +7,7 @@ import (
 type PortForward struct {
 	Dstip     string       `json:"dstip" validate:"nonzero"`
 	Dstport   int          `json:"dstport" validate:"nonzero"`
-	Protocols []IPProtocol `json:"protocols" validate:"nonzero"`
+	Protocols []EnumIPProtocol `json:"protocols" validate:"nonzero"`
 	Srcip     string       `json:"srcip" validate:"nonzero"`
 	Srcport   int          `json:"srcport" validate:"nonzero"`
 }

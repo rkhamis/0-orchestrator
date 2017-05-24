@@ -13,7 +13,6 @@ import (
 // ListStoragePoolDevices is the handler for GET /nodes/{nodeid}/storagepools/{storagepoolname}/devices
 // Lists the devices in the storage pool
 func (api NodeAPI) ListStoragePoolDevices(w http.ResponseWriter, r *http.Request) {
-	// TODO: Device Status is missing
 	var respBody []StoragePoolDevice
 
 	vars := mux.Vars(r)
