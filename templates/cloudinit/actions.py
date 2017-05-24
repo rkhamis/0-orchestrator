@@ -13,19 +13,19 @@ def config_cloud_init(job, nics=None):
     from JumpScale.sal.g8os.Container import Container
 
     container = Container.from_ays(job.service.parent)
-    nics = [] if nics is None else nics
+    nics = nics or []
     config = {}
 
     for nic in nics:
-        if not nic.get("dhcpserver", None):
+        if not nic.get("dhcpserver"):
             continue
 
         for host in nic["dhcpserver"].get("hosts", []):
-            if host.get("cloudinit", None):
+            if host.get("cloudinit"):
                 if host["cloudinit"]["userdata"] and host["cloudinit"]["metadata"]:
                     userdata = json.loads(host["cloudinit"]["userdata"])
                     metadata = json.loads(host["cloudinit"]["metadata"])
-                    config[host.macaddress] = json.dumps({
+                    config[host['macaddress'].lower()] = json.dumps({
                         "meta-data": metadata,
                         "user-data": userdata,
                     })
