@@ -8,10 +8,10 @@ def get_container(service):
 
 def is_running(container):
     try:
-        for process in container.client.job.list():
-            arguments = process['cmd']['arguments']
+        for job in container.client.job.list():
+            arguments = job['cmd']['arguments']
             if 'name' in arguments and arguments['name'] == '/bin/nbdserver':
-                return process
+                return job
         return False
     except Exception as err:
         if str(err).find("invalid container id"):
@@ -92,8 +92,8 @@ def install(job):
             raise j.exceptions.RuntimeError("Failed to start nbdserver {}".format(service.name))
     else:
         # send a siganl sigub(1) to reload the config in case it was changed.
-        process = is_running(container)
-        container.client.job.kill(process['cmd']['id'], signal=1)
+        job = is_running(container)
+        container.client.job.kill(job['cmd']['id'], signal=1)
 
     service.model.data.socketPath = '/server.socket.{id}'.format(id=service.name)
     service.saveAll()
@@ -108,10 +108,10 @@ def stop(job):
     import time
     service = job.service
     container = get_container(service=service)
-    process = is_running(container)
-    if process:
-        job.logger.info("killing process {}".format(process['cmd']['arguments']['name']))
-        container.client.process.kill(process['cmd']['id'])
+    nbdjob = is_running(container)
+    if nbdjob:
+        job.logger.info("killing job {}".format(nbdjob['cmd']['arguments']['name']))
+        container.client.job.kill(nbdjob['cmd']['id'])
 
         job.logger.info("wait for nbdserver to stop")
         for i in range(60):
@@ -119,4 +119,4 @@ def stop(job):
             if is_running(container):
                 continue
             return
-        raise j.exceptions.RuntimeError("ardb-server didn't stopped")
+        raise j.exceptions.RuntimeError("nbdserver didn't stopped")
