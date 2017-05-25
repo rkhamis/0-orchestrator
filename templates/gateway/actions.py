@@ -4,10 +4,6 @@ from JumpScale import j
 def input(job):
     import ipaddress
 
-    for arg in ['filesystems', 'arbds']:
-        if job.model.args.get(arg, []) != []:
-            raise j.exceptions.Input('{} should not be set as input'.format(arg))
-
     domain = job.model.args.get('domain')
     if not domain:
         raise j.exceptions.Input('Domain cannot be empty.')
@@ -16,35 +12,33 @@ def input(job):
     publicnetwork = False
     privatenetwork = False
     for nic in nics:
-        config = nic.get('config')
+        config = nic.get('config', {})
         name = nic.get('name')
         dhcp = nic.get('dhcpserver')
-        cidr = None
+        cidr = config.get('cidr')
 
         if not name:
             raise j.exceptions.Input('Gateway nic should have name defined.')
 
         if config:
-            cidr = config.get('cidr')
             if config.get('gateway'):
                 publicnetwork = True
                 if dhcp:
-                    raise j.exceptions.Input('Dhcp can only be defined for private networks')
+                    raise j.exceptions.Input('DHCP can only be defined for private networks')
             else:
                 privatenetwork = True
 
-        if (dhcp and not config) or (dhcp and config and not cidr):
-            raise j.exceptions.Input('Gateway should have cidr if dhcp is defined.')
-
         if dhcp:
+            if not cidr:
+                raise j.exceptions.Input('Gateway nic should have cidr if a DHCP server is defined.')
             nameservers = dhcp.get('nameservers')
 
             if not nameservers:
-                raise j.exceptions.Input('Dhcp nameservers should have at least one nameserver.')
+                raise j.exceptions.Input('DHCP nameservers should have at least one nameserver.')
             hosts = dhcp.get('hosts')
+            subnet = ipaddress.IPv4Interface(cidr).network
             for host in hosts:
                 ip = host.get('ipaddress')
-                subnet = ipaddress.IPv4Interface(cidr).network
                 if not ip or not ipaddress.ip_address(ip) in subnet:
                     raise j.exceptions.Input('Dhcp host ipaddress should be within cidr subnet.')
 
