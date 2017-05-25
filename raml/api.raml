@@ -553,6 +553,8 @@ types:
                     body:
                       application/json:
                         type: GWHost[]
+                  404:
+                    description: No dhcp is defined for this interface.
               post:
                 displayName: AddGWDHCPHost
                 description: Add a dhcp host to a specified interface
