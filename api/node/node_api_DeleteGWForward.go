@@ -24,7 +24,7 @@ func (api NodeAPI) DeleteGWForward(w http.ResponseWriter, r *http.Request) {
 	}
 
 	service, res, err := api.AysAPI.Ays.GetServiceByName(gateway, "gateway", api.AysRepo, nil, queryParams)
-	if !tools.HandleAYSResponse(err, res, w, "Getting storagepool service") {
+	if !tools.HandleAYSResponse(err, res, w, "Getting gateway service") {
 		return
 	}
 

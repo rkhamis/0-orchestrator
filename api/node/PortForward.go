@@ -2,6 +2,7 @@ package node
 
 import (
 	"gopkg.in/validator.v2"
+	"github.com/g8os/resourcepool/api/validators"
 )
 
 type PortForward struct {
@@ -13,6 +14,16 @@ type PortForward struct {
 }
 
 func (s PortForward) Validate() error {
+	protocolsEnums := map[interface{}]struct{}{
+		EnumIPProtocoltcp: struct{}{},
+		EnumIPProtocoludp:    struct{}{},
+	}
 
+	for _, protocol := range s.Protocols {
+		if err := validators.ValidateEnum("Protocols", protocol, protocolsEnums); err != nil {
+			return err
+		}
+
+	}
 	return validator.Validate(s)
 }

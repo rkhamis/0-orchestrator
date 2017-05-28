@@ -19,14 +19,14 @@ func (api NodeAPI) ListGateways(w http.ResponseWriter, r *http.Request) {
 		"parent": fmt.Sprintf("node.g8os!%s", nodeID),
 	}
 	services, res, err := api.AysAPI.Ays.ListServicesByRole("gateway", api.AysRepo, nil, query)
-	if !tools.HandleAYSResponse(err, res, w, "listing gatways") {
+	if !tools.HandleAYSResponse(err, res, w, "listing gateways") {
 		return
 	}
 
 	var respBody = make([]GWCreate, len(services))
 	for i, serviceData := range services {
 		service, res, err := api.AysAPI.Ays.GetServiceByName(serviceData.Name, serviceData.Role, api.AysRepo, nil, nil)
-		if !tools.HandleAYSResponse(err, res, w, "listing gatways") {
+		if !tools.HandleAYSResponse(err, res, w, "Getting gateway service") {
 			return
 		}
 		var data GWCreate

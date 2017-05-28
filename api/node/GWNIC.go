@@ -29,5 +29,18 @@ func (s GWNIC) Validate() error {
 			}
 		}
 	}
+
+	nicTypes := map[interface{}]struct{}{
+		EnumGWNICTypezerotier: struct{}{},
+		EnumGWNICTypevxlan:    struct{}{},
+		EnumGWNICTypevlan:  struct{}{},
+		EnumGWNICTypedefault:  struct{}{},
+		EnumGWNICTypebridge: struct {}{},
+	}
+
+	if err := validators.ValidateEnum("Type", s.Type, nicTypes); err != nil {
+		return err
+	}
+
 	return validator.Validate(s)
 }

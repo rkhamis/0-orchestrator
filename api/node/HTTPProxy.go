@@ -2,6 +2,7 @@ package node
 
 import (
 	"gopkg.in/validator.v2"
+	"github.com/g8os/resourcepool/api/validators"
 )
 
 type HTTPProxy struct {
@@ -12,5 +13,16 @@ type HTTPProxy struct {
 
 func (s HTTPProxy) Validate() error {
 
+	httpTypes := map[interface{}]struct{}{
+		EnumHTTPTypehttp: struct{}{},
+		EnumHTTPTypehttps:    struct{}{},
+	}
+
+	for _, httpType := range s.Types {
+		if err := validators.ValidateEnum("Types", httpType, httpTypes); err != nil {
+			return err
+		}
+
+	}
 	return validator.Validate(s)
 }
