@@ -3,7 +3,7 @@ package node
 import (
 	"net/http"
 
-	"github.com/g8os/blockstor/log"
+	log "github.com/Sirupsen/logrus"
 	"github.com/g8os/resourcepool/api/tools"
 	"github.com/gorilla/mux"
 )
