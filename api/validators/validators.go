@@ -150,3 +150,16 @@ func ValidateIp6(ip string) error {
 	}
 	return nil
 }
+
+func ValidateVdisk(vtype string, tlog string, template string) error {
+	if template != "" {
+		if vtype != "boot" {
+			return fmt.Errorf("Vdisks of type %v do not have template support", vtype)
+		}
+	}
+
+	if tlog != "" && (vtype == "cache" || vtype == "tmp") {
+		return fmt.Errorf("Vdisks of type %v can't be redundant", vtype)
+	}
+	return nil
+}

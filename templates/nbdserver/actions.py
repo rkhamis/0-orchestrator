@@ -20,10 +20,8 @@ def is_running(container):
 
 
 def install(job):
-    from JumpScale.sal.g8os.StorageCluster import StorageCluster
     import time
     import yaml
-    import uuid
     from io import BytesIO
     from urllib.parse import urlparse
     service = job.service
@@ -44,25 +42,24 @@ def install(job):
             conf = container.node.client.config.get()
             rootardb = urlparse(conf['globals']['storage']).netloc
 
-
-        if  vdiskservice.model.data.storageCluster not in config['storageClusters']:
-            storageclusterservice = service.aysrepo.serviceGet(role='storage_cluster',
-                                                               instance=vdiskservice.model.data.storageCluster)
-            cluster = StorageCluster.from_ays(storageclusterservice)
-            clusterconfig = cluster.get_config()
+        if vdiskservice.model.data.storageCluster not in config['storageClusters']:
+            storagecluster = vdiskservice.model.data.storageCluster
+            clusterconfig = get_storagecluster_config(service, storagecluster)
             rootcluster = {'dataStorage': [{'address': rootardb}], 'metadataStorage': {'address': rootardb}}
             rootclustername = hash(j.data.serializer.json.dumps(rootcluster, sort_keys=True))
-            vdiskconfig = {'blockSize': vdiskservice.model.data.blocksize,
-                           'id': vdiskservice.name,
-                           'readOnly': vdiskservice.model.data.readOnly,
-                           'size': vdiskservice.model.data.size,
-                           'storageCluster': vdiskservice.model.data.storageCluster,
-                           'rootStorageCluster': rootclustername,
-                           'tlogstoragecluster': vdiskservice.model.data.tlogStoragecluster,
-                           'type': str(vdiskservice.model.data.type)}
-            config['storageClusters'][cluster.name] = clusterconfig
+            config['storageClusters'][storagecluster] = clusterconfig
         if rootclustername not in config['storageClusters']:
             config['storageClusters'][rootclustername] = rootcluster
+
+        vdisk_type = "cache" if str(vdiskservice.model.data.type) == "tmp" else str(vdiskservice.model.data.type)
+        vdiskconfig = {'blockSize': vdiskservice.model.data.blocksize,
+                       'id': vdiskservice.name,
+                       'readOnly': vdiskservice.model.data.readOnly,
+                       'size': vdiskservice.model.data.size,
+                       'storageCluster': vdiskservice.model.data.storageCluster,
+                       'rootStorageCluster': rootclustername,
+                       'tlogstoragecluster': vdiskservice.model.data.tlogStoragecluster,
+                       'type': vdisk_type}
         config['vdisks'][vdiskservice.name] = vdiskconfig
 
     yamlconfig = yaml.safe_dump(config, default_flow_style=False)
@@ -104,10 +101,35 @@ def start(job):
     j.tools.async.wrappers.sync(service.executeAction('install'))
 
 
+def get_storagecluster_config(service, storagecluster):
+    from JumpScale.sal.g8os.StorageCluster import StorageCluster
+    storageclusterservice = service.aysrepo.serviceGet(role='storage_cluster',
+                                                       instance=storagecluster)
+    cluster = StorageCluster.from_ays(storageclusterservice)
+    return cluster.get_config()
+
+
 def stop(job):
     import time
     service = job.service
     container = get_container(service=service)
+
+    vm = service.aysrepo.serviceGet(role='vm', instance=service.name)
+    vdisks = vm.producers.get('vdisk', [])
+
+    # Delete tmp vdisks
+    configpath = "/{}.config".format(service.name)
+    vdisks = [vdiskservice.name for vdiskservice in vdisks if vdiskservice.model.data.type == "tmp"]
+    if not vdisks:
+        container.client.system(
+            '/bin/g8stor \
+            delete \
+            vdisks \
+            {vdisks} \
+            --config {configpath}'
+            .format(vdisks=" ".join(vdisks), configpath=configpath)
+        ).get()
+
     nbdjob = is_running(container)
     if nbdjob:
         job.logger.info("killing job {}".format(nbdjob['cmd']['arguments']['name']))
