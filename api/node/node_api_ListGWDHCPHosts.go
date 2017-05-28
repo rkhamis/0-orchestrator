@@ -43,7 +43,9 @@ func (api NodeAPI) ListGWDHCPHosts(w http.ResponseWriter, r *http.Request) {
 	for _, nic := range data.Nics {
 		if nic.Name == nicInterface {
 			if nic.Dhcpserver == nil {
-				break
+				err = fmt.Errorf("Interface %v has no dhcp", nicInterface)
+				tools.WriteError(w, http.StatusNotFound, err)
+				return
 			}
 			exists = true
 			respBody = nic.Dhcpserver.Hosts
@@ -52,7 +54,8 @@ func (api NodeAPI) ListGWDHCPHosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !exists {
-		w.WriteHeader(http.StatusNotFound)
+		err = fmt.Errorf("Interface %v not found.", nicInterface)
+		tools.WriteError(w, http.StatusNotFound, err)
 		return
 	}
 

@@ -561,6 +561,8 @@ types:
                 responses:
                   204:
                     description: Host added successfully
+                  404:
+                    description: No dhcp is defined for this interface or interface doesn't exist
                 body:
                   application/json:
                     type: GWHost
@@ -573,6 +575,8 @@ types:
                     204:
                       description: |
                         Succesfully deleted resource
+                    404:
+                      description: No dhcp is defined for this interface or no host with this macaddress exist
 
         /advanced:
           /http:

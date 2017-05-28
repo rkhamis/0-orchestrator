@@ -37,24 +37,33 @@ func (api NodeAPI) DeleteDHCPHost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var exists bool
+NicsLoop:
 	for i, nic := range data.Nics {
 		if nic.Name == nicInterface {
 			if nic.Dhcpserver == nil {
-				break
+				err = fmt.Errorf("Interface %v has no dhcp.", nicInterface)
+				tools.WriteError(w, http.StatusNotFound, err)
+				return
 			}
+
+			exists = true
+
 			for j, host := range nic.Dhcpserver.Hosts {
 				if host.Macaddress == macaddress {
-					exists = true
 					data.Nics[i].Dhcpserver.Hosts = append(data.Nics[i].Dhcpserver.Hosts[:j],
 						data.Nics[i].Dhcpserver.Hosts[j+1:]...)
-					break
+					break NicsLoop
 				}
 			}
+			err = fmt.Errorf("Dhcp has no host with macaddress %v", macaddress)
+			tools.WriteError(w, http.StatusNotFound, err)
+			return
 		}
 	}
 
 	if !exists {
-		w.WriteHeader(http.StatusNotFound)
+		err = fmt.Errorf("Interface %v not found", nicInterface)
+		tools.WriteError(w, http.StatusNotFound, err)
 		return
 	}
 
