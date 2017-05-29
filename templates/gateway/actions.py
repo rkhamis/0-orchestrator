@@ -121,6 +121,10 @@ def processChange(job):
         j.tools.async.wrappers.sync(httpServ.executeAction('update', args=http_args))
         service.model.data.httpproxies = args['httpproxies']
 
+    if args.get("domain", None):
+        service.model.data.advanced = args["domain"]
+
+
     if args.get("advanced", None):
         service.model.data.advanced = args["advanced"]
 
