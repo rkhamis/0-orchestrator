@@ -16,6 +16,8 @@ var serviceRegex = regexp.MustCompile(`^[a-zA-Z0-9-._]+$`)
 func init() {
 	validator.SetValidationFunc("cidr", cidr)
 	validator.SetValidationFunc("ip", ip)
+	validator.SetValidationFunc("ipv4", ipv4)
+	validator.SetValidationFunc("ipv6", ipv6)
 	validator.SetValidationFunc("macaddress", macAddress)
 	validator.SetValidationFunc("servicename", serviceName)
 }
@@ -36,7 +38,7 @@ func serviceName(v interface{}, param string) error {
 	return nil
 }
 
-// Validates that a string is a valid ip
+// Validates that a string is a valid ipv4/ipv6
 func ip(v interface{}, param string) error {
 	ip := reflect.ValueOf(v)
 	if ip.Kind() != reflect.String {
@@ -57,6 +59,46 @@ func ip(v interface{}, param string) error {
 	return nil
 }
 
+// Validates that a string is a valid ipv4
+func ipv4(v interface{}, param string) error {
+	ip := reflect.ValueOf(v)
+	if ip.Kind() != reflect.String {
+		return errors.New("ip only validates strings")
+	}
+
+	ipValue := ip.String()
+	if param == "empty" && ipValue == "" {
+		return nil
+	}
+
+	match := net.ParseIP(ipValue)
+	if match.To4() == nil{
+		return errors.New("string is not a valid ipv4 address.")
+	}
+
+	return nil
+}
+
+
+// Validates that a string is a valid ipv6
+func ipv6(v interface{}, param string) error {
+	ip := reflect.ValueOf(v)
+	if ip.Kind() != reflect.String {
+		return errors.New("ip only validates strings")
+	}
+
+	ipValue := ip.String()
+	if param == "empty" && ipValue == "" {
+		return nil
+	}
+
+	match := net.ParseIP(ipValue)
+	if match.To16() == nil || match.To4() != nil {
+		return errors.New("string is not a valid ipv6 address.")
+	}
+
+	return nil
+}
 // Validates that a string is a valid ip
 func cidr(v interface{}, param string) error {
 	cidr := reflect.ValueOf(v)
@@ -121,6 +163,18 @@ func ValidateContainerFilesystem(fs string) error {
 		return fmt.Errorf("Invalid Filesystems format")
 	}
 	return nil
+}
+
+func ValidateIpInRange(cidr string, ip string) error {
+	_, subnet, err := net.ParseCIDR(cidr)
+	if err != nil {
+		return fmt.Errorf("%v: is not a valid cidr", cidr)
+	}
+	clientip := net.ParseIP(ip)
+	if subnet.Contains(clientip) {
+		return nil
+	}
+	return fmt.Errorf("%v: ip is not in valid range for cidr %v ", ip, cidr)
 }
 
 func ValidateVdisk(vtype string, tlog string, template string, size int) error {

@@ -1052,3 +1052,146 @@ VdiskRollback:
     epoch:
       type: integer
       description: Epoch to which we want to rollback the vdisk
+
+# GWS objects
+IPProtocol:
+  enum: [tcp, udp]
+
+PortForward:
+  properties:
+    protocols:
+      type: IPProtocol[]
+    srcport:
+      type: integer
+    srcip:
+      type: string
+    dstport:
+      type: integer
+    dstip:
+      type: string
+
+HTTPType:
+  enum: [http, https]
+
+HTTPProxy:
+  properties:
+    host:
+      type: string
+      description: Host to proxy for eg. myhost.mydomain.com
+    destinations:
+      type: string[]
+      description: |
+        Destinations of the proxy eg. http://172.17.0.6:5000
+        If multiple destinations are given loadbalancing will be applied
+    types:
+      type: HTTPType[]
+
+CloudInit:
+  properties:
+    userdata:
+      type: string
+      description: userdata for cloud-init
+    metadata:
+      type: string
+      description: metadata for cloud-init
+
+GWHost:
+  properties:
+    macaddress:
+      type: string
+      description: Phyiscal Address
+    hostname:
+      type: string
+      description: hostname
+    ipaddress:
+      type: string
+      description: IP Address for hostname
+    ip6address:
+      type: string
+      description: IP6 Address for hostname
+      required: false
+    cloudinit:
+      type: CloudInit
+      description: Cloudinit configuration
+      required: false
+
+DHCP:
+  properties:
+    nameservers:
+      type: string[]
+      description: List of nameservers
+      required: false
+    hosts:
+      type: GWHost[]
+      description: List of dhcpshosts
+    domain:
+      type: string
+      description: Domain for dhcp
+      required: false
+
+GWNIC:
+  type: object
+  properties:
+    type:
+      description: Type of the interface
+      enum: [zerotier, vxlan, vlan, default, bridge]
+    id:
+      description: |
+        Id for the specified network type
+          vlan: vlantag for the vlan
+          vxlan: vxlan id
+          zerotier: Zerotier network id
+          default: id can be ommited
+          bridge: name of the bridge to connect to
+      type: string
+    config:
+      required: false
+      properties:
+         cidr:
+           description: IP Address/Prefix for the interface eg 192.168.103.1/24
+           type: string
+         gateway:
+           type: string
+           description: Gateway for the the container
+           required: false
+      description: Optional IP address configuration for this interface, only allowed for interfaces of type vxlan and vlan
+    name:
+      description: Name of the interface
+      type: string
+    dhcpserver:
+      description: The DHCP config for the nic
+      required: false
+      type: DHCP
+
+GWCreate:
+  properties:
+    name:
+      type: string
+      description: Name of gateway
+    domain:
+      type: string
+      description: Name of domain
+    nics:
+      type: GWNIC[]
+      description: List of gateway nics
+    portforwards:
+      type: PortForward[]
+      description: List of portfowardings
+    httpproxies:
+      type: HTTPProxy[]
+      description: List of HTTPProxy
+
+GW:
+  properties:
+    domain:
+      type: string
+      description: Name of domain
+    nics:
+      type: GWNIC[]
+      description: List of gateway nics
+    portforwards:
+      type: PortForward[]
+      description: List of portfowardings
+    httpproxies:
+      type: HTTPProxy[]
+      description: List of HTTPProxy

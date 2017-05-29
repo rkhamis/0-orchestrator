@@ -253,6 +253,59 @@ type NodesInterface interface { // ListNodes is the handler for GET /node
 	// GetNodeMounts is the handler for GET /node/{nodeid}/mounts
 	// The mountpoints of the node
 	GetNodeMounts(http.ResponseWriter, *http.Request)
+	// GetGWFWConfig is the handler for GET /nodes/{nodeid}/gws/{gwname}/advanced/firewall
+	// Get current FW config
+	// Once used you can not use gw.portforwards any longer
+	GetGWFWConfig(http.ResponseWriter, *http.Request)
+	// SetGWFWConfig is the handler for POST /nodes/{nodeid}/gws/{gwname}/advanced/firewall
+	// Set FW config
+	SetGWFWConfig(http.ResponseWriter, *http.Request)
+	// GetGWHTTPConfig is the handler for GET /nodes/{nodeid}/gws/{gwname}/advanced/http
+	// Get current HTTP config
+	// Once used you can not use gw.httpproxxies any longer
+	GetGWHTTPConfig(http.ResponseWriter, *http.Request)
+	// SetGWHTTPConfig is the handler for POST /nodes/{nodeid}/gws/{gwname}/advanced/http
+	// Set HTTP config
+	SetGWHTTPConfig(http.ResponseWriter, *http.Request)
+	// DeleteDHCPHost is the handler for DELETE /nodes/{nodeid}/gws/{gwname}/dhcp/{interface}/hosts/{macaddress}
+	// Delete dhcp host
+	DeleteDHCPHost(http.ResponseWriter, *http.Request)
+	// ListGWDHCPHosts is the handler for GET /nodes/{nodeid}/gws/{gwname}/dhcp/{interface}/hosts
+	// List DHCPHosts for specified interface
+	ListGWDHCPHosts(http.ResponseWriter, *http.Request)
+	// AddGWDHCPHost is the handler for POST /nodes/{nodeid}/gws/{gwname}/dhcp/{interface}/hosts
+	// Add a dhcp host to a specified interface
+	AddGWDHCPHost(http.ResponseWriter, *http.Request)
+	// DeleteGWForward is the handler for DELETE /nodes/{nodeid}/gws/{gwname}/firewall/forwards/{forwardid}
+	// Delete portforward, forwardid = srcip:srcport
+	DeleteGWForward(http.ResponseWriter, *http.Request)
+	// GetGWForwards is the handler for GET /nodes/{nodeid}/gws/{gwname}/firewall/forwards
+	// Get list for IPv4 Forwards
+	GetGWForwards(http.ResponseWriter, *http.Request)
+	// CreateGWForwards is the handler for POST /nodes/{nodeid}/gws/{gwname}/firewall/forwards
+	// Create a new Portforwarding
+	CreateGWForwards(http.ResponseWriter, *http.Request)
+	// StartGateway is the handler for POST /nodes/{nodeid}/gws/{gwname}/start
+	// Start Gateway instance
+	StartGateway(http.ResponseWriter, *http.Request)
+	// StopGateway is the handler for POST /nodes/{nodeid}/gws/{gwname}/stop
+	// Stop gateway instance
+	StopGateway(http.ResponseWriter, *http.Request)
+	// DeleteGateway is the handler for DELETE /nodes/{nodeid}/gws/{gwname}
+	// Delete gateway instance
+	DeleteGateway(http.ResponseWriter, *http.Request)
+	// GetGateway is the handler for GET /nodes/{nodeid}/gws/{gwname}
+	// Get gateway
+	GetGateway(http.ResponseWriter, *http.Request)
+	// UpdateGateway is the handler for PUT /nodes/{nodeid}/gws/{gwname}
+	// Update Gateway
+	UpdateGateway(http.ResponseWriter, *http.Request)
+	// ListGateways is the handler for GET /nodes/{nodeid}/gws
+	// List running gateways
+	ListGateways(http.ResponseWriter, *http.Request)
+	// CreateGW is the handler for POST /nodes/{nodeid}/gws
+	// Create a new gateway
+	CreateGW(http.ResponseWriter, *http.Request)
 }
 
 // NodesInterfaceRoutes is routing for /node root endpoint
@@ -338,4 +391,21 @@ func NodesInterfaceRoutes(r *mux.Router, i NodesInterface) {
 	r.HandleFunc("/nodes/{nodeid}/disks", i.GetDiskInfo).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/state", i.GetNodeState).Methods("GET")
 	r.HandleFunc("/nodes/{nodeid}/mounts", i.GetNodeMounts).Methods("GET")
+	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/advanced/firewall", i.GetGWFWConfig).Methods("GET")
+	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/advanced/firewall", i.SetGWFWConfig).Methods("POST")
+	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/advanced/http", i.GetGWHTTPConfig).Methods("GET")
+	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/advanced/http", i.SetGWHTTPConfig).Methods("POST")
+	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/dhcp/{interface}/hosts/{macaddress}", i.DeleteDHCPHost).Methods("DELETE")
+	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/dhcp/{interface}/hosts", i.ListGWDHCPHosts).Methods("GET")
+	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/dhcp/{interface}/hosts", i.AddGWDHCPHost).Methods("POST")
+	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/firewall/forwards/{forwardid}", i.DeleteGWForward ).Methods("DELETE")
+	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/firewall/forwards", i.GetGWForwards).Methods("GET")
+	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/firewall/forwards", i.CreateGWForwards).Methods("POST")
+	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/start", i.StartGateway).Methods("POST")
+	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}/stop", i.StopGateway).Methods("POST")
+	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}", i.DeleteGateway).Methods("DELETE")
+	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}", i.GetGateway).Methods("GET")
+	r.HandleFunc("/nodes/{nodeid}/gws/{gwname}", i.UpdateGateway).Methods("PUT")
+	r.HandleFunc("/nodes/{nodeid}/gws", i.ListGateways).Methods("GET")
+	r.HandleFunc("/nodes/{nodeid}/gws", i.CreateGW).Methods("POST")
 }
