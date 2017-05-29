@@ -122,11 +122,13 @@ def processChange(job):
         service.model.data.httpproxies = args['httpproxies']
 
     if args.get("domain", None):
-        service.model.data.advanced = args["domain"]
+        service.model.data.domain = args["domain"]
 
 
     if args.get("advanced", None):
         service.model.data.advanced = args["advanced"]
+
+    service.saveAll()
 
 
 def uninstall(job):
