@@ -3,7 +3,7 @@ package node
 import (
 	"net/http"
 
-	"github.com/g8os/resourcepool/api/tools"
+	"github.com/zero-os/0-rest-api/api/tools"
 )
 
 // StopVM is the handler for POST /node/{nodeid}/vm/{vmid}/stop

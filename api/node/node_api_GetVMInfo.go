@@ -5,12 +5,12 @@ import (
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
-	g8client "github.com/g8os/go-client"
+	g8client "github.com/zero-os/go-client"
 	"github.com/gorilla/mux"
 
 	"fmt"
 
-	"github.com/g8os/resourcepool/api/tools"
+	"github.com/zero-os/0-rest-api/api/tools"
 )
 
 // GetVMInfo is the handler for GET /nodes/{nodeid}/vms/{vmid}/info

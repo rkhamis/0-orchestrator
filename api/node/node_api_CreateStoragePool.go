@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/g8os/go-client"
-	"github.com/g8os/resourcepool/api/tools"
+	"github.com/zero-os/go-client"
+	"github.com/zero-os/0-rest-api/api/tools"
 	"github.com/gorilla/mux"
 
 	log "github.com/Sirupsen/logrus"

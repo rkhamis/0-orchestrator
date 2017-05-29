@@ -1,8 +1,8 @@
 package node
 
 import (
-	ays "github.com/g8os/resourcepool/api/ays-client"
-	_ "github.com/g8os/resourcepool/api/validators"
+	ays "github.com/zero-os/0-rest-api/api/ays-client"
+	_ "github.com/zero-os/0-rest-api/api/validators"
 	"github.com/patrickmn/go-cache"
 )
 
