@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 	"fmt"
-	"github.com/g8os/go-client"
+	"github.com/zero-os/go-client"
 	"strconv"
 )
 

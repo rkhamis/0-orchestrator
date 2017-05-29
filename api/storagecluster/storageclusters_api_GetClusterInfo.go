@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/g8os/resourcepool/api/tools"
+	"github.com/zero-os/0-rest-api/api/tools"
 	"github.com/gorilla/mux"
 )
 

@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/g8os/go-client"
-	"github.com/g8os/resourcepool/api/tools"
+	"github.com/zero-os/go-client"
+	"github.com/zero-os/0-rest-api/api/tools"
 )
 
 // PingNode is the handler for POST /nodes/{nodeid}/ping

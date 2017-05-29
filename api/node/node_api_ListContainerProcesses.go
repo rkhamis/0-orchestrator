@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	client "github.com/g8os/go-client"
-	"github.com/g8os/resourcepool/api/tools"
+	client "github.com/zero-os/go-client"
+	"github.com/zero-os/0-rest-api/api/tools"
 )
 
 // ListContainerProcesses is the handler for GET /nodes/{nodeid}/containers/{containername}/process

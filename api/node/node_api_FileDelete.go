@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	client "github.com/g8os/go-client"
-	"github.com/g8os/resourcepool/api/tools"
+	client "github.com/zero-os/go-client"
+	"github.com/zero-os/0-rest-api/api/tools"
 )
 
 // FileDelete is the handler for DELETE /nodes/{nodeid}/container/{containername}/filesystem

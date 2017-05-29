@@ -1,7 +1,7 @@
 package node
 
 import (
-	"github.com/g8os/resourcepool/api/validators"
+	"github.com/zero-os/0-rest-api/api/validators"
 	"gopkg.in/validator.v2"
 )
 

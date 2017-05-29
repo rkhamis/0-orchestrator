@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/g8os/resourcepool/api/tools"
+	"github.com/zero-os/0-rest-api/api/tools"
 )
 
 // RollbackVdisk is the handler for POST /vdisks/{vdiskid}/rollback

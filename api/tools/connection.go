@@ -9,15 +9,15 @@ import (
 
 	"encoding/json"
 
-	"github.com/g8os/go-client"
-	ays "github.com/g8os/resourcepool/api/ays-client"
+	"github.com/zero-os/go-client"
+	ays "github.com/zero-os/0-rest-api/api/ays-client"
 	"github.com/garyburd/redigo/redis"
 	"github.com/gorilla/mux"
 	"github.com/patrickmn/go-cache"
 )
 
 const (
-	connectionPoolMiddlewareKey         = "github.com/g8os/resourcepool+connection-pool"
+	connectionPoolMiddlewareKey         = "github.com/zero-os/0-rest-api+connection-pool"
 	connectionPoolMiddlewareDefaultPort = 6379
 )
 

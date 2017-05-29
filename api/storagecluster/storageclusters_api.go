@@ -1,8 +1,8 @@
 package storagecluster
 
 import (
-	ays "github.com/g8os/resourcepool/api/ays-client"
-	_ "github.com/g8os/resourcepool/api/validators"
+	ays "github.com/zero-os/0-rest-api/api/ays-client"
+	_ "github.com/zero-os/0-rest-api/api/validators"
 )
 
 // StorageclusterAPI is API implementation of /storagecluster root endpoint
