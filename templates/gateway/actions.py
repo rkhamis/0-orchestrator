@@ -73,27 +73,23 @@ def init(job):
 
     # create firewall
     fwactor = service.aysrepo.actorGet('firewall')
-    fw_service = fwactor.serviceCreate(instance=service.name, args=args)
-    fw_service.consume(cont_service)
+    fwactor.serviceCreate(instance=service.name, args=args)
 
     # create http
     httpactor = service.aysrepo.actorGet('http')
-    http_service = httpactor.serviceCreate(instance=service.name, args=args)
-    http_service.consume(cont_service)
+    httpactor.serviceCreate(instance=service.name, args=args)
 
     # create dhcp
     dhcpactor = service.aysrepo.actorGet('dhcp')
-    dhcp_service = dhcpactor.serviceCreate(instance=service.name, args=args)
-    dhcp_service.consume(cont_service)
+    dhcpactor.serviceCreate(instance=service.name, args=args)
 
     # Start cloudinit
     cloudinitactor = service.aysrepo.actorGet("cloudinit")
-    cloudinit_service = cloudinitactor.serviceCreate(instance=service.name, args=args)
-    cloudinit_service.consume(cont_service)
+    cloudinitactor.serviceCreate(instance=service.name, args=args)
 
 
 def install(job):
-    service  = job.service
+    service = job.service
     j.tools.async.wrappers.sync(service.executeAction('start'))
 
 
@@ -128,12 +124,14 @@ def processChange(job):
     if args.get("advanced", None):
         service.model.data.advanced = args["advanced"]
 
+
 def uninstall(job):
     service = job.service
     container = service.producers.get('container')[0]
     if container:
         j.tools.async.wrappers.sync(container.executeAction('stop'))
         j.tools.async.wrappers.sync(container.delete())
+
 
 def start(job):
     service = job.service
@@ -148,6 +146,7 @@ def start(job):
     j.tools.async.wrappers.sync(dhcp.executeAction('install'))
     j.tools.async.wrappers.sync(firewall.executeAction('install'))
     j.tools.async.wrappers.sync(cloudinit.executeAction('install'))
+
 
 def stop(job):
     service = job.service
