@@ -23,10 +23,13 @@ def create_nbdserver_container(service, parent):
     if not it creates it.
     return the container service
     """
+    from zeroos.orchestrator.configuration import get_configuration
+
+    config = get_configuration(service.aysrepo)
     actor = service.aysrepo.actorGet("container")
     args = {
         'node': parent.name,
-        'flist': 'https://hub.gig.tech/gig-official-apps/blockstor-master.flist',
+        'flist': config.get('blockstor-flist', 'https://hub.gig.tech/gig-official-apps/blockstor-master.flist'),
         'hostNetworking': True,
     }
     container_name = 'vdisks_{}_{}'.format(service.name, parent.name)
