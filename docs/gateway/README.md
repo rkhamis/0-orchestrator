@@ -1,11 +1,11 @@
 # Table of contents
-- [What is the gateway?](#%20What%20is%20the%20gateway?)
-- [DHCP service](#DHCP service)
-- [Port forwarding](#Port%20forwarding)
-- [Reverse proxying](#Reverse%20proxying)
-- [Advanced modus](#Advanced%20modus)
-- [Cloud init](#Cloud%20init)
-- [V(x)Lan to V(x)Lan bridge](#V(x)Lan%20to%20V(x)Lan%20bridge)
+- [What is the gateway?](#what-is-the-gateway)
+- [DHCP service](#dhcp-service)
+- [Port forwarding](#port-forwarding)
+- [Reverse proxying](#reverse-proxying)
+- [Advanced modus](#advanced-modus)
+- [Cloud init](#cloud-init)
+- [V(x)Lan to V(x)Lan bridge](#vxlan-to-vxlan-bridge)
 
 # What is the gateway?
 ![gateway](gateway.png)
