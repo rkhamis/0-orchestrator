@@ -1,5 +1,17 @@
 # Development Setup of a Zero-OS Cluster
 
+## Automatic setup
+In order to have a full zero-OS cluster you need:
+1. JumpScale9 development docker
+2. Install the 0-orchestrator
+
+Install JumpScale9 by following the documentation at https://github.com/Jumpscale/developer#jumpscale-9  
+
+One you have you JumpScale9 docker, ssh into it and install the rest using this script [installgrid.sh](../../scripts/installgrid.sh)  
+example:
+`./installgrid.sh master 93afae5953aba39a 4gE9Cfqw2vKFzCPC2BYav2mbSpNScxJx`
+
+## Manual setup
 All steps:
 1. Create a ZeroTier network
 2. [Setup the AYS Server](#ays-server)
