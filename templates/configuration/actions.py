@@ -1,6 +1,3 @@
-from JumpScale import j
-
-
 def input(job):
     ays_repo = job.service.aysrepo
     services = ays_repo.servicesFind(actor=job.service.model.dbobj.actorName)
