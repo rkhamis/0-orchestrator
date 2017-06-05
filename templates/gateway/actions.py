@@ -213,6 +213,7 @@ def start(job):
     j.tools.async.wrappers.sync(dhcp.executeAction('install'))
     j.tools.async.wrappers.sync(firewall.executeAction('install'))
     j.tools.async.wrappers.sync(cloudinit.executeAction('install'))
+    service.model.data.status = "running"
 
 
 def stop(job):
@@ -220,3 +221,4 @@ def stop(job):
     container = service.producers.get('container')[0]
     if container:
         j.tools.async.wrappers.sync(container.executeAction('stop'))
+        service.model.data.status = "halted"
