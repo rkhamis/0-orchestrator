@@ -247,6 +247,6 @@ if __name__ == '__main__':
 <a id="boot-nodes"></a>
 ## Boot the Zero-OS nodes
 
-Download your iPXE boot ISO image from the Zero-OS Bootstrap Service: `https://bootstrap.gig.tech/iso/${BRANCH}/${ZeroTier-Network-ID}``
+Download your iPXE boot ISO image from the Zero-OS Bootstrap Service: `https://bootstrap.gig.tech/iso/${BRANCH}/${ZeroTier-Network-ID}`
 
 Use this image to boot your node. For all detailed instruction on how to boot a Zero-OS node see the Core0 documentation: https://github.com/g8os/core0
