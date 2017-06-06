@@ -118,4 +118,4 @@ Via ipxe from the following URL: `https://bootstrap.gig.tech/ipxe/1.1.0-alpha-3/
 
 Or download your ISO from the following url: `https://bootstrap.gig.tech/iso/1.1.0-alpha-3/<Your ZeroTier network id>`
 
-Refer to the 0-core repository documentation for more information onm booting Zero-OS.
+Refer to the 0-core repository documentation for more information on booting Zero-OS.
