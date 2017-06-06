@@ -39,9 +39,10 @@ Here are the steps:
 1. Create a ZeroTier network
 2. [Setup the AYS Server](#ays-server)
 3. [Setup the Orchestrator](#orchestrator)
-4. [Start the Bootstrap Service, using an AYS blueprint](#bootstrap-service)
-5. [Format all hard disks](#format-disks)
-6. [Boot the Zero-OS nodes](#boot-nodes)
+4. [Configure Version](#configure-versions)
+5. [Start the Bootstrap Service, using an AYS blueprint](#bootstrap-service)
+6. [Format all hard disks](#format-disks)
+7. [Boot the Zero-OS nodes](#boot-nodes)
 
 The first step is pretty straight forward, go to https://my.zerotier.com/ and create your ZeroTier network.
 
@@ -183,6 +184,25 @@ pip3 install zerotier
   - `--ays-url` needed to point to the AYS REST API
   - `--ays-repo` is the name of the AYS repository the Orchestrator needs to use. It should be the repo you created in the previous step.
 
+<a id="configure-versions"></a>
+### Configure Versions
+
+Configuring the jumpscale and 0-core version is possible with the [configuration](../versioning.md) service.
+
+For alpha-3, add the following blueprint in the `blueprint` directory of your AYS repository.
+ ```yaml
+ configuration__main:
+   configurations:
+   - key: '0-core-version'
+     value: 'v1.1.0-alpha-3'
+   - key: 'js-version'
+     value: 'master'
+ ```
+After creating the blueprint, run the following commands to execute the blueprints:
+
+```shell
+ays blueprint
+```
 
 <a id="bootstrap-service"></a>
 ### Install the auto node discovery service
@@ -190,7 +210,7 @@ pip3 install zerotier
 Add the following blueprint in the `blueprints` directory of your AYS repository:
 
 ```
-bootstrap.g8os__restapi1:
+bootstrap.zero-os__restapi1:
   zerotierNetID: {ZeroTier-Network-ID}
   zerotierToken: '{ZeroTier-API-Token}'
 
@@ -209,7 +229,7 @@ This blueprint will install the **auto discovery service** which will auto disco
 Alternatively you can also manually add a Zero-OS node to the Zero-OS cluster with following blueprint:
 
 ```
-node.g8os__525400123456:
+node.zero-os__525400123456:
   redisAddr: 172.17.0.1
 
 actions:

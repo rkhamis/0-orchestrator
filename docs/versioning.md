@@ -9,7 +9,7 @@ configuration__main:
   configurations:
   - key: 'gw-flist'
     value: 'https://hub.gig.tech/deboeckj/g8osgw.flist'
-  - key: '0-core-branch'
+  - key: '0-core-version'
     value: 'master'
 ```
 
@@ -26,15 +26,15 @@ The following are the available keys:
 * `ovs-flist`:
   - Specifies the flist used for the Open vSwitch (OVS) container
   - Defaults to 'https://hub.gig.tech/gig-official-apps/ovs.flist'
-* `0-core-branch`:
-  - Specifies the branch used to build the core0 node
+* `0-core-version`:
+  - Specifies the branch/tag used to control the build version of the core0 nodes
   - If not configured, any branch will be allowed
 * `0-core-revision`:
-  - Specifies the revision used to build the core0 node
+  - Specifies the revision used to control the build revision of the core0 nodes
   - If not configured, any revision will be allowed
 * `rocksdb-flist`:
   - Specifies the flist used for the RocksDB container
   - Defaults to 'https://hub.gig.tech/gig-official-apps/ardb-rocksdb.flist'
-* `blockstor-flist`:
-  - Specifies the flist for the NBD server containers
-  - Defaults to 'https://hub.gig.tech/gig-official-apps/blockstor-master.flist'
+* `0-disk-flist`:
+  - Specifies the flist for the 0-disk containers
+  - Defaults to 'https://hub.gig.tech/gig-official-apps/0-disk-master.flist'
