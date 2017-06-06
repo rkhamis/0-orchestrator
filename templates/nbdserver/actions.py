@@ -19,6 +19,13 @@ def is_running(container):
         raise
 
 
+def is_socket_listening(container, socketpath):
+    for connection in container.client.info.port():
+        if connection['network'] == 'unix' and connection['unix'] == socketpath:
+            return True
+    return False
+
+
 def install(job):
     import time
     import yaml
@@ -75,13 +82,13 @@ def install(job):
             -config {config}'
             .format(id=service.name, socketpath=socketpath, config=configpath)
         )
+
         # wait for socket to be created
         start = time.time()
         while start + 60 > time.time():
-            if container.client.filesystem.exists(socketpath):
+            if is_socket_listening(container, socketpath):
                 break
-            else:
-                time.sleep(0.2)
+            time.sleep(0.2)
         else:
             raise j.exceptions.RuntimeError("Failed to start nbdserver {}".format(service.name))
         # make sure nbd is still running
@@ -118,17 +125,9 @@ def stop(job):
     vdisks = vm.producers.get('vdisk', [])
 
     # Delete tmp vdisks
-    configpath = "/{}.config".format(service.name)
-    vdisks = [vdiskservice.name for vdiskservice in vdisks if vdiskservice.model.data.type == "tmp"]
-    if not vdisks:
-        container.client.system(
-            '/bin/g8stor \
-            delete \
-            vdisks \
-            {vdisks} \
-            --config {configpath}'
-            .format(vdisks=" ".join(vdisks), configpath=configpath)
-        ).get()
+    for vdiskservice in vdisks:
+        if vdiskservice.model.data.type == "tmp":
+            j.tools.async.wrappers.sync(vdiskservice.executeAction('delete'))
 
     nbdjob = is_running(container)
     if nbdjob:
