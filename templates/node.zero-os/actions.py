@@ -10,10 +10,10 @@ def input(job):
 
     config = get_configuration(job.service.aysrepo)
     version = node.client.info.version()
-    core0_branch = config.get('0-core-branch')
+    core0_version = config.get('0-core-version')
     core0_revision = config.get('0-core-revision')
 
-    if (core0_branch and core0_branch != version['branch']) or (
+    if (core0_version and core0_version != version['branch']) or (
                 core0_revision and core0_revision != version['revision']):
         raise RuntimeError("Node with IP {} has a wrong version".format(ip))
 
