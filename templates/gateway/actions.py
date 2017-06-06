@@ -50,6 +50,8 @@ def input(job):
 
 
 def init(job):
+    from zeroos.orchestrator.configuration import get_configuration
+
     service = job.service
     containeractor = service.aysrepo.actorGet("container")
     nics = service.model.data.to_dict()['nics']  # get dict version of nics
@@ -59,9 +61,11 @@ def init(job):
         if zerotierbridge:
             nics.append({'id': zerotierbridge, 'type': 'zerotier', 'name': 'z-{}'.format(nic['name'])})
 
+    config = get_configuration(service.aysrepo)
+
     args = {
         'node': service.model.data.node,
-        'flist': 'https://hub.gig.tech/gig-official-apps/g8osgw.flist',
+        'flist': config.get('gw-flist', 'https://hub.gig.tech/gig-official-apps/g8osgw.flist'),
         'nics': nics,
         'hostname': service.model.data.hostname,
         'hostNetworking': False,
