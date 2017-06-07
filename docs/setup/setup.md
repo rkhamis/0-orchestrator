@@ -18,32 +18,7 @@ Create the Docker container with JumpScale9 by following the documentation at ht
 
 You now have your JumpScale9 Docker container running, before you start the 0-orchestrator setup you need to join your docker into the ZeroTier management network that will be used to manage the ZeroTier nodes in your cluster.
 
-SSH into your JumpScale9 docker and join the ZeroTier network. Make sure you allow your docker into your ZeroTier network, and that you zt0 interface in your docker was assigned an ipaddress.
-```
-(gig) root@js9:/root$ zerotier-cli join <Zerotier Network Id>
-200 join OK
-(gig) root@js9:/root$ ip a
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-    inet 127.0.0.1/8 scope host lo
-       valid_lft forever preferred_lft forever
-    inet6 ::1/128 scope host
-       valid_lft forever preferred_lft forever
-2: zt0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 2800 qdisc pfifo_fast state UNKNOWN group default qlen 1000
-    link/ether 2e:ab:58:13:6a:e6 brd ff:ff:ff:ff:ff:ff
-    inet 192.168.192.1/24 brd 192.168.192.255 scope global zt0
-       valid_lft forever preferred_lft forever
-    inet6 fe80::2cab:58ff:fe13:6ae6/64 scope link
-       valid_lft forever preferred_lft forever
-127: eth0@if128: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default
-    link/ether 02:42:ac:11:00:02 brd ff:ff:ff:ff:ff:ff link-netnsid 0
-    inet 172.17.0.2/16 scope global eth0
-       valid_lft forever preferred_lft forever
-    inet6 fe80::42:acff:fe11:2/64 scope link
-       valid_lft forever preferred_lft forever
-```
-
-Now you can continue with installing the 0-orchestrator server by means of the [`install-orchestrator.sh`](../../scripts/install-orchestrator.sh) script.
+SSH into your JumpScale9 docker and continue with installing the 0-orchestrator server by means of the [`install-orchestrator.sh`](../../scripts/install-orchestrator.sh) script.
 
 This script takes 3 parameters:
 - BRANCH: 0-orchestrator development branch
@@ -55,9 +30,12 @@ So:
 (gig) root@js9:/root$ export BRANCH="1.1.0-alpha-3"
 (gig) root@js9:/root$ export ZEROTIERNWID="<Your ZeroTier network id>"
 (gig) root@js9:/root$ export ZEROTIERTOKEN="<Your ZeroTier token>"
-(gig) root@js9:/root$ curl -o install-orchestrator.sh https://github.com/zero-os/0-orchestrator/blob/${BRANCH}/scripts/install-orchestrator.sh
+(gig) root@js9:/root$ curl -o install-orchestrator.sh https://raw.githubusercontent.com/zero-os/0-orchestrator/${BRANCH}/scripts/install-orchestrator.sh
 (gig) root@js9:/root$ bash install-orchestrator.sh $BRANCH $ZEROTIERNWID $ZEROTIERTOKEN
 ```
+> **Important:**
+- The ZeroTier network needs to be a private network
+- The script will wait until you authorize your JumpScale9 docker into the network.
 
 ## Setup the configuration service in AYS
 In order for the 0-orchestrator to use the correct versions of flists, Zero-OS nodes and JumpScale9, create the following blueprint in `/optvar/cockpit_repos/orchestrator-server/blueprints/configuration.bp`
@@ -111,11 +89,26 @@ After creating this blueprint, issue the following command to AYS to install it:
 (gig) root@js9:/optvar/cockpit_repos/orchestrator-server$ ays run create -y
 ```
 
+Then we need to update the bootstrap service so that is deploys the storage network when bootstrapping the nodes. So edit `/optvar/cockpit_repos/orchestrator-server/blueprints/network.bp` as follows:
+```yaml
+bootstrap.zero-os__grid1:
+  zerotierNetID: '<Your ZeroTier network id>'
+  zerotierToken: '<Your ZeroTier token>'
+  networks:
+    - storage
+```
+Now issue the following commands to reinstall the updated bootstrap service:
+```shell
+(gig) root@js9:/optvar/cockpit_repos/orchestrator-server$ ays service delete -n grid1 -y
+(gig) root@js9:/optvar/cockpit_repos/orchestrator-server$ ays blueprint bootstrap.bp
+(gig) root@js9:/optvar/cockpit_repos/orchestrator-server$ ays run create -y
+```
+
 ## Boot your Zero-OS nodes
 The final step of rounding up your Zero-OS cluster is to boot your Zero-OS nodes in to your ZeroTier network.
 
-Via ipxe from the following URL: `https://bootstrap.gig.tech/ipxe/1.1.0-alpha-3/<Your ZeroTier network id>`
+Via ipxe from the following URL: `https://bootstrap.gig.tech/ipxe/1.1.0-alpha-3-0-core-6d11a464/<Your ZeroTier network id>`
 
-Or download your ISO from the following url: `https://bootstrap.gig.tech/iso/1.1.0-alpha-3/<Your ZeroTier network id>`
+Or download your ISO from the following url: `https://bootstrap.gig.tech/iso/1.1.0-alpha-3-0-core-6d11a464/<Your ZeroTier network id>`
 
 Refer to the 0-core repository documentation for more information on booting Zero-OS.
