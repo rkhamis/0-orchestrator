@@ -62,7 +62,6 @@ After creating this blueprint, issue the following command to AYS to install it:
 ```bash
 (gig) root@js9:/root$ cd /optvar/cockpit_repos/orchestrator-server
 (gig) root@js9:/optvar/cockpit_repos/orchestrator-server$ ays blueprint configuration.bp
-(gig) root@js9:/optvar/cockpit_repos/orchestrator-server$ ays run create -y
 ```
 
 ## Setup the backplane network
@@ -87,14 +86,14 @@ After creating this blueprint, issue the following command to AYS to install it:
 ```
 (gig) root@js9:/root$ cd /optvar/cockpit_repos/orchestrator-server
 (gig) root@js9:/optvar/cockpit_repos/orchestrator-server$ ays blueprint network.bp
-(gig) root@js9:/optvar/cockpit_repos/orchestrator-server$ ays run create -y
 ```
 
-Then we need to update the bootstrap service so that is deploys the storage network when bootstrapping the nodes. So edit `/optvar/cockpit_repos/orchestrator-server/blueprints/network.bp` as follows:
+Then we need to update the bootstrap service so that is deploys the storage network when bootstrapping the nodes. So edit `/optvar/cockpit_repos/orchestrator-server/blueprints/bootstrap.bp` as follows:
 ```yaml
 bootstrap.zero-os__grid1:
   zerotierNetID: '<Your ZeroTier network id>'
   zerotierToken: '<Your ZeroTier token>'
+  wipedisks: true # indicate you want to wipe the disks of the nodes when adding them
   networks:
     - storage
 ```
