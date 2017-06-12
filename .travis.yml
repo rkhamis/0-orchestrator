@@ -9,6 +9,7 @@ matrix:
         - pip3 install git+https://github.com/gigforks/packet-python.git
         - bash tests/Grid_API_Testing/zt_join.sh
         - cd tests/Grid_API_Testing; python3 orch_packet_machines.py create $PACKET_TOKEN $ZT_NET_ID
+        - export PYTHONPATH='./'
       script:
         - nosetests-3.4 -v -s api_testing/testcases/basic_tests/test01_nodeid_apis.py:TestNodeidAPI.test001_list_nodes --tc-file=api_testing/config.ini
       after_script:
