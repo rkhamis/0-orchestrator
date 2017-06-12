@@ -5,12 +5,7 @@ matrix:
       before_script:
         - pip3 install -r tests/Grid_API_Testing/requirements.txt
         - pip3 install git+https://github.com/gigforks/packet-python.git
-        - curl -s https://install.zerotier.com/ | sudo bash
-        - zerotier-cli join ${ZT_NET_ID}
-        - memberid=$(zerotier-cli info | awk '{print $3}')
-        - sleep 5
-        - curl -H "Content-Type: application/json" -H "Authorization: Bearer ${ZT_TOKEN}" -X POST -d '{"config": {"authorized": true}}' https://my.zerotier.com/api/network/${ZT_NET_ID}/member/${memberid}
-        - sleep 10
+        - bash tests/Grid_API_Testing/zt_join.sh
         - cd tests/Grid_API_Testing; python3 orch_packet_machines.py create $PACKET_TOKEN $ZT_NET_ID
       script:
         - nosetests-3.4 -v -s api_testing/testcases/basic_tests/test01_nodeid_apis.py:TestNodeidAPI.test001_list_nodes --tc-file=api_testing/config.ini
