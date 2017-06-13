@@ -76,6 +76,14 @@ network.zero-os__storage:
 ```
 > **Important:** Change the vlanTag and the cidr according to the needs of your environment.
 
+### Switchless setup
+```yaml
+network.switchless__storage:
+  vlanTag: 101
+  cidr: "192.168.58.0/24"
+```
+> **Important:** Change the vlanTag and the cidr according to the needs of your environment.
+
 ### Packet.net setup
 
 ```yaml
