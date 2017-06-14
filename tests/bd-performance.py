@@ -51,7 +51,7 @@ def test_fio_nbd(orchestratorserver, storagecluster, vdiskcount, vdisksize, runt
     deployInfo = {}
     try:
         deployInfo = deploy(api, nodeIDs, nodeIPs, orchestratorserver, storagecluster, vdiskcount, vdisksize, vdisktype)
-        cycle = cycle_dir0
+        cycle = 0
         while runtime:
             if runtime < 3600:
                 cycle_time = runtime
