@@ -95,8 +95,7 @@ vdisks: # A required map of vdisks,
     rootVdiskID: mytemplate # Optional (string) ID of the template vdisk,
                             # only used for `db` vdisk
     type: boot # Required (VdiskType) type of this vdisk
-               - address: 192.123.123.123:2001 # more connections are optional
-
+               # which also defines if its deduped or nondeduped,      
                # valid types are: `boot`, `db`, `cache` and `tmp`
   # ... more (optional) vdisks
 ```
