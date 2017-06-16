@@ -6,7 +6,7 @@ When an NBD server would crash, AYS will discover that instantaneously through i
 AYS then needs to restarts the NBD server and the corresponding VM.
 
 # Tlog server failure
-todo
+As we deploy multiple Tlog servers per NBD server (https://github.com/zero-os/0-Disk/issues/279), AYS just needs to restart the Tlog server when it crashed.
 
 # SSD failure in Primary Storage Cluster
 When an NBD server is unable to read or write from storage engine (ARDB server) with modulo X, it will fail over to the backup storage cluster to continue serving blocks for shard X. At the same time it will report the failure on its stderr stream that is monitored by the long-polling monitor action of it's service.
@@ -148,3 +148,6 @@ storageClusters: # A required map of storage clusters,
       address: 192.168.58.146:2001 # Required connection (dial)string,
                                    # used to store meta data (LBA indices)
 ```
+
+# SSD failure in Backup Storage Cluster
+When an SSD fails in the Backup Storage Cluster the NBD server will act similarly as it acts for the Primary Storage Cluster, performing the same kind of restoring actions.
