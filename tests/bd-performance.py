@@ -61,7 +61,7 @@ def test_fio_nbd(orchestratorserver, storagecluster, vdiskcount, vdisksize, runt
                 runtime -= 3600
             cycle += 1
             cycle_dir = os.path.join(resultdir, str(cycle))
-            os.makedirs(cycle_dir)
+            os.makedirs(cycle_dir, exist_ok=True)
             test(api, deployInfo, nodeIDs, cycle_time)
             waitForData(api, nodeIDs, deployInfo, cycle_time, cycle_dir)
     except Exception as e:
