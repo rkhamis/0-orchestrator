@@ -95,8 +95,57 @@ vdisks: # A required map of vdisks,
     rootVdiskID: mytemplate # Optional (string) ID of the template vdisk,
                             # only used for `db` vdisk
     type: boot # Required (VdiskType) type of this vdisk
-               # which also defines if its deduped or nondeduped,
+               - address: 192.123.123.123:2001 # more connections are optional
+
                # valid types are: `boot`, `db`, `cache` and `tmp`
   # ... more (optional) vdisks
 ```
 This snippet shows the re-mapping after the rebalancing completed, and AYS updated the config of the NBD server again.
+
+## DEDUPED disks
+
+### Rebalancing step1: Flag the broken storage engine as rebalancing
+> **Update all NBD server configs to flag the broken storage engine as broken.**
+This step indicates the NBD servers that reading and writing blocks to this shard, should be done directly to the storage engine in the backup storage cluster.
+
+NBD server configuration snippet showing a broken storage engine that is rebalancing:
+```yaml
+storageClusters: # A required map of storage clusters,
+                 # only 1 storage cluster is required
+  mycluster: # Required (string) ID of this storage cluster,
+             # you are free to name the cluster however you want
+    dataStorage: # A required array of connection (dial)strings, used to store data
+      - address: 192.168.58.146:2000 # At least 1 connection (dial)string is required
+        status: rebalancing          # indicates this storage engine is rebalancing
+      - address: 192.123.123.123:2001 # more connections are optional
+      - address: 192.123.123.123:2002 # more connections are optional
+      - address: 192.123.123.123:2003 # more connections are optional
+
+    metadataStorage: # Required ONLY when used as the (Root)StorageCluster of a `boot` vdisk
+      address: 192.168.58.146:2001 # Required connection (dial)string,
+                                   # used to store meta data (LBA indices)
+```
+
+### Rebalancing step2: Rebalance the broken storage engine
+> **Execute 0-ctl --rebalance <NBD server config file>** to re-spread the blocks of the broken storage engine over the remaining storage engines in the storage cluster. This step only needs to be executed on 1 NBD container.
+
+### Rebalancing step3: flag the broken storage engine as broken
+> When rebalancing has completed when can notify the NBD servers that they can read blocks again from the primary storage cluster using the broken-re-spreaded-storage-engine algorithm implemented in the NBD server.
+
+NBD server configuration snippet showing a broken storage engine that has finished rebalancing:
+```yaml
+storageClusters: # A required map of storage clusters,
+                 # only 1 storage cluster is required
+  mycluster: # Required (string) ID of this storage cluster,
+             # you are free to name the cluster however you want
+    dataStorage: # A required array of connection (dial)strings, used to store data
+      - address: 192.168.58.146:2000 # At least 1 connection (dial)string is required
+        status: broken          # indicates this storage engine is broken
+      - address: 192.123.123.123:2001 # more connections are optional
+      - address: 192.123.123.123:2002 # more connections are optional
+      - address: 192.123.123.123:2003 # more connections are optional
+
+    metadataStorage: # Required ONLY when used as the (Root)StorageCluster of a `boot` vdisk
+      address: 192.168.58.146:2001 # Required connection (dial)string,
+                                   # used to store meta data (LBA indices)
+```
