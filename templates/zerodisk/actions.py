@@ -1,9 +1,9 @@
 from js9 import j
 
 
-def get_container(service):
+def get_container(service, password):
     from zeroos.orchestrator.sal.Container import Container
-    return Container.from_ays(service.parent)
+    return Container.from_ays(service.parent, password)
 
 
 def is_job_running(container, cmd='/bin/nbdserver'):
@@ -34,7 +34,7 @@ def install(job):
     service = job.service
     vm = service.aysrepo.serviceGet(role='vm', instance=service.name)
     vdisks = vm.producers.get('vdisk', [])
-    container = get_container(service)
+    container = get_container(service, job.context['token'])
     config = {
         'storageClusters': {},
         'vdisks': {},
@@ -61,7 +61,7 @@ def install(job):
 
         if vdiskservice.model.data.storageCluster not in config['storageClusters']:
             storagecluster = vdiskservice.model.data.storageCluster
-            clusterconfig, _, _ = get_storagecluster_config(service, storagecluster)
+            clusterconfig, _, _ = get_storagecluster_config(job, storagecluster)
             rootcluster = {'dataStorage': [{'address': rootardb}], 'metadataStorage': {'address': rootardb}}
             rootclustername = hash(j.data.serializer.json.dumps(rootcluster, sort_keys=True))
             config['storageClusters'][storagecluster] = clusterconfig
@@ -82,7 +82,7 @@ def install(job):
 
         if vdiskservice.model.data.tlogStoragecluster and vdiskservice.model.data.tlogStoragecluster not in tlogconfig['storageClusters']:
             tlogcluster = vdiskservice.model.data.tlogStoragecluster
-            clusterconfig, k, m = get_storagecluster_config(service, tlogcluster)
+            clusterconfig, k, m = get_storagecluster_config(job, tlogcluster)
             tlogconfig['storageClusters'][tlogcluster] = {"dataStorage": clusterconfig["dataStorage"]}
             tlogconfig['vdisks'][vdiskservice.name] = {'tlogStorageCluster': tlogcluster}
             tlogconfig['k'] += k
@@ -163,7 +163,8 @@ def start_tlog(service, container, config):
     container.client.filesystem.upload(configpath, configstream)
     if not is_job_running(container, cmd='/bin/tlogserver'):
         port = get_tlog_port(container)
-        container.client.system('/bin/tlogserver -address 0.0.0.0:{} -config {} -k {} -m {}'.format(port, configpath, k, m))
+        container.client.system(
+            '/bin/tlogserver -address 0.0.0.0:{} -config {} -k {} -m {}'.format(port, configpath, k, m))
         if not is_job_running(container, cmd='/bin/tlogserver'):
             raise j.exceptions.RuntimeError("Failed to start tlogserver {}".format(service.name))
         return port
@@ -171,21 +172,21 @@ def start_tlog(service, container, config):
 
 def start(job):
     service = job.service
-    j.tools.async.wrappers.sync(service.executeAction('install'))
+    j.tools.async.wrappers.sync(service.executeAction('install', context=job.context))
 
 
-def get_storagecluster_config(service, storagecluster):
+def get_storagecluster_config(job, storagecluster):
     from zeroos.orchestrator.sal.StorageCluster import StorageCluster
-    storageclusterservice = service.aysrepo.serviceGet(role='storage_cluster',
+    storageclusterservice = job.service.aysrepo.serviceGet(role='storage_cluster',
                                                        instance=storagecluster)
-    cluster = StorageCluster.from_ays(storageclusterservice)
+    cluster = StorageCluster.from_ays(storageclusterservice, job.context['token'])
     return cluster.get_config(), cluster.k, cluster.m
 
 
 def stop(job):
     import time
     service = job.service
-    container = get_container(service=service)
+    container = get_container(service, job.context['token'])
 
     vm = service.aysrepo.serviceGet(role='vm', instance=service.name)
     vdisks = vm.producers.get('vdisk', [])
@@ -195,7 +196,7 @@ def stop(job):
         vdiskservice.model.data.status = 'halted'
         vdiskservice.saveAll()
         if vdiskservice.model.data.type == "tmp":
-            j.tools.async.wrappers.sync(vdiskservice.executeAction('delete'))
+            j.tools.async.wrappers.sync(vdiskservice.executeAction('delete', context=job.context))
 
     nbdjob = is_job_running(container)
     if nbdjob:
@@ -212,12 +213,14 @@ def stop(job):
 
 
 def monitor(job):
+    from zeroos.orchestrator.configuration import get_jwt_token
+
     service = job.service
     if not service.model.actionsState['install'] == 'ok':
         return
     vm = service.aysrepo.serviceGet(role='vm', instance=service.name)
     vdisks = vm.producers.get('vdisk', [])
-    running = is_job_running(get_container(service))
+    running = is_job_running(get_container(service, get_jwt_token(job.service.aysrepo)))
     for vdisk in vdisks:
         if running:
             vdisk.model.data.status = 'running'

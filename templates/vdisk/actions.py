@@ -11,11 +11,11 @@ def install(job):
 
     if service.model.data.templateVdisk:
         template = urlparse(service.model.data.templateVdisk)
-        targetconfig = get_storagecluster_config(service)
+        targetconfig = get_storagecluster_config(job)
         target_node = random.choice(targetconfig['nodes'])
         storagecluster = service.model.data.storageCluster
 
-        volume_container = create_from_template_container(service, target_node)
+        volume_container = create_from_template_container(job, target_node)
         try:
             srcardb = get_srcardb(volume_container, template)
             configpath = "/config.yml"
@@ -63,9 +63,9 @@ def delete(job):
 
     service = job.service
     storagecluster = service.model.data.storageCluster
-    clusterconfig = get_storagecluster_config(service)
+    clusterconfig = get_storagecluster_config(job)
     node = random.choice(clusterconfig['nodes'])
-    container = create_from_template_container(service, node)
+    container = create_from_template_container(job, node)
     configpath = "/config.yaml"
     disktype = "cache" if str(service.model.data.type) == "tmp" else str(service.model.data.type)
     config = {
@@ -104,16 +104,16 @@ def get_srcardb(container, template):
         raise j.exceptions.RuntimeError("Unsupport protocol {}".format(template.scheme))
 
 
-def get_storagecluster_config(service):
+def get_storagecluster_config(job):
     from zeroos.orchestrator.sal.StorageCluster import StorageCluster
-    storagecluster = service.model.data.storageCluster
-    storageclusterservice = service.aysrepo.serviceGet(role='storage_cluster',
+    storagecluster = job.service.model.data.storageCluster
+    storageclusterservice = job.service.aysrepo.serviceGet(role='storage_cluster',
                                                        instance=storagecluster)
-    cluster = StorageCluster.from_ays(storageclusterservice)
+    cluster = StorageCluster.from_ays(storageclusterservice, job.context['token'])
     return {"config": cluster.get_config(), "nodes": storageclusterservice.producers["node"]}
 
 
-def create_from_template_container(service, parent):
+def create_from_template_container(job, parent):
     """
     if not it creates it.
     return the container service
@@ -122,9 +122,9 @@ def create_from_template_container(service, parent):
     from zeroos.orchestrator.sal.Container import Container
     from zeroos.orchestrator.sal.Node import Node
 
-    container_name = 'vdisk_{}_{}'.format(service.name, parent.name)
-    node = Node.from_ays(parent)
-    config = get_configuration(service.aysrepo)
+    container_name = 'vdisk_{}_{}'.format(job.service.name, parent.name)
+    node = Node.from_ays(parent, job.context['token'])
+    config = get_configuration(job.service.aysrepo)
     container = Container(name=container_name,
                           flist=config.get('0-disk-flist', 'https://hub.gig.tech/gig-official-apps/0-disk-master.flist'),
                           host_network=True,
@@ -165,9 +165,12 @@ def resize(job):
 
 
 def processChange(job):
+    from zeroos.orchestrator.configuration import get_jwt_token_from_job
+
     service = job.service
 
     args = job.model.args
     category = args.pop('changeCategory')
     if category == "dataschema" and service.model.actionsState['install'] == 'ok':
-        j.tools.async.wrappers.sync(service.executeAction('resize', args={'size': args['size']}))
+        job.context['token'] = get_jwt_token_from_job(job)
+        j.tools.async.wrappers.sync(service.executeAction('resize', context=job.context, args={'size': args['size']}))
