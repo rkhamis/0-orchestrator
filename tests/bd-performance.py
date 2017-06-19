@@ -51,6 +51,7 @@ def test_fio_nbd(orchestratorserver, storagecluster, vdiskcount, vdisksize, runt
     deployInfo = {}
     try:
         deployInfo = deploy(api, nodeIDs, nodeIPs, orchestratorserver, storagecluster, vdiskcount, vdisksize, vdisktype)
+        mountVdisks(api, deployInfo, nodeIDs)
         cycle = 0
         while runtime:
             if runtime < 3600:
@@ -99,11 +100,17 @@ def waitForData(api, nodeIDs, deployInfo, runtime, resultdir):
                     break
 
 
-def test(api, deployInfo, nodeIDs, runtime):
+def mountVdisks(api, deployInfo, nodeIDs):
     for nodeID in nodeIDs:
         containername = deployInfo[nodeID]["testContainer"]
         nbdConfig = deployInfo[nodeID]["nbdConfig"]
-        clientInfo = nbdClientConnect(api, nodeID, containername, nbdConfig)
+        deployInfo[nodeID]["nbdClientInfo"] = nbdClientConnect(api, nodeID, containername, nbdConfig)
+
+
+def test(api, deployInfo, nodeIDs, runtime):
+    for nodeID in nodeIDs:
+        containername = deployInfo[nodeID]["testContainer"]
+        clientInfo = deployInfo[nodeID]["nbdClientInfo"]
         filenames = clientInfo["filenames"]
         client_pids = clientInfo["client_pids"]
         deployInfo[nodeID]["filenames"] = filenames
