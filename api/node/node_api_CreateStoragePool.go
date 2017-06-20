@@ -14,6 +14,7 @@ import (
 // CreateStoragePool is the handler for POST /nodes/{nodeid}/storagepools
 // Create a new storage pool
 func (api NodeAPI) CreateStoragePool(w http.ResponseWriter, r *http.Request) {
+	aysClient := tools.GetAysConnection(r, api)
 	var reqBody StoragePoolCreate
 	node := mux.Vars(r)["nodeid"]
 
@@ -70,11 +71,9 @@ func (api NodeAPI) CreateStoragePool(w http.ResponseWriter, r *http.Request) {
 			Service: reqBody.Name}},
 	}
 
-	run, err := tools.ExecuteBlueprint(api.AysRepo, "storagepool", reqBody.Name, "install", blueprint)
-	if err != nil {
-		httpErr := err.(tools.HTTPError)
-		errmsg := "Error executing blueprint for storagepool creation "
-		tools.WriteError(w, httpErr.Resp.StatusCode, httpErr, errmsg)
+	run, err := aysClient.ExecuteBlueprint(api.AysRepo, "storagepool", reqBody.Name, "install", blueprint)
+	errmsg := "Error executing blueprint for storagepool creation "
+	if !tools.HandleExecuteBlueprintResponse(err, w, errmsg) {
 		return
 	}
 
@@ -88,6 +87,7 @@ func (api NodeAPI) CreateStoragePool(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api NodeAPI) GetNodeDevices(w http.ResponseWriter, r *http.Request) (map[string]struct{}, error) {
+
 	cl, err := tools.GetConnection(r, api)
 	if err != nil {
 		return nil, err

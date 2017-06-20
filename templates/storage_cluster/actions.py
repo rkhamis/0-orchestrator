@@ -25,9 +25,9 @@ def input(job):
     return job.model.args
 
 
-def get_cluster(service):
+def get_cluster(job):
     from zeroos.orchestrator.sal.StorageCluster import StorageCluster
-    return StorageCluster.from_ays(service)
+    return StorageCluster.from_ays(job.service, job.context['token'])
 
 
 def init(job):
@@ -38,7 +38,7 @@ def init(job):
     service = job.service
     nodes = []
     for node_service in service.producers['node']:
-        nodes.append(Node.from_ays(node_service))
+        nodes.append(Node.from_ays(node_service, job.context['token']))
     nodemap = {node.name: node for node in nodes}
 
     cluster = StorageCluster(service.name, nodes, service.model.data.diskType)
@@ -62,10 +62,8 @@ def init(job):
     ardbactor = service.aysrepo.actorGet("ardb")
     filesystems = []
     ardbs = []
-    idx = 0
-    baseport = 2000
 
-    def create_server(node, disk, variant='data'):
+    def create_server(node, disk, baseport, variant='data'):
         diskmap = [{'device': disk.devicename}]
         args = {
             'node': node.name,
@@ -75,7 +73,7 @@ def init(job):
         }
         storagepoolname = 'cluster_{}_{}_{}'.format(node.name, service.name, disk.name)
         spactor.serviceCreate(instance=storagepoolname, args=args)
-        containername = '{}_{}_{}'.format(storagepoolname, variant, idx)
+        containername = '{}_{}_{}'.format(storagepoolname, variant, baseport)
         # adding filesystem
         args = {
             'storagePool': storagepoolname,
@@ -96,20 +94,20 @@ def init(job):
         # create ardbs
         args = {
             'homeDir': '/mnt/data',
-            'bind': '{}:{}'.format(node.storageAddr, baseport + idx),
+            'bind': '{}:{}'.format(node.storageAddr, baseport),
             'container': containername
         }
         ardbs.append(ardbactor.serviceCreate(instance=containername, args=args))
 
     for nodename, disks in availabledisks.items():
         node = nodemap[nodename]
-        # making the storagepools
-        for disk in disks:
-            create_server(node, disk)
-            idx += 1
+        # making the storagepool
+        baseports = node.freeports(baseport=2000, nrports=len(disks) + 1)
+        for idx, disk in enumerate(disks):
+            create_server(node, disk, baseports[idx])
 
     if str(service.model.data.clusterType) != 'tlog':
-        create_server(node, disk, 'metadata')
+        create_server(node, disk, baseports[-1], 'metadata')
 
     service.model.data.init('filesystems', len(filesystems))
     service.model.data.init('ardbs', len(ardbs))
@@ -132,7 +130,7 @@ def install(job):
 def start(job):
     service = job.service
 
-    cluster = get_cluster(service)
+    cluster = get_cluster(job)
     job.logger.info("start cluster {}".format(service.name))
     cluster.start()
     job.service.model.data.status = 'ready'
@@ -140,7 +138,7 @@ def start(job):
 
 def stop(job):
     service = job.service
-    cluster = get_cluster(service)
+    cluster = get_cluster(job)
     job.logger.info("stop cluster {}".format(service.name))
     cluster.stop()
 
@@ -152,14 +150,14 @@ def delete(job):
 
     for ardb in ardbs:
         container = ardb.parent
-        j.tools.async.wrappers.sync(container.executeAction('stop'))
+        j.tools.async.wrappers.sync(container.executeAction('stop', context=job.context))
         j.tools.async.wrappers.sync(container.delete())
 
     for fs in filesystems:
         if not fs.parent:
             continue
         pool = fs.parent
-        j.tools.async.wrappers.sync(pool.executeAction('delete'))
+        j.tools.async.wrappers.sync(pool.executeAction('delete', context=job.context))
         j.tools.async.wrappers.sync(pool.delete())
 
     job.logger.info("stop cluster {}".format(service.name))

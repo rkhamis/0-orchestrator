@@ -14,6 +14,7 @@ import (
 // CreateContainer is the handler for POST /nodes/{nodeid}/containers
 // Create a new Container
 func (api NodeAPI) CreateContainer(w http.ResponseWriter, r *http.Request) {
+	aysClient := tools.GetAysConnection(r, api)
 	var reqBody CreateContainer
 
 	// decode request
@@ -32,7 +33,7 @@ func (api NodeAPI) CreateContainer(w http.ResponseWriter, r *http.Request) {
 	nodeID := vars["nodeid"]
 
 	// validate container name
-	exists, err := tools.ServiceExists("container", reqBody.Name, api.AysRepo)
+	exists, err := aysClient.ServiceExists("container", reqBody.Name, api.AysRepo)
 	if err != nil {
 		tools.WriteError(w, http.StatusInternalServerError, err, "Error checking container service exists")
 		return
@@ -53,7 +54,7 @@ func (api NodeAPI) CreateContainer(w http.ResponseWriter, r *http.Request) {
 		storagepoolname := parts[0]
 		filesystemname := parts[1]
 
-		exists, err := tools.ServiceExists("storagepool", storagepoolname, api.AysRepo)
+		exists, err := aysClient.ServiceExists("storagepool", storagepoolname, api.AysRepo)
 		if err != nil {
 			tools.WriteError(w, http.StatusInternalServerError, err, "Error checking storagepool service exists")
 			return
@@ -62,7 +63,7 @@ func (api NodeAPI) CreateContainer(w http.ResponseWriter, r *http.Request) {
 			tools.WriteError(w, http.StatusBadRequest, err, "")
 			return
 		}
-		exists, err = tools.ServiceExists("filesystem", filesystemname, api.AysRepo)
+		exists, err = aysClient.ServiceExists("filesystem", filesystemname, api.AysRepo)
 		if err != nil {
 			tools.WriteError(w, http.StatusInternalServerError, err, "Error checking filesystem service exists")
 			return
@@ -72,6 +73,13 @@ func (api NodeAPI) CreateContainer(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		mounts[idx] = mount{Filesystem: parts[1], Target: fmt.Sprintf("/fs/%s/%s", storagepoolname, filesystemname)}
+	}
+
+	for _, nic := range reqBody.Nics {
+		if err = nic.ValidateServices(aysClient, api.AysRepo); err != nil {
+			tools.WriteError(w, http.StatusBadRequest, err, "")
+			return
+		}
 	}
 
 	container := struct {
@@ -100,13 +108,12 @@ func (api NodeAPI) CreateContainer(w http.ResponseWriter, r *http.Request) {
 	obj[fmt.Sprintf("container__%s", reqBody.Name)] = container
 	obj["actions"] = []tools.ActionBlock{{Action: "install", Service: reqBody.Name, Actor: "container"}}
 
-	run, err := tools.ExecuteBlueprint(api.AysRepo, "container", reqBody.Name, "install", obj)
-	if err != nil {
-		httpErr := err.(tools.HTTPError)
-		errmsg := fmt.Sprintf("error executing blueprint for container %s creation", reqBody.Name)
-		tools.WriteError(w, httpErr.Resp.StatusCode, err, errmsg)
+	run, err := aysClient.ExecuteBlueprint(api.AysRepo, "container", reqBody.Name, "install", obj)
+	errmsg := fmt.Sprintf("error executing blueprint for container %s creation", reqBody.Name)
+	if !tools.HandleExecuteBlueprintResponse(err, w, errmsg) {
 		return
 	}
+
 	response := runs.Run{Runid: run.Key, State: runs.EnumRunState(run.State)}
 
 	w.Header().Set("Location", fmt.Sprintf("/nodes/%s/containers/%s", nodeID, reqBody.Name))
