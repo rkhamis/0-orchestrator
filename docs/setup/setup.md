@@ -35,7 +35,7 @@ This script takes the following parameters:
 So:
 ```bash
 cd /tmp
-export BRANCH="1.1.0-alpha-3"
+export BRANCH="1.1.0-alpha-4"
 export ZEROTIERNWID="<Your ZeroTier network ID>"
 export ZEROTIERTOKEN="<Your ZeroTier token>"
 export ITSYOUONLINEORG="<itsyou.online organization>"
@@ -80,7 +80,7 @@ In order for the Orchestrator to know which flists and version of JumpScale to u
 configuration__main:
   configurations:
   - key: '0-core-version'
-    value: 'master'
+    value: '1.1.0-alpha-4'
   - key: 'js-version'
     value: '9.0.0'
   - key: 'gw-flist'
@@ -158,8 +158,8 @@ ays run create -y
 ## Boot your Zero-OS nodes
 The final step of rounding up your Zero-OS cluster is to boot your Zero-OS nodes in to your ZeroTier network.
 
-Via iPXE from the following URL: `https://bootstrap.gig.tech/ipxe/master/<Your ZeroTier network id>/organization=${ITSYOUONLINEORG}`
+Via iPXE from the following URL: `https://bootstrap.gig.tech/ipxe/1.1.0-alpha-4/<Your ZeroTier network id>/organization=${ITSYOUONLINEORG}`
 
-Or download your ISO from the following URL: `https://bootstrap.gig.tech/iso/master/<Your ZeroTier network id>/organization=${ITSYOUONLINEORG}`
+Or download your ISO from the following URL: `https://bootstrap.gig.tech/iso/1.1.0-alpha-4/<Your ZeroTier network id>/organization=${ITSYOUONLINEORG}`
 
 Refer to the 0-core repository documentation for more information on booting Zero-OS.
