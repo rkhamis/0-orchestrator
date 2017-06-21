@@ -3,6 +3,8 @@ Auto-generated class for GWNIC
 """
 from .DHCP import DHCP
 from .EnumGWNICType import EnumGWNICType
+from .GWNICconfig import GWNICconfig
+from .ZerotierBridge import ZerotierBridge
 
 from . import client_support
 
@@ -13,13 +15,14 @@ class GWNIC(object):
     """
 
     @staticmethod
-    def create(id, name, type, config=None, dhcpserver=None):
+    def create(id, name, type, config=None, dhcpserver=None, zerotierbridge=None):
         """
-        :type config: str
+        :type config: GWNICconfig
         :type dhcpserver: DHCP
         :type id: str
         :type name: str
         :type type: EnumGWNICType
+        :type zerotierbridge: ZerotierBridge
         :rtype: GWNIC
         """
 
@@ -29,10 +32,11 @@ class GWNIC(object):
             id=id,
             name=name,
             type=type,
+            zerotierbridge=zerotierbridge,
         )
 
     def __init__(self, json=None, **kwargs):
-        if not json and not kwargs:
+        if json is None and not kwargs:
             raise ValueError('No data or kwargs present')
 
         class_name = 'GWNIC'
@@ -44,7 +48,7 @@ class GWNIC(object):
         property_name = 'config'
         val = data.get(property_name)
         if val is not None:
-            datatypes = [str]
+            datatypes = [GWNICconfig]
             try:
                 self.config = client_support.val_factory(val, datatypes)
             except ValueError as err:
@@ -91,6 +95,15 @@ class GWNIC(object):
                 raise ValueError(create_error.format(cls=class_name, prop=property_name, val=val, err=err))
         else:
             raise ValueError(required_error.format(cls=class_name, prop=property_name))
+
+        property_name = 'zerotierbridge'
+        val = data.get(property_name)
+        if val is not None:
+            datatypes = [ZerotierBridge]
+            try:
+                self.zerotierbridge = client_support.val_factory(val, datatypes)
+            except ValueError as err:
+                raise ValueError(create_error.format(cls=class_name, prop=property_name, val=val, err=err))
 
     def __str__(self):
         return self.as_json(indent=4)

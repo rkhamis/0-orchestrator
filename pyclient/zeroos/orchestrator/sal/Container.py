@@ -1,6 +1,9 @@
 import json
 from io import BytesIO
-from JumpScale import j
+
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class Containers:
@@ -27,7 +30,7 @@ class Containers:
 
     def create(self, name, flist, hostname=None, mounts=None, nics=None,
                host_network=False, ports=None, storage=None, init_processes=None):
-        j.sal.g8os.logger.debug("create container %s", name)
+        logger.debug("create container %s", name)
         container = Container(name, self.node, flist, hostname, mounts, nics,
                               host_network, ports, storage, init_processes)
         container.start()
@@ -56,10 +59,12 @@ class Container:
         self._client = None
 
         self._ays = None
+        for nic in self.nics:
+            nic.pop('token', None)
 
     @classmethod
     def from_containerinfo(cls, containerinfo, node):
-        j.sal.g8os.logger.debug("create container from info")
+        logger.debug("create container from info")
         arguments = containerinfo['container']['arguments']
         if not arguments['tags']:
             # we don't deal with tagless containers
@@ -75,10 +80,10 @@ class Container:
                    arguments['storage'])
 
     @classmethod
-    def from_ays(cls, service):
-        j.sal.g8os.logger.debug("create container from service (%s)", service)
+    def from_ays(cls, service, password=None):
+        logger.debug("create container from service (%s)", service)
         from .Node import Node
-        node = Node.from_ays(service.parent)
+        node = Node.from_ays(service.parent, password)
         ports = {}
         for portmap in service.model.data.ports:
             source, dest = portmap.split(':')
@@ -110,7 +115,7 @@ class Container:
 
     @property
     def id(self):
-        j.sal.g8os.logger.debug("get container id")
+        logger.debug("get container id")
         info = self.info
         if info:
             return info['container']['id']
@@ -118,7 +123,7 @@ class Container:
 
     @property
     def info(self):
-        j.sal.g8os.logger.debug("get container info")
+        logger.debug("get container info")
         for containerid, container in self.node.client.container.list().items():
             if self.name in (container['container']['arguments']['tags'] or []):
                 container['container']['id'] = int(containerid)
@@ -138,7 +143,7 @@ class Container:
         self.client.filesystem.upload(remote, bytes)
 
     def _create_container(self, timeout=60):
-        j.sal.g8os.logger.debug("send create container command to g8os")
+        logger.debug("send create container command to g8os")
         tags = [self.name]
         if self.hostname and self.hostname != self.name:
             tags.append(self.hostname)
@@ -161,7 +166,7 @@ class Container:
 
     def start(self):
         if not self.is_running():
-            j.sal.g8os.logger.debug("start %s", self)
+            logger.debug("start %s", self)
             self._create_container()
             for process in self.init_processes:
                 cmd = "{} {}".format(process['name'], ' '.join(process.get('args', [])))
@@ -176,7 +181,7 @@ class Container:
     def stop(self):
         if not self.is_running():
             return
-        j.sal.g8os.logger.debug("stop %s", self)
+        logger.debug("stop %s", self)
 
         self.node.client.container.terminate(self.id)
         self._client = None

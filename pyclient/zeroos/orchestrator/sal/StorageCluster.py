@@ -1,5 +1,9 @@
-from JumpScale import j
+from js9 import j
 from .ARDB import ARDB
+
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class StorageCluster:
@@ -15,24 +19,27 @@ class StorageCluster:
         self.filesystems = []
         self.storage_servers = []
         self.disk_type = disk_type
+        self.k = 0
+        self.m = 0
         self._ays = None
 
     @classmethod
-    def from_ays(cls, service):
-        j.sal.g8os.logger.debug("load cluster storage cluster from service (%s)", service)
+    def from_ays(cls, service, password):
+        logger.debug("load cluster storage cluster from service (%s)", service)
         disk_type = str(service.model.data.diskType)
 
         nodes = []
         storage_servers = []
         for ardb_service in service.producers.get('ardb', []):
-            storages_server = StorageServer.from_ays(ardb_service)
+            storages_server = StorageServer.from_ays(ardb_service, password)
             storage_servers.append(storages_server)
             if storages_server.node not in nodes:
                 nodes.append(storages_server.node)
 
         cluster = cls(label=service.name, nodes=nodes, disk_type=disk_type)
         cluster.storage_servers = storage_servers
-
+        cluster.k = service.model.data.k
+        cluster.m = service.model.data.m
         return cluster
 
     def get_config(self):
@@ -60,7 +67,7 @@ class StorageCluster:
         return a list of disk that are not used by storage pool
         or has a different type as the one required for this cluster
         """
-        j.sal.g8os.logger.debug("find available_disks")
+        logger.debug("find available_disks")
         cluster_name = 'sp_cluster_{}'.format(self.label)
         available_disks = {}
 
@@ -89,12 +96,12 @@ class StorageCluster:
         return available_disks
 
     def start(self):
-        j.sal.g8os.logger.debug("start %s", self)
+        logger.debug("start %s", self)
         for server in self.storage_servers:
             server.start()
 
     def stop(self):
-        j.sal.g8os.logger.debug("stop %s", self)
+        logger.debug("stop %s", self)
         for server in self.storage_servers:
             server.stop()
 
@@ -139,8 +146,8 @@ class StorageServer:
         self.ardb = None
 
     @classmethod
-    def from_ays(cls, ardb_services):
-        ardb = ARDB.from_ays(ardb_services)
+    def from_ays(cls, ardb_services, password=None):
+        ardb = ARDB.from_ays(ardb_services, password)
         storage_server = cls(None)
         storage_server.container = ardb.container
         storage_server.ardb = ardb
@@ -166,7 +173,7 @@ class StorageServer:
             return start_port
 
     def start(self, timeout=30):
-        j.sal.g8os.logger.debug("start %s", self)
+        logger.debug("start %s", self)
         if not self.container.is_running():
             self.container.start()
 
@@ -175,7 +182,7 @@ class StorageServer:
         self.ardb.start(timeout=timeout)
 
     def stop(self, timeout=30):
-        j.sal.g8os.logger.debug("stop %s", self)
+        logger.debug("stop %s", self)
         self.ardb.stop(timeout=timeout)
         self.container.stop()
 

@@ -1,7 +1,9 @@
 from zeroos.core0.client import Client
+from zeroos.orchestrator.configuration import get_jwt_token
 from .Disk import Disks, DiskType
 from .Container import Containers
 from .StoragePool import StoragePools
+from .Network import Network
 from collections import namedtuple
 from datetime import datetime
 import netaddr
@@ -12,22 +14,24 @@ Mount = namedtuple('Mount', ['device', 'mountpoint', 'fstype', 'options'])
 class Node:
     """Represent a G8OS Server"""
 
-    def __init__(self, addr, port=6379, password=None):
+    def __init__(self, addr, port=6379, password=None, timeout=120):
         # g8os client to talk to the node
-        self._client = Client(host=addr, port=port, password=password, timeout=120)
+        self._client = Client(host=addr, port=port, password=password, timeout=timeout)
         self._storageAddr = None
         self.addr = addr
         self.port = port
         self.disks = Disks(self)
         self.storagepools = StoragePools(self)
         self.containers = Containers(self)
+        self.network = Network(self)
 
     @classmethod
-    def from_ays(cls, service):
+    def from_ays(cls, service, password=None, timeout=120):
         return cls(
             addr=service.model.data.redisAddr,
             port=service.model.data.redisPort,
-            password=service.model.data.redisPassword or None
+            password=password,
+            timeout=timeout
         )
 
     @property
@@ -111,6 +115,22 @@ class Node:
             # startup syslogd and klogd
             self.client.system('syslogd -n -O /var/log/messages')
             self.client.system('klogd -n')
+
+    def freeports(self, baseport=2000, nrports=3):
+        ports = self.client.info.port()
+        usedports = set()
+        for portInfo in ports:
+            if portInfo['network'] != "tcp":
+                continue
+            usedports.add(portInfo['port'])
+
+        freeports = []
+        while True:
+            if baseport not in usedports:
+                freeports.append(baseport)
+                if len(freeports) >= nrports:
+                    return freeports
+            baseport += 1
 
     def ensure_persistance(self, name='fscache'):
         """

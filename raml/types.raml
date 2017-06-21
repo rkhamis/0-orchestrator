@@ -137,8 +137,11 @@ BridgeCreate:
   description: Arguments for a bridge.create job
   properties:
     name:
-      description: Name for the bridge to be created
+      description: |
+        Name for the bridge to be created.
+        The name can't be "default".
       type: string
+      maxLength: 15
     hwaddr:
       description: MAC address for the bridge to be created. If none, a random MAC address will be assigned.
       type: string
@@ -378,12 +381,6 @@ VMCreate:
     disks:
       description: List of virtual disks
       type: VDiskLink[]
-    userCloudInit:
-      description: User level cloudinit configuration
-      type: object
-    systemCloudInit:
-      description: System level cloudinit configuration
-      type: object
 
 VMUpdate:
   type: object
@@ -467,6 +464,10 @@ ContainerNIC:
     status:
       enum: [up, down]
       description: Status of the bridge
+    token:
+      type: string
+      description: Zerotier token, only valid for nic of type 'zerotier'. If supplied, the container will be authorized on the zerotier network.
+      required: false
 
 ContainerListItem:
   type: object
@@ -493,6 +494,10 @@ Container:
     hostname:
       description: Hostname for the Container
       type: string
+    zerotiernodeid:
+      description: Zerotier id if the container has a nic of type zerotier
+      type: string
+      required: false
     flist:
       type: string
       description: Url to the root filesystem flist
@@ -655,9 +660,14 @@ ZerotierListItem:
 
 ZerotierJoin:
   type: object
-  description: Arguments to join a Zerotier network
+  description: |
+    Arguments to join a Zerotier network.
+    If the token is specified, the node will be authorized.
   properties:
     nwid: string
+    token:
+      type: string
+      required: false
 
 Zerotier:
   type: object
@@ -921,6 +931,18 @@ ClusterCreate:
     nodes:
       type: string[]
       description: List of node ID on which we can deploy storage server
+    clusterType:
+      type: string
+      enum: [storage, tlog]
+      description: cluster type
+    k:
+      type: integer
+      description: K variable of the erasure encoding, required for tlog clusters
+      required: false
+    m:
+      type: integer
+      description: M variable of the erasure encoding, required for tlog clusters
+      required: false
   example:
     label: cluster1
     servers: 256
@@ -928,6 +950,7 @@ ClusterCreate:
     nodes:
        - node1
        - node2
+    clusterType: storage
 
 Cluster:
   properties:
@@ -1090,10 +1113,15 @@ CloudInit:
   properties:
     userdata:
       type: string
-      description: userdata for cloud-init
+      description: |
+        userdata for cloud-init ini YAML format
+        For more detauled information [see](https://cloudinit.readthedocs.io/en/latest/topics/examples.html)
+
     metadata:
       type: string
-      description: metadata for cloud-init
+      description: |
+        metadata for cloud-init ini YAML format mainly used for setting hostname
+        For more details [see](http://cloudinit.readthedocs.io/en/latest/topics/datasources/ec2.html)
 
 GWHost:
   properties:
@@ -1124,10 +1152,17 @@ DHCP:
     hosts:
       type: GWHost[]
       description: List of dhcpshosts
-    domain:
+
+ZerotierBridge:
+  properties:
+    id:
       type: string
-      description: Domain for dhcp
+      description: zerotier network id
+    token:
+      type: string
+      description: zerotier authorization token, used to authorize the container if supplied.
       required: false
+
 
 GWNIC:
   type: object
@@ -1144,6 +1179,12 @@ GWNIC:
           default: id can be ommited
           bridge: name of the bridge to connect to
       type: string
+    zerotierbridge:
+      required: false
+      description: |
+        Zerotier NetworkId we want to use to bridge the private network to.
+        This makes it possible to bridge your private network with a private network of an other gateway
+      type: ZerotierBridge
     config:
       required: false
       properties:
@@ -1152,7 +1193,9 @@ GWNIC:
            type: string
          gateway:
            type: string
-           description: Gateway for the the container
+           description: |
+             Gateway for the the container
+             When adding a gateway to a Nic it's considered a public interface
            required: false
       description: Optional IP address configuration for this interface, only allowed for interfaces of type vxlan and vlan
     name:
@@ -1177,9 +1220,35 @@ GWCreate:
     portforwards:
       type: PortForward[]
       description: List of portfowardings
+      required: false
     httpproxies:
       type: HTTPProxy[]
       description: List of HTTPProxy
+      required: false
+
+ListGW:
+  properties:
+    name:
+      type: string
+      description: Name of gateway
+    domain:
+      type: string
+      description: Name of domain
+    nics:
+      type: GWNIC[]
+      description: List of gateway nics
+    portforwards:
+      type: PortForward[]
+      description: List of portfowardings
+      required: false
+    httpproxies:
+      type: HTTPProxy[]
+      description: List of HTTPProxy
+      required: false
+    zerotiernodeid:
+      type: string
+      description: id of the zerotier daemon
+      required: false
 
 GW:
   properties:
@@ -1192,6 +1261,30 @@ GW:
     portforwards:
       type: PortForward[]
       description: List of portfowardings
+      required: false
     httpproxies:
       type: HTTPProxy[]
       description: List of HTTPProxy
+      required: false
+
+GetGW:
+  properties:
+    domain:
+      type: string
+      description: Name of domain
+    nics:
+      type: GWNIC[]
+      description: List of gateway nics
+    portforwards:
+      type: PortForward[]
+      description: List of portfowardings
+      required: false
+    httpproxies:
+      type: HTTPProxy[]
+      description: List of HTTPProxy
+      required: false
+    zerotiernodeid:
+      type: string
+      description: id of the zerotier daemon
+      required: false
+

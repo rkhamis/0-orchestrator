@@ -1,4 +1,4 @@
-@0xdaf186973a8e7936;
+@0xd3397b8ab433d876;
 
 
 struct Schema {
@@ -11,6 +11,7 @@ struct Schema {
     container @6 :Text; # Container spawned by this service
     domain @7: Text;
     advanced @8: Bool; # flag to check if http config has been set manually
+    zerotiernodeid @9:Text;
 
     struct Nic {
         type @0: NicType;
@@ -18,8 +19,14 @@ struct Schema {
         config @2: NicConfig;
         name @3: Text;
         dhcpserver @4: DHCP;
+        zerotierbridge @5: Bridge;
+        token @6: Text;
     }
 
+    struct Bridge {
+        id @0: Text;
+        token @1: Text;
+    }
     struct CloudInit {
         userdata @0: Text;
         metadata @1: Text;

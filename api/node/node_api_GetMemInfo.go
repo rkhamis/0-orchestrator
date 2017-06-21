@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/zero-os/go-client"
+	"github.com/zero-os/0-core/client/go-client"
 	"github.com/zero-os/0-orchestrator/api/tools"
 )
 
@@ -13,7 +13,7 @@ import (
 func (api NodeAPI) GetMemInfo(w http.ResponseWriter, r *http.Request) {
 	cl, err := tools.GetConnection(r, api)
 	if err != nil {
-		tools.WriteError(w, http.StatusInternalServerError, err)
+		tools.WriteError(w, http.StatusInternalServerError, err, "Failed to establish connection to node")
 		return
 	}
 
@@ -21,7 +21,7 @@ func (api NodeAPI) GetMemInfo(w http.ResponseWriter, r *http.Request) {
 	result, err := info.Mem()
 
 	if err != nil {
-		tools.WriteError(w, http.StatusInternalServerError, err)
+		tools.WriteError(w, http.StatusInternalServerError, err, "Error getting memory info from node")
 		return
 	}
 

@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/zero-os/0-orchestrator/api/tools"
 	"github.com/gorilla/mux"
 
-	log "github.com/Sirupsen/logrus"
+	"github.com/zero-os/0-orchestrator/api/tools"
 )
 
 // CreateSnapshot is the handler for POST /nodes/{nodeid}/storagepools/{storagepoolname}/filesystem/{filesystemname}/snapshot
 // Create a new readonly filesystem of the current state of the vdisk
 func (api NodeAPI) CreateSnapshot(w http.ResponseWriter, r *http.Request) {
+	aysClient := tools.GetAysConnection(r, api)
 	filessytem := mux.Vars(r)["filesystemname"]
 	nodeid := mux.Vars(r)["nodeid"]
 	storagepool := mux.Vars(r)["storagepoolname"]
@@ -22,13 +22,13 @@ func (api NodeAPI) CreateSnapshot(w http.ResponseWriter, r *http.Request) {
 
 	// decode request
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
-		tools.WriteError(w, http.StatusBadRequest, err)
+		tools.WriteError(w, http.StatusBadRequest, err, "Error decoding request body")
 		return
 	}
 
 	// validate request
 	if err := reqBody.Validate(); err != nil {
-		tools.WriteError(w, http.StatusBadRequest, err)
+		tools.WriteError(w, http.StatusBadRequest, err, "")
 		return
 	}
 
@@ -49,11 +49,16 @@ func (api NodeAPI) CreateSnapshot(w http.ResponseWriter, r *http.Request) {
 			Service: reqBody.Name}},
 	}
 
-	if _, err := tools.ExecuteBlueprint(api.AysRepo, "fssnapshot", reqBody.Name, "install", blueprint); err != nil {
-		httpErr := err.(tools.HTTPError)
-		log.Errorf("Error executing blueprint for fssnapshot creation : %+v", err.Error())
-		tools.WriteError(w, httpErr.Resp.StatusCode, httpErr)
+	run, err := aysClient.ExecuteBlueprint(api.AysRepo, "fssnapshot", reqBody.Name, "install", blueprint)
+	errmsg := "Error executing blueprint for fssnapshot creation "
+	if !tools.HandleExecuteBlueprintResponse(err, w, errmsg) {
+		return
+	}
+
+	if _, errr := tools.WaitOnRun(api, w, r, run.Key); errr != nil {
+		return
 	}
 	w.Header().Set("Location", fmt.Sprintf("/nodes/%s/storagepools/%s/filesystems/%s/snapshots/%s", nodeid, storagepool, filessytem, reqBody.Name))
 	w.WriteHeader(http.StatusCreated)
+
 }

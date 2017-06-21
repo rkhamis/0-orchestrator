@@ -3,8 +3,8 @@
 
 - Requirements:
 
-    * `pip3 install git+https://github.com/zero-os/0-rest-api.git#subdirectory=pyclient`
-    * `pip3 install git+https://github.com/zero-os/0-core.git#subdirectory=pyclient`
+    * `pip3 install git+https://github.com/zero-os/0-orchestrator.git#subdirectory=pyclient`
+    * `pip3 install git+https://github.com/zero-os/0-core.git#subdirectory=client/py-client`
 
 - Run [bd-performance.py](./bd-performance.py)
 
@@ -12,7 +12,7 @@
 python3 bd-performance.py [Options]
 
 Options:
-  --restapiserver TEXT       0-rest-api api server endpoint. Eg
+  --orchestratorserver TEXT       0-orchestrator api server endpoint. Eg
                              http://192.168.193.212:8080
   --storagecluster TEXT      Name of the storage cluster in which the vdisks
                              need to be created
