@@ -3,10 +3,10 @@ package tools
 import (
 	"crypto/ecdsa"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
+	log "github.com/Sirupsen/logrus"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
@@ -14,7 +14,12 @@ import (
 type Oauth2itsyouonlineMiddleware struct {
 	describedBy string
 	field       string
-	scopes      []string
+	org         string
+}
+
+type JWTClaim struct {
+	scopes []string
+	azp    string
 }
 
 var JWTPublicKey *ecdsa.PublicKey
@@ -42,16 +47,10 @@ func init() {
 }
 
 // NewOauth2itsyouonlineMiddlewarecreate new Oauth2itsyouonlineMiddleware struct
-func NewOauth2itsyouonlineMiddleware(scope string) *Oauth2itsyouonlineMiddleware {
-	var scopes []string
-	if scope == "" {
-		scopes = []string{}
-	} else {
-		scopes = []string{fmt.Sprintf("user:memberof:%s", scope)}
-	}
+func NewOauth2itsyouonlineMiddleware(org string) *Oauth2itsyouonlineMiddleware {
 
 	om := Oauth2itsyouonlineMiddleware{
-		scopes: scopes,
+		org: org,
 	}
 
 	om.describedBy = "headers"
@@ -61,16 +60,11 @@ func NewOauth2itsyouonlineMiddleware(scope string) *Oauth2itsyouonlineMiddleware
 }
 
 // CheckScopes checks whether user has needed scopes
-func (om *Oauth2itsyouonlineMiddleware) CheckScopes(scopes []string) bool {
-	if len(om.scopes) == 0 {
-		return true
-	}
-
-	for _, allowed := range om.scopes {
-		for _, scope := range scopes {
-			if scope == allowed {
-				return true
-			}
+func (om *Oauth2itsyouonlineMiddleware) CheckScopes(claims jwt.MapClaims) bool {
+	requiredscope := fmt.Sprintf("user:memberof:%s", om.org)
+	for _, claimedscope := range claims["scope"].([]interface{}) {
+		if claimedscope == requiredscope {
+			return true
 		}
 	}
 	return false
@@ -81,7 +75,7 @@ func (om *Oauth2itsyouonlineMiddleware) Handler(next http.Handler) http.Handler 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var accessToken string
 		var err error
-		if len(om.scopes) == 0 {
+		if om.org == "" {
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -97,17 +91,18 @@ func (om *Oauth2itsyouonlineMiddleware) Handler(next http.Handler) http.Handler 
 			return
 		}
 
-		var scopes []string
+		var claim jwt.MapClaims
 		if len(oauth2ServerPublicKey) > 0 {
-			scopes, err = om.checkJWTGetScope(accessToken)
+			claim, err = om.checkJWTClaim(accessToken)
 			if err != nil {
+				log.Error(err)
 				w.WriteHeader(403)
 				return
 			}
 		}
 
 		// check scopes
-		if !om.CheckScopes(scopes) {
+		if !om.CheckScopes(claim) && om.org != claim["azp"] {
 			w.WriteHeader(403)
 			return
 		}
@@ -117,7 +112,7 @@ func (om *Oauth2itsyouonlineMiddleware) Handler(next http.Handler) http.Handler 
 }
 
 // check JWT token and get it's scopes
-func (om *Oauth2itsyouonlineMiddleware) checkJWTGetScope(tokenStr string) ([]string, error) {
+func (om *Oauth2itsyouonlineMiddleware) checkJWTClaim(tokenStr string) (jwt.MapClaims, error) {
 	jwtStr := strings.TrimSpace(strings.TrimPrefix(tokenStr, "Bearer"))
 	token, err := jwt.Parse(jwtStr, func(token *jwt.Token) (interface{}, error) {
 		if token.Method != jwt.SigningMethodES384 {
@@ -133,10 +128,5 @@ func (om *Oauth2itsyouonlineMiddleware) checkJWTGetScope(tokenStr string) ([]str
 	if !(ok && token.Valid) {
 		return nil, fmt.Errorf("invalid token")
 	}
-
-	var scopes []string
-	for _, v := range claims["scope"].([]interface{}) {
-		scopes = append(scopes, v.(string))
-	}
-	return scopes, nil
+	return claims, nil
 }
