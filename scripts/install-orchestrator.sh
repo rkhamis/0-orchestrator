@@ -22,17 +22,40 @@ export LANG=en_US.UTF-8
 logfile="/tmp/install.log"
 
 if [ -z $1 ] || [ -z $2 ] || [ -s $3 ]; then
-  echo "Usage: installgrid.sh <BRANCH> <ZEROTIERNWID> <ZEROTIERTOKEN>"
+  echo "Usage: installgrid.sh <BRANCH> <ZEROTIERNWID> <ZEROTIERTOKEN> <ITSYOUONLINEORG> [<DOMAIN> [--development]]"
   echo
   echo "  BRANCH: 0-orchestrator development branch."
   echo "  ZEROTIERNWID: Zerotier network id."
   echo "  ZEROTIERTOKEN: Zerotier api token."
+  echo "  ITSYOUONLINEORG: itsyou.online organization for use to authenticate."
+  echo "  DOMAIN: the domain to use for caddy."
+  echo "  --development: an optional parameter to use self signed certificates."
   echo
   exit 1
 fi
 BRANCH=$1
-ZEROTIERNWID=$2
-ZEROTIERTOKEN=$3
+shift
+ZEROTIERNWID=$1
+shift
+ZEROTIERTOKEN=$1
+shift
+ITSYOUONLINEORG=$1
+shift
+DOMAIN=$1
+
+if [ -n "$DOMAIN" ]; then
+    shift
+    if [ "$1" = "--development" ]; then
+        DEVELOPMENT=true
+        shift
+    else
+        DEVELOPMENT=false
+    fi
+else
+    DEVELOPMENT=true
+fi
+
+# NOTE that you can't add any arguments after here, if you want to do so, please use argparse
 
 CODEDIR="/root/gig/code"
 if [ "$GIGDIR" != "" ]; then
@@ -94,22 +117,47 @@ popd
 echo "[+] Start AtYourService server"
 
 aysinit="/etc/my_init.d/10_ays.sh"
+if [ -n "${ITSYOUONLINEORG}" ]; then
+    if [ ! -d /optvar/cfg/ ]; then
+        mkdir /optvar/cfg/
+    fi
+    cat >>  /optvar/cfg/jumpscale9.toml << EOL
+[ays]
+production = true
+
+[ays.oauth]
+jwt_key = "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n27MjiGYvqalizeSWTHEpnd7oea9IQ8T5oJjMVH5cc0H5tFSKilFFeh//wngxIyny66+Vq5t5B0V0Ehy01+2ceEon2Y0XDkIKv"
+organization = "${ITSYOUONLINEORG}"
+EOL
+fi
+
 echo '#!/bin/bash -x' > ${aysinit}
 echo 'ays start > /dev/null 2>&1' >> ${aysinit}
 
 chmod +x ${aysinit} >> ${logfile} 2>&1
 bash $aysinit >> ${logfile} 2>&1
 
+echo "[+] Waiting for AtYourService"
+while ! curl http://127.0.0.1:5000 >> ${logfile} 2>&1; do sleep 0.1; done
+
 echo "[+] Building orchestrator api server"
-mkdir -p /opt/go/proj/src/github.com >> ${logfile} 2>&1
-if [ ! -d /opt/go/proj/src/github.com/zero-os ]; then
-    ln -sf ${CODEDIR}/github/zero-os /opt/go/proj/src/github.com/zero-os >> ${logfile} 2>&1
+mkdir -p /opt/jumpscale9/go/proj/src/github.com >> ${logfile} 2>&1
+if [ ! -d /opt/jumpscale9/go/proj/src/github.com/zero-os ]; then
+    ln -sf ${CODEDIR}/github/zero-os /opt/jumpscale9/go/proj/src/github.com/zero-os >> ${logfile} 2>&1
 fi
-cd /opt/go/proj/src/github.com/zero-os/0-orchestrator/api
-GOPATH=/opt/go/proj GOROOT=/opt/go/root/ /opt/go/root/bin/go get -d ./... >> ${logfile} 2>&1
-GOPATH=/opt/go/proj GOROOT=/opt/go/root/ /opt/go/root/bin/go build -o /usr/local/bin/orchestratorapiserver >> ${logfile} 2>&1
+cd /opt/jumpscale9/go/proj/src/github.com/zero-os/0-orchestrator/api
+GOPATH=/opt/jumpscale9/go/proj GOROOT=/opt/jumpscale9/go/root /opt/jumpscale9/go/root/bin/go build -o /usr/local/bin/orchestratorapiserver >> ${logfile} 2>&1
 if [ ! -d /optvar/cockpit_repos/orchestrator-server ]; then
-    ays repo create -n orchestrator-server -g js9 >> ${logfile} 2>&1
+    mkdir -p /optvar/cockpit_repos/orchestrator-server >> ${logfile} 2>&1
+    pushd /optvar/cockpit_repos/orchestrator-server
+    mkdir services >> ${logfile} 2>&1
+    mkdir actorTemplates >> ${logfile} 2>&1
+    mkdir actors >> ${logfile} 2>&1
+    mkdir blueprints >> ${logfile} 2>&1
+    touch .ays >> ${logfile} 2>&1
+    git init >> ${logfile} 2>&1
+    git remote add origin https://github.com/zero-os/orchestrator >> ${logfile} 2>&1
+    popd
 fi
 
 echo "[+] Starting orchestrator api server"
@@ -120,12 +168,45 @@ if [ "$ZEROTIERIP" == "" ]; then
     exit 1
 fi
 
+if [ -z "$DOMAIN" ]; then
+    PRIV="$ZEROTIERIP"
+    PUB="https://$ZEROTIERIP:443/"
+else
+    PRIV="127.0.0.1"
+    PUB="https://$DOMAIN:443/"
+fi
+
+
 # create orchestrator service
 echo '#!/bin/bash -x' > ${orchinit}
-echo 'cmd="orchestratorapiserver --bind '"${ZEROTIERIP}"':8080 --ays-url http://127.0.0.1:5000 --ays-repo orchestrator-server"' >> ${orchinit}
+if [ -z "${ITSYOUONLINEORG}" ]; then
+    echo 'cmd="orchestratorapiserver --bind '"${PRIV}"':8080 --ays-url http://127.0.0.1:5000 --ays-repo orchestrator-server "' >> ${orchinit}
+else
+    echo 'cmd="orchestratorapiserver --bind '"${PRIV}"':8080 --ays-url http://127.0.0.1:5000 --ays-repo orchestrator-server --org '"${ITSYOUONLINEORG}"'"' >> ${orchinit}
+fi
+
 echo 'tmux new-session -d -s main -n 1 || true' >> ${orchinit}
 echo 'tmux new-window -t main -n orchestrator' >> ${orchinit}
 echo 'tmux send-key -t orchestrator.0 "$cmd" ENTER' >> ${orchinit}
+
+js9 'j.tools.prefab.local.apps.caddy.install()'
+tls=
+if [ "$DEVELOPMENT" = true ]; then
+    tls='tls self_signed'
+fi
+
+cfgdir=`js9 "print(j.dirs.CFGDIR)"`
+cat > $cfgdir/caddy.cfg <<EOF
+#tcpport:443
+$PUB {
+    proxy / $PRIV:8080 {
+        transparent
+    }
+    $tls
+}
+EOF
+echo 'js9 "j.tools.prefab.local.apps.caddy.start()"' >> ${orchinit}
+
 
 chmod +x ${orchinit} >> ${logfile} 2>&1
 bash $orchinit >> ${logfile} 2>&1
@@ -136,5 +217,9 @@ cd /optvar/cockpit_repos/orchestrator-server; ays blueprint >> ${logfile} 2>&1
 cd /optvar/cockpit_repos/orchestrator-server; ays run create --follow -y >> ${logfile} 2>&1
 
 echo "Your ays server is ready to bootstrap nodes into your zerotier network."
-echo "Download your ipxe boot iso image https://bootstrap.gig.tech/iso/${BRANCH}/${ZEROTIERNWID} and boot up your nodes!"
-echo "Enjoy your orchestrator api server: http://${ZEROTIERIP}:8080/"
+if [ -z "${ITSYOUONLINEORG}" ]; then
+    echo "Download your ipxe boot iso image https://bootstrap.gig.tech/iso/${BRANCH}/${ZEROTIERNWID}/ and boot up your nodes!"
+else
+    echo "Download your ipxe boot iso image https://bootstrap.gig.tech/iso/${BRANCH}/${ZEROTIERNWID}/organization=${ITSYOUONLINEORG} and boot up your nodes!"
+fi
+echo "Enjoy your orchestrator api server: $PUB"

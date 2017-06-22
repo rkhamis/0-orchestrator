@@ -32,9 +32,14 @@ The following are the available keys:
 * `0-core-revision`:
   - Specifies the revision used to control the build revision of the core0 nodes
   - If not configured, any revision will be allowed
-* `rocksdb-flist`:
-  - Specifies the flist used for the RocksDB container
+* `ardb-flist`:
+  - Specifies the flist used for the ARDB container
   - Defaults to 'https://hub.gig.tech/gig-official-apps/ardb-rocksdb.flist'
 * `0-disk-flist`:
   - Specifies the flist for the 0-disk containers
   - Defaults to 'https://hub.gig.tech/gig-official-apps/0-disk-master.flist'
+* `jwt-token`:
+  - Specifies a refreshable JWT token. To configure jwt-token, the jwt-key must be supplied too.
+  - If not configured, the services will connect to 0core with supplying a password.
+* `jwt-key`:
+  - Key used to validate the jwt-token.
