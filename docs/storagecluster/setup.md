@@ -2,7 +2,7 @@
 
 Setting up a storage cluster is achieved through the RESTful API exposed by the Zero-OS Orchestrator.
 
-So you first need to setup a Zero-OS cluster, as documented in [Setup a Zero-OS Cluster](/docs/setup/setup.README.md).
+So you first need to setup a Zero-OS cluster, as documented in [Setup a Zero-OS Cluster](/docs/setup/README.md).
 
 Once the Zero-OS cluster is setup, following storage cluster API endpoint is exposed by the Orchestrator:
 
