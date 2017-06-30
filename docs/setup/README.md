@@ -35,7 +35,7 @@ This script takes the following parameters:
 So:
 ```bash
 cd /tmp
-export BRANCH="1.1.0-alpha-4"
+export BRANCH="master"
 export ZEROTIERNWID="<Your ZeroTier network ID>"
 export ZEROTIERTOKEN="<Your ZeroTier token>"
 export ITSYOUONLINEORG="<itsyou.online organization>"
