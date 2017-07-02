@@ -5,11 +5,11 @@ matrix:
       dist: trusty
       python: 3.5
       before_script:
-        - bash tests/Grid_API_Testing/before_script.sh
+        - bash tests/Grid_API_Testing/run_tests.sh before
       script:
-        - bash tests/Grid_API_Testing/run_tests.sh
+        - bash tests/Grid_API_Testing/run_tests.sh run
       after_script:
-        - python3 orch_packet_machines.py delete $PACKET_TOKEN
+        - bash tests/Grid_API_Testing/run_tests.sh after
     
     - language: go
       sudo: true
