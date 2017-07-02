@@ -123,7 +123,7 @@ def install(job):
         if not running:
             raise j.exceptions.RuntimeError("Failed to start nbdserver {}".format(service.name))
     else:
-        # send a siganl sigub(1) to reload the config in case it was changed.
+        # send a siganl SIGHUP(1) to reload the config in case it was changed.
         import signal
         job = is_job_running(container)
         container.client.job.kill(job['cmd']['id'], signal=int(signal.SIGHUP))
@@ -173,11 +173,14 @@ def stop(job):
 
 
 def monitor(job):
+    from io import BytesIO
     from zeroos.orchestrator.configuration import get_jwt_token
+    import yaml
 
     service = job.service
     if not service.model.actionsState['install'] == 'ok':
         return
+
     vm = service.aysrepo.serviceGet(role='vm', instance=service.name)
     vdisks = vm.producers.get('vdisk', [])
     running = is_job_running(get_container(service, get_jwt_token(job.service.aysrepo)))
@@ -186,3 +189,56 @@ def monitor(job):
             j.tools.async.wrappers.sync(vdisk.executeAction('start'))
         else:
             j.tools.async.wrappers.sync(vdisk.executeAction('pause'))
+
+    # Get all ardb services
+    ardbs = {}
+    services = service.aysrepo.servicesFind(role='ardb')
+    for ardb in services:
+        ardbs[ardb.model.data.bind] = ardb
+
+    # Get nbd config
+    container = get_container(service, job.context['token'])
+    configpath = '/nbd_{}.config'.format(service.name)
+    config = BytesIO()
+    container.client.filesystem.download(configpath, config)
+    config = yaml.load(config.getvalue())
+
+    broken_storages = set()
+    restored_storges = set()
+    for cluster in config.get('storageClusters', []):
+        for storage in cluster.get('dataStorage', []):
+            ardb = ardbs[storage['address']]
+            if str(ardb.model.data.status) == 'halted':
+                storage['status'] = 'rebalancing'
+                broken_storages.add(storage['address'])
+                break
+
+            if storage.get('status', None) and storage['status'] == 'broken':
+                storage['status'] = 'rebalancing'
+                restored_storges.add(storage['address'])
+
+    upload_config(container, configpath, config)
+
+    cmd = '/bin/zeroctl --rebalance -config %s' % configpath
+    job.logger.info('Executing command: %s' % cmd)
+    container.client.system(cmd).get()
+
+    for cluster in config.get('storageClusters', []):
+        for storage in cluster.get('dataStorage', []):
+            if storage['address'] in broken_storages:
+                storage['status'] = 'broken'
+                break
+            if storage['address'] in restored_storges:
+                storage.pop('status')
+
+    upload_config(container, configpath, config)
+
+
+def upload_config(container, configpath, config):
+    from io import BytesIO
+    import yaml
+
+    yamlconfig = yaml.safe_dump(config, default_flow_style=False)
+    configstream = BytesIO(yamlconfig.encode('utf8'))
+    configstream.seek(0)
+    container.client.filesystem.upload(configpath, configstream)

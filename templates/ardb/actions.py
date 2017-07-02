@@ -11,6 +11,7 @@ def start(job):
     service = job.service
     ardb = ARDB.from_ays(service, job.context['token'])
     ardb.start()
+    service.model.data.status = 'running'
 
 
 def stop(job):
@@ -19,6 +20,7 @@ def stop(job):
     service = job.service
     ardb = ARDB.from_ays(service, job.context['token'])
     ardb.stop()
+    service.model.data.status = 'halted'
 
 
 def monitor(job):
@@ -34,11 +36,11 @@ def monitor(job):
         if not running:
             try:
                 job.logger.warning("ardb {} not running, trying to restart".format(service.name))
-                service.model.dbobj.state = 'error'
+                service.model.data.status = 'halted'
                 ardb.start()
                 running, _ = ardb.is_running()
                 if running:
-                    service.model.dbobj.state = 'ok'
+                    service.model.data.status = 'running'
             except:
                 job.logger.error("can't restart ardb {} not running".format(service.name))
-                service.model.dbobj.state = 'error'
+                service.model.data.status = 'halted'
