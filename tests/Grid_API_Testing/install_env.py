@@ -1,6 +1,7 @@
 branch=$1
 zerotierid=$2
 zerotiertoken=$3
+itsyouonlineorg="orchestrator_org"
 
 export SSHKEYNAME=id_rsa
 export GIGBRANCH=master
@@ -80,4 +81,13 @@ sleep 5
 
 ## install orchestrator
 echo "[#] Installing orchestrator ..."
-ssh -tA root@localhost -p 2222 "export GIGDIR=~/gig; curl -sL https://raw.githubusercontent.com/ahmedelsayed-93/0-orchestrator/perf_jenkins_project/scripts/install-orchestrator.sh | bash -s ${branch} ${zerotierid} ${zerotiertoken}"
+ssh -tA root@localhost -p 2222 "export GIGDIR=~/gig; curl -sL https://raw.githubusercontent.com/zero-os/0-orchestrator/master/scripts/install-orchestrator.sh | bash -s ${branch} ${zerotierid} ${zerotiertoken} ${itsyouonlineorg}"
+
+#passing jwt
+scp -P 2222 enable_jwt.sh root@localhost:
+ssh -tA root@localhost -p 2222 "source enable_jwt.sh"
+
+# get orch-server ip
+orch_ip=$(ssh -At root@localhost -p 2222 "ip addr show zt0 | grep 'inet'")
+x=$(echo ${orch_ip} | awk '{print $2}' | awk -F"/" '{print $1}')
+sed -ie "s/^api_base_url.*$/api_base_url=http:\/\/${x}:8080/" api_testing/config.ini

@@ -9,7 +9,7 @@ import threading
 
 def create_new_device(manager, hostname, zt_net_id, branch='master'):
     project = manager.list_projects()[0]
-    ipxe_script_url = 'https://bootstrap.gig.tech/ipxe/{}/{}'.format(branch, zt_net_id)
+    ipxe_script_url = 'https://bootstrap.gig.tech/ipxe/{}/{}/organization=orchestrator_org'.format(branch, zt_net_id)
     print('creating new machine: {}  .. '.format(hostname))
     device = manager.create_device(project_id=project.id,
                                    hostname=hostname,
