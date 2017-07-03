@@ -84,6 +84,7 @@ echo "[#] Installing orchestrator ..."
 ssh -tA root@localhost -p 2222 "export GIGDIR=~/gig; curl -sL https://raw.githubusercontent.com/zero-os/0-orchestrator/master/scripts/install-orchestrator.sh | bash -s ${branch} ${zerotierid} ${zerotiertoken} ${itsyouonlineorg}"
 
 #passing jwt
+echo "Enabling JWT..."
 cd tests/Grid_API_Testing/ 
 scp -P 2222 enable_jwt.sh root@localhost:
 ssh -tA root@localhost -p 2222 "source enable_jwt.sh"
