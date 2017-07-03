@@ -2,15 +2,17 @@ from random import randint
 import uuid
 from unittest import TestCase
 from api_testing.utiles.utiles import Utiles
-from api_testing.grid_apis.pyclient.nodes_apis import NodesAPI
-from api_testing.grid_apis.pyclient.containers_apis import ContainersAPI
-import random
+from api_testing.grid_apis.orchestrator_client.nodes_apis import NodesAPI
+from api_testing.grid_apis.orchestrator_client.containers_apis import ContainersAPI
+import random, string
 import requests
 import time
-from testconfig import config
-from api_testing.testcases import NODES_INFO
 import signal
+from testconfig import config
+from api_testing.grid_apis import JWT
+from api_testing.testcases import NODES_INFO
 from nose.tools import TimeExpired
+from zeroos.orchestrator import client as apiclient
 
 class TestcasesBase(TestCase):
     def __init__(self, *args, **kwargs):
@@ -18,12 +20,13 @@ class TestcasesBase(TestCase):
         self.utiles = Utiles()
         self.nodes_api = NodesAPI()
         self.config = config['main']
+        self.jwt = JWT
         self.nodes = NODES_INFO
         self.lg = self.utiles.logging
         self.session = requests.Session()
         self.zerotier_token = self.config['zerotier_token']
         self.session.headers['Authorization'] = 'Bearer {}'.format(self.zerotier_token)
-        self.createdcontainer=[]
+        self.createdcontainer = []
 
     def setUp(self):
         self._testID = self._testMethodName
@@ -64,11 +67,11 @@ class TestcasesBase(TestCase):
     def random_item(self, array):
         return array[randint(0, len(array)-1)]
 
-    def create_zerotier_network(self):
+    def create_zerotier_network(self, private=False):
         url = 'https://my.zerotier.com/api/network'
         data = {'config': {'ipAssignmentPools': [{'ipRangeEnd': '10.147.17.254',
                                                     'ipRangeStart': '10.147.17.1'}],
-                            'private': False,
+                            'private': private,
                             'routes': [{'target': '10.147.17.0/24', 'via': None}],
                             'v4AssignMode': {'zt': True}}}
 
@@ -81,7 +84,7 @@ class TestcasesBase(TestCase):
         url = 'https://my.zerotier.com/api/network/{}'.format(nwid)
         self.session.delete(url=url)
 
-    def wait_for_container_status(self, status, func, timeout=100, **kwargs):
+    def wait_for_status(self, status, func, timeout=100, **kwargs):
         resource = func(**kwargs)
         if resource.status_code != 200:
             return False
@@ -90,7 +93,7 @@ class TestcasesBase(TestCase):
             if resource['status'] == status:
                 return True
             time.sleep(1)
-            resource = func(**kwargs)  # get resource
+            resource = func(**kwargs)  
             resource = resource.json()
         return False
 
@@ -119,7 +122,7 @@ class TestcasesBase(TestCase):
             response = self.containers_api.post_containers(nodeid=node_id, data=container_body)
             self.assertEqual(response.status_code, 201)
 
-            if not self.wait_for_container_status('running', self.containers_api.get_containers_containerid,
+            if not self.wait_for_status('running', self.containers_api.get_containers_containerid,
                                                           nodeid=node_id, containername=container_name):
                 return False
             else:

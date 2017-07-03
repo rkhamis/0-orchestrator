@@ -2,10 +2,8 @@ import random
 import time
 import unittest
 from api_testing.testcases.testcases_base import TestcasesBase
-from api_testing.python_client.client import Client
-from api_testing.grid_apis.pyclient.nodes_apis import NodesAPI
-from api_testing.grid_apis.pyclient.containers_apis import ContainersAPI
-import json
+from api_testing.utiles.core0_client import Client
+from api_testing.grid_apis.orchestrator_client.containers_apis import ContainersAPI
 
 
 class TestcontaineridAPI(TestcasesBase):
@@ -27,7 +25,7 @@ class TestcontaineridAPI(TestcasesBase):
                 self.g8os_ip = node['ip']
                 self.node = node
                 break
-        self.g8core = Client(self.g8os_ip)
+        self.g8core = Client(self.g8os_ip, password=self.jwt)
 
         self.root_url = "https://hub.gig.tech/gig-official-apps/ubuntu1604.flist"
         self.storage = "ardb://hub.gig.tech:16379"
@@ -90,10 +88,6 @@ class TestcontaineridAPI(TestcasesBase):
 
         self.lg.info('Make sure it created with required values, should succeed.')
         self.assertEqual(response.headers['Location'], "/nodes/%s/containers/%s" % (self.node_id, self.container_name))
-        self.assertTrue(self.wait_for_container_status("running", self.containers_api.get_containers_containerid,
-                                                       nodeid=self.node_id,
-                                                       containername=self.container_name))
-
         response = self.containers_api.get_containers_containerid(self.node_id, self.container_name)
         self.assertEqual(response.status_code, 200)
         response_data = response.json()
@@ -160,9 +154,6 @@ class TestcontaineridAPI(TestcasesBase):
         response = self.containers_api.post_containers(self.node_id, self.container_body)
         self.assertEqual(response.status_code, 201)
         self.createdcontainer.append({"node": self.node_id, "container": self.container_name})
-        container_id = self.wait_for_container_status("running", self.containers_api.get_containers_containerid,
-                                                      nodeid=self.node_id,
-                                                      containername=self.container_name)
         self.assertTrue(container_id)
         self.lg.info('post:/node/{nodeid}/containers/containerid/stop.')
 
@@ -170,10 +161,6 @@ class TestcontaineridAPI(TestcasesBase):
         self.assertEqual(response.status_code, 204)
 
         self.lg.info('Check that container stoped.')
-        self.assertTrue(self.wait_for_container_status("halted", self.containers_api.get_containers_containerid,
-                                                        nodeid=self.node_id,
-                                                        containername=self.container_name))
-
         self.assertTrue(self.g8core.wait_on_container_update(container_id, 60, True))
 
         self.lg.info('post:/node/{nodeid}/containers/containerid/start.')
@@ -181,9 +168,6 @@ class TestcontaineridAPI(TestcasesBase):
         self.assertEqual(response.status_code, 201)
 
         self.lg.info('Check that container running.')
-        self.assertTrue(self.wait_for_container_status("running", self.containers_api.get_containers_containerid,
-                                                      nodeid=self.node_id,
-                                                      containername=self.container_name))
         self.assertTrue(self.g8core.wait_on_container_update(self.container_name, 60, False))
 
     def test005_get_running_jobs(self):
@@ -659,8 +643,6 @@ class TestcontaineridAPI(TestcasesBase):
         self.lg.info('create container ')
         response = self.containers_api.post_containers(nodeid=self.node_id, data=self.container_body)
         self.assertEqual(response.status_code, 201)
-        self.assertTrue(self.wait_for_container_status('running', self.containers_api.get_containers_containerid,
-                                                          nodeid=self.node_id, containername=self.container_name))
         self.createdcontainer.append({"node": self.node_id, "container": self.container_name})
 
         self.lg.info('create file in g8os node ')
@@ -718,8 +700,6 @@ class TestcontaineridAPI(TestcasesBase):
         self.lg.info('create container ')
         response = self.containers_api.post_containers(nodeid=self.node_id, data=self.container_body)
         self.assertEqual(response.status_code, 201)
-        self.assertTrue(self.wait_for_container_status('running', self.containers_api.get_containers_containerid,
-                                                       nodeid=self.node_id, containername=self.container_name))
         self.createdcontainer.append({"node": self.node_id, "container": self.container_name})
 
         self.lg.info('create new file in container ')

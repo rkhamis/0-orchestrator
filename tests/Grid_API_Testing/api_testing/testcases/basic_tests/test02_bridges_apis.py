@@ -1,8 +1,8 @@
 from random import randint
 import unittest, time
 from api_testing.testcases.testcases_base import TestcasesBase
-from api_testing.grid_apis.pyclient.bridges_apis import BridgesAPI
-from api_testing.python_client.client import Client
+from api_testing.grid_apis.orchestrator_client.bridges_apis import BridgesAPI
+from api_testing.utiles.core0_client import Client
 
 class TestBridgesAPI(TestcasesBase):
     def __init__(self, *args, **kwargs):
@@ -15,7 +15,7 @@ class TestBridgesAPI(TestcasesBase):
         self.lg.info('Get random nodid (N0)')
         self.nodeid = self.get_random_node()
         pyclient_ip = [x['ip'] for x in self.nodes if x['id'] == self.nodeid][0]
-        self.pyclient = Client(pyclient_ip)
+        self.pyclient = Client(pyclient_ip, password=self.jwt)
 
         self.lg.info('Create bridge (B0) on node (N0)')
         self.name = self.rand_str()
@@ -82,7 +82,7 @@ class TestBridgesAPI(TestcasesBase):
 
         #. Get random node (N0).
         #. Create bridge (B1) on node (N0), should succeed with 201.
-        #. Get bridges using pyclient , (B1) should be listed
+        #. Get bridges using orchestrator_client , (B1) should be listed
         #. List node (N0) bridges, (B1) should be listed.
         #. Delete bridge (B1), should succeed with 204.
         """
@@ -92,8 +92,8 @@ class TestBridgesAPI(TestcasesBase):
         networkMode = self.random_item(["none", "static", "dnsmasq"])
         nat = self.random_item([False, True])
         settings = {"none":{},
-                    "static":{"cidr":"192.100.1.0/16"},
-                    "dnsmasq":{"cidr":"192.100.2.0/16", "start":"192.100.2.1", "end":"192.100.2.5"}}
+                    "static":{"cidr":"192.100.1.1/16"},
+                    "dnsmasq":{"cidr":"192.100.2.1/16", "start":"192.100.2.2", "end":"192.100.2.3"}}
 
         body = {"name":name,
                 "hwaddr":hwaddr,
