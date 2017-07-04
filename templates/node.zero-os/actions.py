@@ -42,6 +42,19 @@ def getAddresses(job):
     return networkmap
 
 
+def isConfigured(job):
+    from zeroos.orchestrator.sal.Node import Node
+    from zeroos.orchestrator.configuration import get_jwt_token
+
+    service = job.service
+    node = Node.from_ays(service, get_jwt_token(job.service.aysrepo))
+    poolname = "{}_fscache".format(service.name)
+    fscache_sp = node.find_persistance(poolname)
+    if fscache_sp is None:
+        return False
+    return bool(fscache_sp.mountpoint)
+
+
 def install(job):
     from zeroos.orchestrator.sal.Node import Node
     from zeroos.orchestrator.configuration import get_jwt_token
@@ -64,6 +77,12 @@ def monitor(job):
     from zeroos.orchestrator.configuration import get_jwt_token
     import redis
     service = job.service
+
+    configured = isConfigured(job)
+    if not configured:
+        job = service.getJob('install', args={})
+        j.tools.async.wrappers.sync(job.execute())
+
     if service.model.actionsState['install'] != 'ok':
         return
 
